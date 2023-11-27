@@ -1,11 +1,13 @@
-package com.example.demo.src.user.service;
-
+package com.example.demo.src.service;
 
 
 import com.example.demo.common.BaseException;
-import com.example.demo.src.user.dao.UserDao;
-import com.example.demo.src.user.dto.*;
-import com.example.demo.src.user.repository.UserRepository;
+import com.example.demo.src.dao.UserDao;
+import com.example.demo.src.dto.GetUserRes;
+import com.example.demo.src.dto.PatchUserReq;
+import com.example.demo.src.dto.PostUserReq;
+import com.example.demo.src.dto.PostUserRes;
+import com.example.demo.src.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,10 +26,10 @@ public class UserService {
     //POST
     public PostUserRes createUser(PostUserReq postUserReq) throws BaseException {
         //중복
-        if(checkEmail(postUserReq.getEmail()) ==1){
+        if (checkEmail(postUserReq.getEmail()) == 1) {
             throw new BaseException(POST_USERS_EXISTS_EMAIL);
         }
-        try{
+        try {
             int userId = userDao.createUser(postUserReq); // POINT
             return new PostUserRes(userId);
         } catch (Exception exception) {
@@ -36,48 +38,44 @@ public class UserService {
     }
 
     public void modifyUserName(PatchUserReq patchUserReq) throws BaseException {
-        try{
+        try {
             int result = userDao.modifyUserName(patchUserReq);
-            if(result == 0){
+            if (result == 0) {
                 throw new BaseException(MODIFY_FAIL_USERNAME);
             }
-        } catch(Exception exception){
+        } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
     }
 
     public void deleteUser(int userId) throws BaseException {
-        try{
+        try {
             int result = userDao.deleteUser(userId);
-            if(result == 0){
+            if (result == 0) {
                 throw new BaseException(DELETE_FAIL_USERNAME);
             }
-        } catch(Exception exception){
+        } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
     }
 
-    public List<GetUserRes> getUsers() throws BaseException{
-        try{
+    public List<GetUserRes> getUsers() throws BaseException {
+        try {
             List<GetUserRes> getUserRes = userDao.getUsers();
             return getUserRes;
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
     }
 
-    public List<GetUserRes> getUsersByEmail(String email) throws BaseException{
-        try{
+    public List<GetUserRes> getUsersByEmail(String email) throws BaseException {
+        try {
             List<GetUserRes> getUsersRes = userDao.getUsersByEmail(email);
             return getUsersRes;
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
     }
-
-
 
 
     public GetUserRes getUser(int userId) throws BaseException {
@@ -89,10 +87,10 @@ public class UserService {
         }
     }
 
-    public int checkEmail(String email) throws BaseException{
-        try{
+    public int checkEmail(String email) throws BaseException {
+        try {
             return userDao.checkEmail(email);
-        } catch (Exception exception){
+        } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
     }

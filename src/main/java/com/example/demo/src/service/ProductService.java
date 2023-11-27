@@ -1,9 +1,9 @@
-package com.example.demo.src.user.service;
+package com.example.demo.src.service;
 
 
 import com.example.demo.common.BaseException;
-import com.example.demo.src.user.dao.ProductDao;
-import com.example.demo.src.user.dto.*;
+import com.example.demo.src.dao.ProductDao;
+import com.example.demo.src.dto.ProductRes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -20,12 +20,12 @@ public class ProductService {
 
     //GET
     @Cacheable(value = "productId", key = "#productId")
-    public ProductRes getProductDeatilById(int productId) throws BaseException{
+    public ProductRes getProductDeatilById(int productId) throws BaseException {
         slowQuery(3000);
-        try{
+        try {
             ProductRes getProductRes = productDao.getProductDeatilById(productId);
             return getProductRes;
-        }catch (Exception exception){
+        } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
     }
@@ -41,9 +41,9 @@ public class ProductService {
 //    }
 
     private void slowQuery(long seconds) {
-        try{
+        try {
             Thread.sleep(seconds);
-        }catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             throw new IllegalStateException(e);
         }
     }

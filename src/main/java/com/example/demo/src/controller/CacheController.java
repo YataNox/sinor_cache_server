@@ -1,6 +1,6 @@
-package com.example.demo.src.user.controller;
+package com.example.demo.src.controller;
 
-import com.example.demo.src.user.config.RedisCacheService;
+import com.example.demo.src.config.RedisCacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

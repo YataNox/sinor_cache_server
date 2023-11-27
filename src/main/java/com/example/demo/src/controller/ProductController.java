@@ -1,13 +1,11 @@
-package com.example.demo.src.user.controller;
+package com.example.demo.src.controller;
 
 
 import com.example.demo.common.BaseException;
 import com.example.demo.common.BaseResponse;
-import com.example.demo.src.user.config.RedisCacheService;
-import com.example.demo.src.user.service.ProductService;
-import com.example.demo.src.user.dto.ProductRes;
-
-
+import com.example.demo.src.config.RedisCacheService;
+import com.example.demo.src.dto.ProductRes;
+import com.example.demo.src.service.ProductService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

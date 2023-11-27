@@ -1,6 +1,6 @@
-package com.example.demo.src.user.dao;
+package com.example.demo.src.dao;
 
-import com.example.demo.src.user.dto.*;
+import com.example.demo.src.dto.ProductRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -13,11 +13,11 @@ public class ProductDao {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public void setDataSource(DataSource dataSource){
+    public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public ProductRes getProductDeatilById(int productId){
+    public ProductRes getProductDeatilById(int productId) {
         String getProductQuery = "SELECT product.*, product_detail.*\n" +
                 "FROM product\n" +
                 "JOIN product_detail ON product.product_id = product_detail.product_id\n" +

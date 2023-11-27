@@ -1,9 +1,8 @@
-package com.example.demo.src.user.config;
+package com.example.demo.src.config;
 
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
@@ -13,13 +12,13 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 @OpenAPIDefinition(
         info = @Info(title = "API Swagger Test",
-        description = "Test",
-        version = "v1")
+                description = "Test",
+                version = "v1")
 )
 
 public class SwaggerConfig {
     @Bean
-    public GroupedOpenApi groupedOpenApi(){
+    public GroupedOpenApi groupedOpenApi() {
         String[] paths = {"/app/**"};
 
         return GroupedOpenApi.builder()

@@ -1,4 +1,4 @@
-package com.example.demo.src.user.entity;
+package com.example.demo.src.entity;
 
 
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name="product_Detail")
+@Table(name = "product_Detail")
 public class ProductDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +26,7 @@ public class ProductDetail {
     private String productPhone;
 
     @ManyToOne
-    @JoinColumn(name="productId")
+    @JoinColumn(name = "productId")
     private Product product;
 
 }

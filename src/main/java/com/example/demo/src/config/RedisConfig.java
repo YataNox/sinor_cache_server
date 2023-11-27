@@ -1,4 +1,4 @@
-package com.example.demo.src.user.config;/*
+package com.example.demo.src.config;/*
 package com.example.demo.src.user.config;
 
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +35,7 @@ public class CacheConfig {
         System.out.println("Flush Cache " + LocalDateTime.now());
     }}
 */
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;

@@ -1,6 +1,5 @@
-package com.example.demo.src.user.config;
+package com.example.demo.src.config;
 
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -34,12 +33,12 @@ public class RedisCacheService {
         return ops.get(key);
     }
 
-    public Long getExpireTime(String key){
+    public Long getExpireTime(String key) {
         Long ops = redisTemplate.getExpire(key);
         return ops;
     }
 
-    public void updateExpireTime(Long newBaseExpiredTime){
+    public void updateExpireTime(Long newBaseExpiredTime) {
         baseexpirationTime = newBaseExpiredTime;
         System.out.println("Expiration updated successfully!");
     }
