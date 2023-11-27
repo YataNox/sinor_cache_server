@@ -37,6 +37,4 @@
 
 ### Request & Response Process
 
-![img.png](src%2Fmain%2Fresources%2Freadme%2Fimg%2Fimg.png)
-
 
