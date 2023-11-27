@@ -1,0 +1,65 @@
+plugins {
+    id 'org.springframework.boot' version '2.7.5'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id 'java'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+compileJava.options.encoding = 'UTF-8'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.jetbrains:annotations:23.0.0'
+
+
+    // Spring Boot Starter
+    testImplementation ('org.springframework.boot:spring-boot-starter-test')
+
+    // Lombok
+    implementation ('org.projectlombok:lombok')
+    compileOnly ('org.projectlombok:lombok:1.18.24')
+    annotationProcessor ('org.projectlombok:lombok:1.18.24')
+
+    // DB
+    runtimeOnly ('mysql:mysql-connector-java') //mysql8
+    //runtimeOnly 'mysql:mysql-connector-java:5.1.47' //mysql5
+    implementation ('org.springframework.boot:spring-boot-starter-jdbc')
+    implementation('org.springframework.boot:spring-boot-starter-data-jpa') //mysql 5버전의 경우 삭제.
+
+
+    // Web
+    implementation ('org.springframework.boot:spring-boot-starter-web')
+    implementation('org.springframework.boot:spring-boot-starter')
+    implementation('org.springframework.boot:spring-boot-starter-web')
+
+    //시큐리티
+    /*implementation ('org.springframework.boot:spring-boot-starter-oauth2-client') // 스프링 시큐리티
+    implementation ('org.springframework.boot:spring-boot-starter-security')*/
+
+    //스웨거
+    implementation ('org.springdoc:springdoc-openapi-ui:1.6.9')
+
+    // 캐시
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+
+}
+
+test {
+    useJUnitPlatform()
+}
