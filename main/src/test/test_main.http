@@ -1,0 +1,32 @@
+### getOrderDetails
+GET http://localhost/main/app/orderdetails
+
+### getOrderDetailsByOrderId
+GET http://localhost/main/app/orderdetails?orderId=1
+
+### createOrderDetails
+POST http://localhost/main/app/orderdetails
+Content-Type: application/json
+
+{
+  "order_id": 12,
+  "product_detail_id": 12,
+  "order_detail_unit_price": 12300,
+  "order_detail_quantity": 1,
+  "order_detail_discount": 1000,
+  "order_detail_price": 11300,
+  "order_detail_status": "arrived",
+  "delivery_id": 15223
+}
+
+### updateOrderDetails
+PATCH http://localhost/main/app/orderdetails/1
+Content-Type: application/json
+
+{
+  "order_detail_status": "arrived"
+}
+
+### deleteOrderDetails
+DELETE http://localhost/main/app/orderdetails/1
+

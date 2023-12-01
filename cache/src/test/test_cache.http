@@ -1,0 +1,47 @@
+### getCache
+GET http://localhost/cache/getCache/1
+
+##### deleteCacheByKey
+#POST http://localhost/cache/deleteData/
+#Content-Type: application/json
+#
+#{
+#
+#}
+
+### POST http://localhost/cache/setCache/1/2/3
+#Content-Type: application/json
+#
+#{
+#
+#}
+
+#### getOrderDetailsByOrderId
+#GET http://localhost/cache/app/orderdetails?orderId=1
+#
+#### createOrderDetails
+#POST http://localhost/cache/app/orderdetails
+#Content-Type: application/json
+#
+#{
+#  "order_id": 12,
+#  "product_detail_id": 12,
+#  "order_detail_unit_price": 12300,
+#  "order_detail_quantity": 1,
+#  "order_detail_discount": 1000,
+#  "order_detail_price": 11300,
+#  "order_detail_status": "arrived",
+#  "delivery_id": 15223
+#}
+#
+#### updateOrderDetails
+#PATCH http://localhost/cache/app/orderdetails/1
+#Content-Type: application/json
+#
+#{
+#  "order_detail_status": "arrived"
+#}
+#
+#### deleteOrderDetails
+#DELETE http://localhost/cache/app/orderdetails/1
+#
