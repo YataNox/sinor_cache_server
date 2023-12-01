@@ -1,5 +1,3 @@
-# Docker_Nginx_Spring-Gradle_Redis_MySQL
-
 ### [Open in Docker Dev Environments](https://open.docker.com/dashboard/dev-envs?url=https://github.com/ooMia/Docker_Nginx_Spring-Gradle_MySQL/tree/develop/)
 
 > - Nginx as reverseProxy
@@ -174,4 +172,4 @@ JdbcTemplate을 사용하여 구성되어 있다. 자세한 내용은 이곳 [�
 
 - 컴파일 에러 확인
 - log 폴더 확인
-- 그 외 방법들
+- 그 외 방법
