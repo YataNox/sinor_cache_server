@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class PatchOrderDetailReq {
-    private int id;
-    private String order_detail_status;
+	private int id;
+	private String order_detail_status;
 }

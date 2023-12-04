@@ -6,9 +6,9 @@ secrets:
     file: mysql/password.txt
 
 volumes:
-  cache-redis_db-data: {}
-  cache-mysql_db-data: {}
-  main-mysql_db-data: {}
+  cache-redis_db-data: { }
+  cache-mysql_db-data: { }
+  main-mysql_db-data: { }
 
 networks:
   front-tier:
@@ -51,7 +51,7 @@ services:
       - 6379
     restart: no
     healthcheck: # https://stackoverflow.com/questions/67904609/how-do-you-perform-a-healthcheck-in-the-redis-docker-image
-      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
       interval: 1s
       timeout: 3s
       retries: 5
