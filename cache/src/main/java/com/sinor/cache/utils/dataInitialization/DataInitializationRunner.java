@@ -8,16 +8,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataInitializationRunner implements ApplicationRunner {
 
-    private final DataInitializationService dataInitializationService;
+	private final DataInitializationService dataInitializationService;
 
-    @Autowired
-    public DataInitializationRunner(DataInitializationService dataInitializationService) {
-        this.dataInitializationService = dataInitializationService;
-    }
+	@Autowired
+	public DataInitializationRunner(DataInitializationService dataInitializationService) {
+		this.dataInitializationService = dataInitializationService;
+	}
 
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        // 애플리케이션이 시작될 때 데이터 초기화
-        dataInitializationService.initializeData();
-    }
+	@Override
+	public void run(ApplicationArguments args) throws Exception {
+		// 애플리케이션이 시작될 때 데이터 초기화
+		dataInitializationService.initializeData();
+	}
 }
