@@ -1,4 +1,4 @@
-package com.sinor.cache.product.Response;
+package com.sinor.cache.product.response;
 
 import lombok.*;
 

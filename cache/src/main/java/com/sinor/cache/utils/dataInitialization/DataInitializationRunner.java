@@ -1,4 +1,4 @@
-package com.sinor.cache.utils.DataInitialization;
+package com.sinor.cache.utils.dataInitialization;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;

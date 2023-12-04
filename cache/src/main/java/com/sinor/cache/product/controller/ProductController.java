@@ -10,7 +10,7 @@ import com.sinor.cache.common.constant.GroupKey;
 import com.sinor.cache.common.constant.KeyQueryString;
 import com.sinor.cache.option.Option;
 import com.sinor.cache.option.service.OptionService;
-import com.sinor.cache.product.Response.ProductRes;
+import com.sinor.cache.product.response.ProductRes;
 import com.sinor.cache.product.service.ProductService;
 import com.sinor.cache.stroage.response.CacheRes;
 import com.sinor.cache.stroage.service.CacheService;

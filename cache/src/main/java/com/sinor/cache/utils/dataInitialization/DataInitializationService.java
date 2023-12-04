@@ -1,4 +1,4 @@
-package com.sinor.cache.utils.DataInitialization;
+package com.sinor.cache.utils.dataInitialization;
 
 
 import com.sinor.cache.stroage.service.CacheService;

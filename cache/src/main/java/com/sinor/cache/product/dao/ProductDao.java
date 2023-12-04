@@ -1,7 +1,7 @@
 package com.sinor.cache.product.dao;
 
 
-import com.sinor.cache.product.Response.ProductRes;
+import com.sinor.cache.product.response.ProductRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
