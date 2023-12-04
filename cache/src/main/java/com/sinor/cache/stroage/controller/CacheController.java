@@ -9,19 +9,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sinor.cache.option.service.OptionService;
+import com.sinor.cache.metadata.service.MetadataService;
 import com.sinor.cache.stroage.service.CacheService;
 
 @RestController
 public class CacheController {
 	// 해당 컨트롤러의 API 구조는 캐시의 Key 값에 의해 수정될 필요가 있음
 	private final CacheService cacheService;
-	private final OptionService optionService;
+	private final MetadataService metadataService;
 
 	@Autowired
-	public CacheController(CacheService cacheService, OptionService optionService) {
+	public CacheController(CacheService cacheService, MetadataService metadataService) {
 		this.cacheService = cacheService;
-		this.optionService = optionService;
+		this.metadataService = metadataService;
 	}
 
 	/**
@@ -56,7 +56,7 @@ public class CacheController {
 		@PathVariable long newExpirationTime
 	) {
 		// mysql 값 수정 후 하위 캐시 초기화
-		optionService.updateExpiredTime(key, newExpirationTime);
+		metadataService.updateExpiredTime(key, newExpirationTime);
 		// 현재 하위 캐시들에 대한 삭제 코드가 없음 추가 요망
 		return "Expiration time updated successfully!";
 	}

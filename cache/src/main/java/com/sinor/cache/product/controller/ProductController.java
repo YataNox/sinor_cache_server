@@ -14,11 +14,11 @@ import com.sinor.cache.common.BaseException;
 import com.sinor.cache.common.BaseResponse;
 import com.sinor.cache.common.constant.GroupKey;
 import com.sinor.cache.common.constant.KeyQueryString;
-import com.sinor.cache.option.Option;
-import com.sinor.cache.option.service.OptionService;
+import com.sinor.cache.metadata.Metadata;
+import com.sinor.cache.metadata.service.MetadataService;
 import com.sinor.cache.product.response.ProductRes;
 import com.sinor.cache.product.service.ProductService;
-import com.sinor.cache.stroage.response.CacheRes;
+import com.sinor.cache.stroage.response.CacheGetResponse;
 import com.sinor.cache.stroage.service.CacheService;
 
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class ProductController {
 
 	private final ProductService productService;
 	private final CacheService cacheService;
-	private final OptionService optionService;
+	private final MetadataService metadataService;
 
 	@GetMapping("/{productId}") // (GET) localhost:8080/app/products/{productId}
 	public BaseResponse<ProductRes> getProductDeatilById(@PathVariable("productId") int productId) {
@@ -52,7 +52,8 @@ public class ProductController {
 				System.out.println(cachedData);
 
 				// String 값 GetProductRes로 역직렬화
-				CacheRes readValue = mapper.registerModule(new JavaTimeModule()).readValue(cachedData, CacheRes.class);
+				CacheGetResponse readValue = mapper.registerModule(new JavaTimeModule())
+					.readValue(cachedData, CacheGetResponse.class);
 
 				// 수행 시간 측정
 				long end = System.currentTimeMillis(); // 실행 시간 측정 종료
@@ -74,11 +75,11 @@ public class ProductController {
 				String jsonString = mapper.writeValueAsString(getProductRes);
 
 				// 옵션 값 조회
-				Option option = optionService.getOption(GroupKey.APP_PRODUCT);
+				Metadata metadata = metadataService.getMetadata(GroupKey.APP_PRODUCT);
 
 				// 캐시 Response 생성
-				CacheRes cacheRes = CacheRes.builder()
-					.ttl(option.getExpiredTime())
+				CacheGetResponse cacheRes = CacheGetResponse.builder()
+					.ttl(metadata.getExpiredTime())
 					.createAt(LocalDateTime.now())
 					.url(GroupKey.APP_PRODUCT)
 					.response(jsonString).build();
@@ -89,7 +90,7 @@ public class ProductController {
 
 				// key와 조회한 value로 Cache 설정
 				cacheService.setWithExpiration(KeyQueryString.APP_PRODUCT + productId, jsonCache,
-					option.getExpiredTime());
+					metadata.getExpiredTime());
 				System.out.println(cacheService.get(KeyQueryString.APP_PRODUCT + productId));
 				// cacheService2.updateData(KeyQueryString.APP_PRODUCT + productId, jsonString, GroupKey.APP_PRODUCT);
 

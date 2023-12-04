@@ -14,12 +14,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CacheRes {
+public class CacheGetResponse {
 	// 캐시를 생성하거나, Admin측에서 조회하기 위한 Response
 	// 유저에게는 하위에 들어갈 response만 반환
-	private LocalDateTime createAt;
-	private Long ttl;
-	private String url;
+	private LocalDateTime createAt; // 생성시간
+	private Long ttl; // 설정 만료 시간 (Metadata value)
+	private String url; // 상위 URL
 	@JsonSerialize
-	private String response;
+	private String response; // 해당 캐시에 대한 응답
 }

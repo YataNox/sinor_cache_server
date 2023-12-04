@@ -1,4 +1,4 @@
-package com.sinor.cache.option;
+package com.sinor.cache.metadata;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,8 +16,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "options")
-public class Option {
+@Table(name = "metadata")
+public class Metadata {
 	// Increase Value를 캐시 Key로 활용할 수도 있지 않을까하는 마음에
 	// URL을 키로 사용하던 것에서 Long 타입 id로 변경
 	@Id
