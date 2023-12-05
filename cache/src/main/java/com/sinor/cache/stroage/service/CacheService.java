@@ -2,31 +2,41 @@ package com.sinor.cache.stroage.service;
 
 import static java.nio.charset.StandardCharsets.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.exc.StreamReadException;
+import com.fasterxml.jackson.databind.DatabindException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sinor.cache.stroage.response.CacheGetResponse;
 
 @Service
+@Transactional
 public class CacheService implements ICacheService{
 	private final RedisTemplate<String, String> redisTemplate;
 	private final ObjectMapper objectMapper;
+	private String lastCursor;
 
 	@Autowired
 	public CacheService(RedisTemplate<String, String> redisTemplate, ObjectMapper objectMapper) {
 		this.redisTemplate = redisTemplate;
 		this.objectMapper = objectMapper;
+		this.lastCursor = "0";
 	}
 
 
@@ -64,23 +74,75 @@ public class CacheService implements ICacheService{
 	}
 
 	@Override
-	public List<CacheGetResponse> findAllCache() {
-		return null;
+	public List<CacheGetResponse> findAllCache(int pageSize, int startPage, int totalPages) throws
+		JsonProcessingException {
+		List<CacheGetResponse> keys = new ArrayList<>();
+		ScanOptions options = ScanOptions.scanOptions().match("*").count(pageSize).build();
+
+		for (int i = 0; i < totalPages; i++) {
+			try (Cursor<byte[]> cursorObject = redisTemplate.executeWithStickyConnection(connection -> connection.scan(lastCursor, options))) {
+				while (cursorObject.hasNext()) {
+					byte[] keyBytes = cursorObject.next();
+					String key = new String(keyBytes, UTF_8);
+					keys.add(objectMapper.readValue(key, CacheGetResponse.class));
+				}
+				lastCursor = String.valueOf(cursorObject.getPosition());
+			}
+
+			if ("0".equals(lastCursor) || i < startPage - 1) {
+				// 더 이상 가져올 키가 없거나 startPage 이전의 페이지라면 루프 계속
+				continue;
+			}
+
+			if (i == startPage - 1) {
+				// startPage 이후의 페이지부터 가져올 예정이므로 이전 페이지는 비워두고 루프 계속
+				keys.clear();
+				continue;
+			}
+
+			if (i > startPage) {
+				// startPage 이후의 페이지에서만 가져올 예정이므로 루프 종료
+				break;
+			}
+		}
+
+		return keys;
 	}
 
 	@Override
-	public CacheGetResponse saveOrUpdate(String key, String value, int expiredTime) {
-		return null;
+	public CacheGetResponse saveOrUpdate(String key, String value, int expiredTime) throws JsonProcessingException {
+		redisTemplate.opsForValue().set(key, value, expiredTime, TimeUnit.SECONDS);
+		return objectMapper.readValue(redisTemplate.opsForValue().get(key), CacheGetResponse.class);
 	}
 
 	@Override
 	public void deleteCacheById(String key) {
-
+		redisTemplate.delete(key);
 	}
 
 	@Override
 	public void deleteCacheList(String pattern) {
+		// scan으로 키 조회
+		Cursor<byte[]> cursor = redisTemplate.executeWithStickyConnection(
+			connection -> {
+				ScanOptions options = ScanOptions.scanOptions().match("*" + pattern + "*").build();
+				return connection.scan(options);
+			});
 
+		try {
+			// unlink로 키 삭제
+			redisTemplate.executePipelined((RedisCallback<Object>)connection -> {
+				while (cursor.hasNext()) {
+					byte[] key = cursor.next();
+					connection.unlink(key);
+				}
+				return null;
+			});
+
+			System.out.println("관련 키 전부 삭제 : " + pattern);
+		} finally {
+			cursor.close();
+		}
 	}
 
 

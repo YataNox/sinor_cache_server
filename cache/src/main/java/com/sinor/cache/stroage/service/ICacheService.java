@@ -25,7 +25,7 @@ public interface ICacheService {
 	/**
 	 * 전체 캐시 조회
 	 */
-	List<CacheGetResponse> findAllCache();
+	List<CacheGetResponse> findAllCache(int pageSize, int startPage, int totalPages) throws JsonProcessingException;
 
 	/**
 	 * 캐시 생성 및 덮어쓰기
@@ -33,7 +33,7 @@ public interface ICacheService {
 	 * @param value 생성할 캐시의 Value
 	 * @param expiredTime 생성할 캐시의 만료시간
 	 */
-	CacheGetResponse saveOrUpdate(String key, String value, int expiredTime);
+	CacheGetResponse saveOrUpdate(String key, String value, int expiredTime) throws JsonProcessingException;
 
 	/**
 	 * 캐시 삭제
