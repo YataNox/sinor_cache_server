@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sinor.cache.stroage.response.CacheGetResponse;
 
 @Service
@@ -13,7 +14,7 @@ public interface ICacheService {
 	 * 캐시 조회
 	 * @param key 조회할 캐시의 Key 값
 	 */
-	CacheGetResponse findCacheById(String key);
+	CacheGetResponse findCacheById(String key) throws JsonProcessingException;
 
 	/**
 	 * 패턴과 일치하는 캐시 조회

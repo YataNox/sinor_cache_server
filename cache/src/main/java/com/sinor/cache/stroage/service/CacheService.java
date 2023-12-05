@@ -2,41 +2,65 @@ package com.sinor.cache.stroage.service;
 
 import static java.nio.charset.StandardCharsets.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sinor.cache.stroage.response.CacheGetResponse;
-
-import jakarta.transaction.Transactional;
 
 @Service
 public class CacheService implements ICacheService{
 	private final RedisTemplate<String, String> redisTemplate;
+	private final ObjectMapper objectMapper;
 
 	@Autowired
-	public CacheService(RedisTemplate<String, String> redisTemplate) {
+	public CacheService(RedisTemplate<String, String> redisTemplate, ObjectMapper objectMapper) {
 		this.redisTemplate = redisTemplate;
+		this.objectMapper = objectMapper;
 	}
 
 
 	@Override
-	public CacheGetResponse findCacheById(String key) {
-		return null;
+	public CacheGetResponse findCacheById(String key) throws JsonProcessingException {
+		ValueOperations<String, String> ops = redisTemplate.opsForValue();
+		return objectMapper.readValue(ops.get(key), CacheGetResponse.class);
 	}
 
 	@Override
 	public List<CacheGetResponse> findCacheList(String pattern) {
-		return null;
+		List<CacheGetResponse> list = new ArrayList<>();
+
+		redisTemplate.executeWithStickyConnection(
+			connection -> {
+				ScanOptions options = ScanOptions.scanOptions().match("*" + pattern + "*").build();
+				Cursor<byte[]> cursor = connection.scan(options);
+
+				while (cursor.hasNext()) {
+					byte[] keyBytes = cursor.next();
+					String key = new String(keyBytes, UTF_8);
+					try {
+						list.add(objectMapper.readValue(key, CacheGetResponse.class));
+					} catch (JsonProcessingException e) {
+						throw new RuntimeException(e);
+					}
+				}
+
+				cursor.close();
+
+				return null;
+			});
+
+		return list;
 	}
 
 	@Override
