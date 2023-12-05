@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class PostOrderDetailRes {
-    private int id;
+	private int id;
 }

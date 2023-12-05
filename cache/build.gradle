@@ -25,21 +25,21 @@ repositories {
 dependencies {
 
     // Spring Boot Starter
-    testImplementation ('org.springframework.boot:spring-boot-starter-test')
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
 
     // Lombok
-    implementation ('org.projectlombok:lombok')
-    compileOnly ('org.projectlombok:lombok')
-    annotationProcessor ('org.projectlombok:lombok')
+    implementation('org.projectlombok:lombok')
+    compileOnly('org.projectlombok:lombok')
+    annotationProcessor('org.projectlombok:lombok')
 
     // DB
-    runtimeOnly ('com.mysql:mysql-connector-j')
-    implementation ('org.springframework.boot:spring-boot-starter-jdbc')
+    runtimeOnly('com.mysql:mysql-connector-j')
+    implementation('org.springframework.boot:spring-boot-starter-jdbc')
     implementation('org.springframework.boot:spring-boot-starter-data-jpa') //mysql 5버전의 경우 삭제.
 
 
     // Web
-    implementation ('org.springframework.boot:spring-boot-starter-web')
+    implementation('org.springframework.boot:spring-boot-starter-web')
     implementation('org.springframework.boot:spring-boot-starter')
     implementation('org.springframework.boot:spring-boot-starter-web')
 
@@ -48,7 +48,7 @@ dependencies {
     implementation ('org.springframework.boot:spring-boot-starter-security')*/
 
     //스웨거
-    implementation ('org.springdoc:springdoc-openapi-ui:1.6.9')
+    implementation('org.springdoc:springdoc-openapi-ui:1.6.9')
 
     // 캐시
     implementation 'org.springframework.boot:spring-boot-starter-cache'
