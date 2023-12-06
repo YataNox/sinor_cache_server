@@ -32,12 +32,12 @@ public class CacheController implements ICacheController{
 	}
 
 	@Override
-	public ResponseEntity<?> getUrlCacheList(String url) {
+	public ResponseEntity<?> getCacheListByKeyParams(String url) {
 		return null;
 	}
 
 	@Override
-	public ResponseEntity<?> getAllCacheList() {
+	public ResponseEntity<?> getCacheListAll() {
 		return null;
 	}
 

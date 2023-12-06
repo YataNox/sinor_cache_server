@@ -25,7 +25,7 @@ public interface ICacheService {
 	/**
 	 * 전체 캐시 조회
 	 */
-	List<CacheGetResponse> findAllCache(int pageSize, int startPage, int totalPages) throws JsonProcessingException;
+	List<CacheGetResponse> findAllCache();
 
 	/**
 	 * 캐시 생성 및 덮어쓰기

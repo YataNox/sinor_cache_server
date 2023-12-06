@@ -23,13 +23,13 @@ public interface ICacheController {
 	 * @param url 조회할 캐시들의 공통 url 값
 	 */
 	@GetMapping("/admin/cache/list")
-	ResponseEntity<?> getUrlCacheList(@RequestParam("url") String url);
+	ResponseEntity<?> getCacheListByKeyParams(@RequestParam("url") String url);
 
 	/**
 	 * 전체 캐시 목록 조회
 	 */
 	@GetMapping("/admin/cache/list/all")
-	ResponseEntity<?> getAllCacheList();
+	ResponseEntity<?> getCacheListAll();
 
 	/**
 	 *

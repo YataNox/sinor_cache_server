@@ -30,13 +30,11 @@ import com.sinor.cache.stroage.response.CacheGetResponse;
 public class CacheService implements ICacheService{
 	private final RedisTemplate<String, String> redisTemplate;
 	private final ObjectMapper objectMapper;
-	private String lastCursor;
 
 	@Autowired
 	public CacheService(RedisTemplate<String, String> redisTemplate, ObjectMapper objectMapper) {
 		this.redisTemplate = redisTemplate;
 		this.objectMapper = objectMapper;
-		this.lastCursor = "0";
 	}
 
 
@@ -74,39 +72,9 @@ public class CacheService implements ICacheService{
 	}
 
 	@Override
-	public List<CacheGetResponse> findAllCache(int pageSize, int startPage, int totalPages) throws
-		JsonProcessingException {
-		List<CacheGetResponse> keys = new ArrayList<>();
-		ScanOptions options = ScanOptions.scanOptions().match("*").count(pageSize).build();
-
-		for (int i = 0; i < totalPages; i++) {
-			try (Cursor<byte[]> cursorObject = redisTemplate.executeWithStickyConnection(connection -> connection.scan(lastCursor, options))) {
-				while (cursorObject.hasNext()) {
-					byte[] keyBytes = cursorObject.next();
-					String key = new String(keyBytes, UTF_8);
-					keys.add(objectMapper.readValue(key, CacheGetResponse.class));
-				}
-				lastCursor = String.valueOf(cursorObject.getPosition());
-			}
-
-			if ("0".equals(lastCursor) || i < startPage - 1) {
-				// 더 이상 가져올 키가 없거나 startPage 이전의 페이지라면 루프 계속
-				continue;
-			}
-
-			if (i == startPage - 1) {
-				// startPage 이후의 페이지부터 가져올 예정이므로 이전 페이지는 비워두고 루프 계속
-				keys.clear();
-				continue;
-			}
-
-			if (i > startPage) {
-				// startPage 이후의 페이지에서만 가져올 예정이므로 루프 종료
-				break;
-			}
-		}
-
-		return keys;
+	public List<CacheGetResponse> findAllCache() { // 수많은 오류로 인해 임시 삭제 
+		// 구조를 다시 정해서 작성해야함
+		return null;
 	}
 
 	@Override
