@@ -1,4 +1,4 @@
-package com.sinor.cache.product;
+package com.sinor.cache.product.model;
 
 import java.io.Serializable;
 

@@ -1,4 +1,4 @@
-package com.sinor.cache.stroage;
+package com.sinor.cache.stroage.service;
 
 import static java.nio.charset.StandardCharsets.*;
 
@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sinor.cache.stroage.model.CacheGetResponse;
 
 @Service
 @Transactional
@@ -105,8 +106,6 @@ public class CacheService implements ICacheService{
 			cursor.close();
 		}
 	}
-
-	// 테스트2
 
 
 	/**

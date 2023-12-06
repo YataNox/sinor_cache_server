@@ -16,11 +16,11 @@ import com.sinor.cache.common.BaseResponse;
 import com.sinor.cache.common.constant.GroupKey;
 import com.sinor.cache.common.constant.KeyQueryString;
 import com.sinor.cache.metadata.Metadata;
-import com.sinor.cache.metadata.MetadataService;
-import com.sinor.cache.product.ProductRes;
-import com.sinor.cache.product.ProductService;
-import com.sinor.cache.stroage.CacheGetResponse;
-import com.sinor.cache.stroage.CacheService;
+import com.sinor.cache.metadata.service.MetadataService;
+import com.sinor.cache.product.model.ProductRes;
+import com.sinor.cache.product.service.ProductService;
+import com.sinor.cache.stroage.model.CacheGetResponse;
+import com.sinor.cache.stroage.service.CacheService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

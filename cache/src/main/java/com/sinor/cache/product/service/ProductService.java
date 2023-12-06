@@ -1,12 +1,12 @@
-package com.sinor.cache.product;
+package com.sinor.cache.product.service;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.sinor.cache.common.BaseException;
 import com.sinor.cache.common.BaseResponseStatus;
-import com.sinor.cache.product.ProductDao;
-import com.sinor.cache.product.ProductRes;
+import com.sinor.cache.product.model.ProductDao;
+import com.sinor.cache.product.model.ProductRes;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

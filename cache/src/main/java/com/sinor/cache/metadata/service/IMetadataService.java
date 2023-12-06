@@ -1,8 +1,8 @@
-package com.sinor.cache.metadata;
+package com.sinor.cache.metadata.service;
 
 import org.springframework.stereotype.Service;
 
-import com.sinor.cache.metadata.MetadataGetResponse;
+import com.sinor.cache.metadata.model.MetadataGetResponse;
 
 @Service
 public interface IMetadataService {
