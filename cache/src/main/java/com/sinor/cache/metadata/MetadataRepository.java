@@ -1,4 +1,4 @@
-package com.sinor.cache.metadata.repository;
+package com.sinor.cache.metadata;
 
 import java.util.Optional;
 

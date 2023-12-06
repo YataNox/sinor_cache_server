@@ -1,28 +1,18 @@
-package com.sinor.cache.stroage.controller;
-
-import java.util.Set;
+package com.sinor.cache.stroage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.sinor.cache.metadata.service.MetadataService;
-import com.sinor.cache.stroage.service.CacheService;
 
 @RestController
 public class CacheController implements ICacheController{
 	// 해당 컨트롤러의 API 구조는 캐시의 Key 값에 의해 수정될 필요가 있음
-	private final CacheService cacheService;
-	private final MetadataService metadataService;
+	private final ICacheService cacheService;
 
 	@Autowired
-	public CacheController(CacheService cacheService, MetadataService metadataService) {
+	public CacheController(ICacheService cacheService) {
 		this.cacheService = cacheService;
-		this.metadataService = metadataService;
 	}
 
 	@Override
@@ -38,26 +28,6 @@ public class CacheController implements ICacheController{
 
 	@Override
 	public ResponseEntity<?> getCacheListAll() {
-		return null;
-	}
-
-	@Override
-	public ResponseEntity<?> getMetadata(String url) {
-		return null;
-	}
-
-	@Override
-	public ResponseEntity<?> createMetadata(String url) {
-		return null;
-	}
-
-	@Override
-	public ResponseEntity<?> updateMetadata(String url) {
-		return null;
-	}
-
-	@Override
-	public ResponseEntity<?> deleteMetadata(String url) {
 		return null;
 	}
 

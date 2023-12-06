@@ -1,4 +1,4 @@
-package com.sinor.cache.metadata.response;
+package com.sinor.cache.metadata;
 
 import lombok.Builder;
 

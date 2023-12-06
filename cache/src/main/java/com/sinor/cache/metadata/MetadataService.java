@@ -1,12 +1,13 @@
-package com.sinor.cache.metadata.service;
+package com.sinor.cache.metadata;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sinor.cache.metadata.IMetadataService;
 import com.sinor.cache.metadata.Metadata;
-import com.sinor.cache.metadata.repository.MetadataRepository;
-import com.sinor.cache.metadata.response.MetadataGetResponse;
+import com.sinor.cache.metadata.MetadataRepository;
+import com.sinor.cache.metadata.MetadataGetResponse;
 
 import lombok.extern.slf4j.Slf4j;
 

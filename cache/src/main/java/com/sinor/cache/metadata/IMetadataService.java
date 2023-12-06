@@ -1,9 +1,8 @@
-package com.sinor.cache.metadata.service;
+package com.sinor.cache.metadata;
 
 import org.springframework.stereotype.Service;
 
-import com.sinor.cache.common.BaseException;
-import com.sinor.cache.metadata.response.MetadataGetResponse;
+import com.sinor.cache.metadata.MetadataGetResponse;
 
 @Service
 public interface IMetadataService {

@@ -1,4 +1,4 @@
-package com.sinor.cache.product.response;
+package com.sinor.cache.product;
 
 import java.io.Serializable;
 

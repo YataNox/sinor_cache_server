@@ -3,7 +3,7 @@ package com.sinor.cache.utils.dataInitialization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.sinor.cache.stroage.service.CacheService;
+import com.sinor.cache.stroage.CacheService;
 
 @Service
 public class DataInitializationService {

@@ -1,4 +1,4 @@
-package com.sinor.cache.stroage.controller;
+package com.sinor.cache.metadata;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -9,28 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public interface ICacheController {
-
-	/**
-	 * 단일 캐시 조회
-	 * @param key 조회할 캐시의 Key 값
-	 */
-	@GetMapping("/admin/cache")
-	ResponseEntity<?> getCache(@RequestParam("key") String key);
-
-	/**
-	 * URL 별 캐시 목록 조회
-	 * @param url 조회할 캐시들의 공통 url 값
-	 */
-	@GetMapping("/admin/cache/list")
-	ResponseEntity<?> getCacheListByKeyParams(@RequestParam("url") String url);
-
-	/**
-	 * 전체 캐시 목록 조회
-	 */
-	@GetMapping("/admin/cache/list/all")
-	ResponseEntity<?> getCacheListAll();
-
+public interface IMetadataController {
 	/**
 	 *
 	 * @param url 조회할 옵션의 URL 값
@@ -58,4 +37,5 @@ public interface ICacheController {
 	 */
 	@DeleteMapping("/admin/metadata")
 	ResponseEntity<?> deleteMetadata(@RequestParam("url") String url);
+
 }

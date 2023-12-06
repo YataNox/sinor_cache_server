@@ -1,11 +1,11 @@
-package com.sinor.cache.stroage.service;
+package com.sinor.cache.stroage;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.sinor.cache.stroage.response.CacheGetResponse;
+import com.sinor.cache.stroage.CacheGetResponse;
 
 @Service
 public interface ICacheService {

@@ -1,4 +1,4 @@
-package com.sinor.cache.product.dao;
+package com.sinor.cache.product;
 
 import javax.sql.DataSource;
 
@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.sinor.cache.product.response.ProductRes;
+import com.sinor.cache.product.ProductRes;
 
 @Repository
 public class ProductDao {
