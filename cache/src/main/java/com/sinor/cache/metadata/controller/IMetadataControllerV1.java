@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public interface IMetadataController {
+public interface IMetadataControllerV1 {
 	/**
 	 *
 	 * @param url 조회할 옵션의 URL 값

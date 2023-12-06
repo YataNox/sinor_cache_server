@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public interface ICacheController {
+public interface ICacheControllerV1 {
 
 	/**
 	 * 단일 캐시 조회

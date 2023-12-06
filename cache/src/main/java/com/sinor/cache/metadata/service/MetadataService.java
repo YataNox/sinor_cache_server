@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 @Transactional
-public class MetadataService implements IMetadataService {
+public class MetadataService implements IMetadataServiceV1 {
 	private final MetadataRepository metadataRepository;
 
 	@Autowired

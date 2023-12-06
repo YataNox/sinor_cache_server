@@ -4,15 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sinor.cache.metadata.service.IMetadataService;
+import com.sinor.cache.metadata.service.IMetadataServiceV1;
 
 @RestController
-public class MetadataController implements IMetadataController{
+public class MetadataController implements IMetadataControllerV1{
 
-	private final IMetadataService metadataService;
+	private final IMetadataServiceV1 metadataService;
 
 	@Autowired
-	public MetadataController(IMetadataService metadataService) {
+	public MetadataController(IMetadataServiceV1 metadataService) {
 		this.metadataService = metadataService;
 	}
 

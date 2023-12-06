@@ -5,15 +5,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sinor.cache.stroage.service.ICacheService;
+import com.sinor.cache.stroage.service.ICacheServiceV1;
 
 @RestController
-public class CacheController implements ICacheController{
+public class CacheController implements ICacheControllerV1{
 	// 해당 컨트롤러의 API 구조는 캐시의 Key 값에 의해 수정될 필요가 있음
-	private final ICacheService cacheService;
+	private final ICacheServiceV1 cacheService;
 
 	@Autowired
-	public CacheController(ICacheService cacheService) {
+	public CacheController(ICacheServiceV1 cacheService) {
 		this.cacheService = cacheService;
 	}
 

@@ -8,7 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sinor.cache.stroage.model.CacheGetResponse;
 
 @Service
-public interface ICacheService {
+public interface ICacheServiceV1 {
 
 	/**
 	 * 캐시 조회

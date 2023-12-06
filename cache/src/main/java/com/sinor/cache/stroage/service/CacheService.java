@@ -21,7 +21,7 @@ import com.sinor.cache.stroage.model.CacheGetResponse;
 
 @Service
 @Transactional
-public class CacheService implements ICacheService{
+public class CacheService implements ICacheServiceV1{
 	private final RedisTemplate<String, String> redisTemplate;
 	private final ObjectMapper objectMapper;
 

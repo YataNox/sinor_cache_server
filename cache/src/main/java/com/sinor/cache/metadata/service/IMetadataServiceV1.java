@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import com.sinor.cache.metadata.model.MetadataGetResponse;
 
 @Service
-public interface IMetadataService {
+public interface IMetadataServiceV1 {
 	/**
 	 * 옵션 조회
 	 * @param url 조회할 옵션의 url
