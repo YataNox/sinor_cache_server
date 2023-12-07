@@ -1,4 +1,4 @@
-package com.sinor.cache.common;
+package com.sinor.main.common;
 
 import lombok.Getter;
 import lombok.Setter;
