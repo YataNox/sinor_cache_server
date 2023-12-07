@@ -1,4 +1,4 @@
-package com.sinor.cache.stroage.response;
+package com.sinor.cache.cache.model;
 
 import java.time.LocalDateTime;
 
