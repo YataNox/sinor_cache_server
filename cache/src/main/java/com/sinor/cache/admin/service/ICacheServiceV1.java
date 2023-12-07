@@ -1,11 +1,11 @@
-package com.sinor.cache.cache.service;
+package com.sinor.cache.admin.service;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.sinor.cache.cache.model.CacheGetResponse;
+import com.sinor.cache.admin.model.CacheGetResponse;
 
 @Service
 public interface ICacheServiceV1 {

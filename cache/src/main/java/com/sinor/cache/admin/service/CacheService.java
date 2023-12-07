@@ -1,4 +1,4 @@
-package com.sinor.cache.cache.service;
+package com.sinor.cache.admin.service;
 
 import static java.nio.charset.StandardCharsets.*;
 
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sinor.cache.cache.model.CacheGetResponse;
+import com.sinor.cache.admin.model.CacheGetResponse;
 
 @Service
 @Transactional

@@ -1,11 +1,11 @@
-package com.sinor.cache.cache.controller;
+package com.sinor.cache.admin.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sinor.cache.cache.service.ICacheServiceV1;
+import com.sinor.cache.admin.service.ICacheServiceV1;
 
 @RestController
 public class CacheController implements ICacheControllerV1{

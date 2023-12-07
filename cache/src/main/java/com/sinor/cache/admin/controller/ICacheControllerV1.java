@@ -1,4 +1,4 @@
-package com.sinor.cache.cache.controller;
+package com.sinor.cache.admin.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public interface ICacheControllerV1 {
-
 	/**
 	 * 단일 캐시 조회
 	 * @param key 조회할 캐시의 Key 값
