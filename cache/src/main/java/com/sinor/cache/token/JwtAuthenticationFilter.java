@@ -1,4 +1,5 @@
-package com.example.AutomateX.config.auth;
+/*
+package com.sinor.cache.token;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -31,4 +32,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     filterChain.doFilter(request, response);
 
   }
-}
+}*/

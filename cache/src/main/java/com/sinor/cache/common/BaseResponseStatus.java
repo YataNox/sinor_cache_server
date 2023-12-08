@@ -13,6 +13,7 @@ public enum BaseResponseStatus {
 	 * 200 : 요청 성공
 	 */
 	SUCCESS(true, HttpStatus.OK.value(), "요청에 성공하였습니다."),
+	NO_CONTENT(true, HttpStatus.NO_CONTENT.value(), "요청에 성공하였습니다."),
 
 	/**
 	 * 400 : Request, Response 오류
@@ -32,6 +33,8 @@ public enum BaseResponseStatus {
 	/**
 	 * 500 :  Database, Server 오류
 	 */
+	DATA_NOT_FOUND(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터가 없습니다."),
+	DATABASE_SAVE_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터 수정, 혹은 저장에 실패했습니다."),
 	DATABASE_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스 연결에 실패하거나 값을 불러오는데 실패 했습니다."),
 	SERVER_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버와의 연결에 실패하였습니다."),
 

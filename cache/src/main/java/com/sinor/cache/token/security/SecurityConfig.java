@@ -1,6 +1,8 @@
+/*
 package com.sinor.cache.token.security;
 
-import lombok.RequiredArgsConstructor;
+import static org.springframework.security.config.Customizer.*;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,16 +16,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import static org.springframework.security.config.Customizer.withDefaults;
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig {
-    /*
+    */
+/*
     비밀번호 암호화
     12/4 [이상민]
-     */
+     *//*
+
     @Bean
     PasswordEncoder passwordEncoder(){return new BCryptPasswordEncoder();
     }
@@ -46,3 +50,4 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 }
+*/

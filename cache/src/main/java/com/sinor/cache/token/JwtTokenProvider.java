@@ -1,4 +1,5 @@
-package com.example.AutomateX.config.auth;
+/*
+package com.sinor.cache.token;
 
 import com.example.AutomateX.domain.user.Role;
 import io.jsonwebtoken.Claims;
@@ -86,4 +87,4 @@ public class JwtTokenProvider {
       return false;
     }
   }
-}
+}*/
