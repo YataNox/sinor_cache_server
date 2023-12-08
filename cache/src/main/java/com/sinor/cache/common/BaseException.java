@@ -13,4 +13,5 @@ public class BaseException extends Exception {
 		fillInStackTrace();
 		this.status = status;
 	}
+
 }

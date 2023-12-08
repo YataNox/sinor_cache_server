@@ -1,4 +1,4 @@
-INSERT INTO product(product_id, product_name, product_price)
+/*INSERT INTO product(product_id, product_name, product_price)
 values (1, '노트북', 23110);
 INSERT INTO product(product_id, product_name, product_price)
 values (2, '마우스', 23222);

@@ -2,6 +2,7 @@ package com.sinor.cache.cache.model;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import lombok.AccessLevel;
@@ -17,6 +18,7 @@ import lombok.NoArgsConstructor;
 public class CacheGetResponse {
 	// 캐시를 생성하거나, Admin측에서 조회하기 위한 Response
 	// 유저에게는 하위에 들어갈 response만 반환
+	//@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
 	private LocalDateTime createAt; // 생성시간
 	private Long ttl; // 설정 만료 시간 (Metadata value)
 	private String url; // 상위 URL

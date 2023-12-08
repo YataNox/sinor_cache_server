@@ -1,14 +1,18 @@
 package com.sinor.cache.cache.service;
 
+import static com.sinor.cache.common.BaseResponseStatus.DATA_NOT_FOUND;
 import static java.nio.charset.StandardCharsets.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.sinor.cache.common.BaseException;
+import com.sinor.cache.common.BaseResponseStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ValueOperations;
@@ -21,6 +25,7 @@ import com.sinor.cache.cache.model.CacheGetResponse;
 
 @Service
 @Transactional
+@Slf4j
 public class CacheService implements ICacheServiceV1{
 	private final RedisTemplate<String, String> redisTemplate;
 	private final ObjectMapper objectMapper;
@@ -32,35 +37,39 @@ public class CacheService implements ICacheServiceV1{
 	}
 
 
-	@Override
-	public CacheGetResponse findCacheById(String key) throws JsonProcessingException {
+	/**
+	 * key를 받아서 Cache를 CacheGetResponse의 형태
+	 * @param key Redis에 조회할 Cache의 키 값
+	 * @throws BaseException 값이 없으면 데이터 없음 반환
+	 */
+	public CacheGetResponse findCacheById(String key) throws BaseException {
 		ValueOperations<String, String> ops = redisTemplate.opsForValue();
-		return objectMapper.readValue(ops.get(key), CacheGetResponse.class);
+		String value = ops.get(key);
+
+		if(value == null)
+            throw new BaseException(BaseResponseStatus.DATA_NOT_FOUND);
+
+		return mapJsonToCacheGetResponse(value);
 	}
 
+	/**
+	 * pattern을 받아서 key에 pattern을 포함하는 Cache들을 List<CacheGetResponse>의 형태로 반환
+	 * @param pattern Redis에 조회할 key가 포함하는 문자열
+	 * @throws BaseException 값이 없으면 데이터 없음 반환
+	 */
 	@Override
-	public List<CacheGetResponse> findCacheList(String pattern) {
+	public List<CacheGetResponse> findCacheList(String pattern) throws BaseException {
 		List<CacheGetResponse> list = new ArrayList<>();
 
-		redisTemplate.executeWithStickyConnection(
-			connection -> {
-				ScanOptions options = ScanOptions.scanOptions().match("*" + pattern + "*").build();
-				Cursor<byte[]> cursor = connection.scan(options);
+		Cursor<byte[]> cursor = redisTemplate.executeWithStickyConnection(connection -> {
+			ScanOptions options = ScanOptions.scanOptions().match("*" + pattern + "*").build();
+			return connection.scan(options);
+		});
 
-				while (cursor.hasNext()) {
-					byte[] keyBytes = cursor.next();
-					String key = new String(keyBytes, UTF_8);
-					try {
-						list.add(objectMapper.readValue(key, CacheGetResponse.class));
-					} catch (JsonProcessingException e) {
-						throw new RuntimeException(e);
-					}
-				}
+		processCursor(cursor, list);
 
-				cursor.close();
-
-				return null;
-			});
+		if (list.isEmpty())
+			throw new BaseException(DATA_NOT_FOUND);
 
 		return list;
 	}
@@ -72,38 +81,60 @@ public class CacheService implements ICacheServiceV1{
 	}
 
 	@Override
-	public CacheGetResponse saveOrUpdate(String key, String value, int expiredTime) throws JsonProcessingException {
+	public CacheGetResponse saveOrUpdate(String key, String value, int expiredTime) throws BaseException {
 		redisTemplate.opsForValue().set(key, value, expiredTime, TimeUnit.SECONDS);
-		return objectMapper.readValue(redisTemplate.opsForValue().get(key), CacheGetResponse.class);
+		return mapJsonToCacheGetResponse(redisTemplate.opsForValue().get(key));
 	}
 
 	@Override
-	public void deleteCacheById(String key) {
+	public void deleteCacheById(String key) throws BaseException {
 		redisTemplate.delete(key);
 	}
 
 	@Override
-	public void deleteCacheList(String pattern) {
+	public void deleteCacheList(String pattern) throws BaseException {
 		// scan으로 키 조회
 		Cursor<byte[]> cursor = redisTemplate.executeWithStickyConnection(
-			connection -> {
-				ScanOptions options = ScanOptions.scanOptions().match("*" + pattern + "*").build();
-				return connection.scan(options);
-			});
+				connection -> {
+					ScanOptions options = ScanOptions.scanOptions().match("*" + pattern + "*").build();
+					return connection.scan(options);
+				});
 
+		if(cursor == null) throw new BaseException(DATA_NOT_FOUND);
+
+        // unlink로 키 삭제
+		while (cursor.hasNext()) {
+			redisTemplate.unlink(Arrays.toString(cursor.next()));
+		}
+    }
+
+	/**
+	 * RedisTemplate에서 얻은 byte Cursor 값을 CacheGetResponse List 형태로 담아 반환하는 메소드
+	 * @param cursor Redis에서 조회로 얻은 Byte 값
+	 * @param list cursor를 역직렬화해서 넣어줄 List 객체
+	 * @throws BaseException 역직렬화 시 JsonProcessingException이 발생했을 때 Throw될 BaseException
+	 */
+	private void processCursor(Cursor<byte[]> cursor, List<CacheGetResponse> list) throws BaseException {
+		while (cursor.hasNext()) {
+			byte[] keyBytes = cursor.next();
+			String key = new String(keyBytes, UTF_8);
+
+			String jsonValue = redisTemplate.opsForValue().get(key);
+			list.add(mapJsonToCacheGetResponse(jsonValue));
+		}
+	}
+
+	/**
+	 * Json을 CacheGetResponse 객체로 역직렬화하기 위한 메소드
+	 * @param jsonValue
+	 * @return
+	 * @throws BaseException
+	 */
+	private CacheGetResponse mapJsonToCacheGetResponse(String jsonValue) throws BaseException {
 		try {
-			// unlink로 키 삭제
-			redisTemplate.executePipelined((RedisCallback<Object>)connection -> {
-				while (cursor.hasNext()) {
-					byte[] key = cursor.next();
-					connection.unlink(key);
-				}
-				return null;
-			});
-
-			System.out.println("관련 키 전부 삭제 : " + pattern);
-		} finally {
-			cursor.close();
+			return objectMapper.readValue(jsonValue, CacheGetResponse.class);
+		} catch (JsonProcessingException e) {
+			throw new BaseException(BaseResponseStatus.DESERIALIZATION_ERROR);
 		}
 	}
 

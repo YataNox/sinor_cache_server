@@ -33,6 +33,7 @@ public enum BaseResponseStatus {
 	/**
 	 * 500 :  Database, Server 오류
 	 */
+	DESERIALIZATION_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "역직렬화를 실패했습니다."),
 	DATA_NOT_FOUND(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터가 없습니다."),
 	DATABASE_SAVE_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터 수정, 혹은 저장에 실패했습니다."),
 	DATABASE_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스 연결에 실패하거나 값을 불러오는데 실패 했습니다."),

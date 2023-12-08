@@ -1,11 +1,20 @@
 package com.sinor.cache.cache.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ser.Serializers;
+import com.sinor.cache.cache.model.CacheGetResponse;
+import com.sinor.cache.common.BaseException;
+import com.sinor.cache.common.BaseResponse;
+import com.sinor.cache.common.BaseResponseStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sinor.cache.cache.service.ICacheServiceV1;
+
+import java.util.List;
 
 @RestController
 public class CacheController implements ICacheControllerV1{
@@ -18,18 +27,26 @@ public class CacheController implements ICacheControllerV1{
 	}
 
 	@Override
-	public ResponseEntity<?> getCache(@PathVariable String key) {
+	public BaseResponse<CacheGetResponse> getCache(@RequestParam("key") String key) {
 
-		return null;
+		try {
+			return new BaseResponse<CacheGetResponse>(BaseResponseStatus.SUCCESS, cacheService.findCacheById(key));
+		} catch (BaseException e) {
+			return new BaseResponse<>(e.getStatus());
+		}
+    }
+
+	@Override
+	public BaseResponse<List<CacheGetResponse>> getCacheListByKeyParams(@RequestParam("url") String url) {
+		try {
+			return new BaseResponse<List<CacheGetResponse>>(BaseResponseStatus.SUCCESS, cacheService.findCacheList(url));
+		} catch (BaseException e) {
+			return new BaseResponse<>(e.getStatus());
+		}
 	}
 
 	@Override
-	public ResponseEntity<?> getCacheListByKeyParams(String url) {
-		return null;
-	}
-
-	@Override
-	public ResponseEntity<?> getCacheListAll() {
+	public BaseResponse<List<CacheGetResponse>> getCacheListAll() {
 		return null;
 	}
 
