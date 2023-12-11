@@ -1,4 +1,4 @@
-package com.sinor.cache.cache.service;
+package com.sinor.cache.admin.service;
 
 import java.util.List;
 
