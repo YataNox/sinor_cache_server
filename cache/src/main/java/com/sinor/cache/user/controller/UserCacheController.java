@@ -14,25 +14,33 @@ import lombok.AllArgsConstructor;
 @RestController
 @AllArgsConstructor
 public class UserCacheController implements IUserCacheControllerV1<UserCacheResponse, UserCacheResponse> {
-
 	private final UserCacheService userCacheService;
 
+	/**
+	 *
+	 * @param path 요청에 전달된 path
+	 * @param queryString 요청에 전달된 queryString
+	 * @return
+	 */
 	@Override
 	@GetMapping("/{path}")
 	@ResponseBody
 	public UserCacheResponse getDataReadCache(@PathVariable String path,
 		@RequestParam(required = false) String queryString) {
 		try {
-			System.out.println("path: " + path + ", queryString: " + queryString);
-			return userCacheService.fetchDataAndStoreInCache(path, queryString);
+			if (userCacheService.getDataInCache(path) == null) {
+				return userCacheService.postInCache(path, queryString);
+			}
 		} catch (Exception e) {
 			e.fillInStackTrace();
 			return null;
 		}
+		return null;
 	}
 
 	@Override
 	public UserCacheResponse postDataReadCache(String path, String queryString, UserCacheResponse body) {
+
 		return null;
 	}
 

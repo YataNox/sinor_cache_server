@@ -1,14 +1,12 @@
 package com.sinor.cache.user.service;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sinor.cache.user.model.UserCacheResponse;
 
@@ -24,40 +22,55 @@ public class UserCacheService {
 
 	public UserCacheResponse getMainPathData(String path, String queryString) {
 		return webClient.get()
-			.uri("/main/{path}", path)
+			.uri("http://mainHost:8080/{path}", path)
 			.retrieve()
 			.bodyToMono(UserCacheResponse.class)
 			.log()
 			.block();
 	}
-
-	// 메인 서버에서 데이터를 가져와 캐시에 저장하고 데이터를 반환하는 메서드
-	public UserCacheResponse fetchDataAndStoreInCache(String path, String queryString) throws JsonProcessingException {
+	
+	/**
+	 * 캐시에 데이터가 있는지 확인하고 없으면 데이터를 조회해서 있으면 데이터를 조회해서 반환해주는 메소드
+	 * opsForValue() - Strings를 쉽게 Serialize / Deserialize 해주는 Interface
+	 * @parampath
+	 * @paramqueryString
+	 * @return
+	 */
+	public String getDataInCache(String path) {
 		String cachedData = redisTemplate.opsForValue().get(path);
 		System.out.println("cachedData: " + cachedData + "값입니다.");
-		if (cachedData == null) {
-			System.out.println("getMainPathData 진입: " + "path : " + path + ", queryString: " + queryString);
-			//문제 발생 근원지
-			UserCacheResponse userCacheResponse = getMainPathData(path, queryString);
-			redisTemplate.opsForValue().set(path, String.valueOf(userCacheResponse), Duration.ofMinutes(10));
-			// 여기서 WebClient에서 가져온 데이터를 CacheResponse로 매핑하여 반환합니다.
-			return mapToCacheResponse(userCacheResponse);
-		}
-
-		// 여기서는 캐시된 데이터를 CacheResponse로 매핑하여 반환합니다.
-		System.out.println("notNull 영역 진입 cachedData: " + cachedData);
-		System.out.println("cachedData: " + cachedData);
-		return mapToCacheResponse(objectMapper.readValue(cachedData, UserCacheResponse.class));
+		return cachedData;
 	}
 
-	// WebClient에서 가져온 데이터를 CacheResponse로 매핑하는 메서드
-	private UserCacheResponse mapToCacheResponse(UserCacheResponse userCacheResponse) {
-		UserCacheResponse cacheResponse = new UserCacheResponse();
-		cacheResponse.setCreateAt(LocalDateTime.now()); // 현재 시간을 설정 (원하는 대로 변경 가능)
-		cacheResponse.setTtl(600L); // TTL을 600초로 설정 (원하는 대로 변경 가능)
-		cacheResponse.setUrl(userCacheResponse.getUrl()); // 원하는 URL로 설정 (원하는 대로 변경 가능)
-		cacheResponse.setResponse(userCacheResponse.getResponse()); // 실제 응답 데이터를 설정
-		System.out.println("cacheResponse: " + cacheResponse);
-		return cacheResponse;
+	/**
+	 * 캐시에 데이터가 없으면 메인 데이터를 조회해서 캐시에 저장하고 반환해주는 메소드
+	 * @param path
+	 * @param queryString
+	 * @return
+	 */
+	public UserCacheResponse postInCache(String path, String queryString) {
+		UserCacheResponse userCacheResponse = getMainPathData(path, queryString);
+		System.out.println("userCacheResponse = " + userCacheResponse);
+		redisTemplate.opsForValue().set(path, String.valueOf(userCacheResponse), Duration.ofMinutes(10));
+		System.out.println(redisTemplate.opsForValue().get(path));
+		return userCacheResponse;
 	}
+
+	// 1. RequestBody에 다음과 같은 형식으로 전달하면 캐시에 저장해주는 API
+	// application/json
+	// {
+	//  "key": /main/expression,
+	//  "value": { "url": "http://localhost:8080/main/expression", "createAt": "2021-08-31T15:00:00", "ttl": 600 }
+	// }
+	// public UserCacheResponse postCache(String key, Object value) {
+	// 	try {
+	// 		String jsonValue = objectMapper.writeValueAsString(value);
+	// 		redisTemplate.opsForValue().set(key, jsonValue);
+	// 		System.out.println("redisTemplate.opsForValue().get(key) = " + redisTemplate.opsForValue().get(key));
+	// 		return objectMapper.readValue(jsonValue, UserCacheResponse.class);
+	// 	} catch (Exception e) {
+	// 		e.fillInStackTrace();
+	// 		return null;
+	// 	}
+	// }
 }

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sinor.cache.user.model.UserCacheResponse;
+
 // https://www.baeldung.com/jackson-mapping-dynamic-object#using-jsonanysetter
 // 어떤 형태로 요청이 들어오든 json 타입이라는 가정만 있으면 모두 Map<String, Object> 형식으로 저장 가능하다고 생각
 // 기술적인 부분은 시간이 없어서 검증을 못했고, 일단 모든 Dto를 구분하는 기존 방식으로 작성
@@ -44,7 +46,7 @@ public interface IUserCacheControllerV1<Response, RequestBodyDto> {
 	@PostMapping("/{path}")
 	@ResponseBody
 	Response postDataReadCache(@PathVariable String path, @RequestParam String queryString,
-		@RequestBody RequestBodyDto body);
+		@RequestBody UserCacheResponse body);
 
 	/**
 	 * 데이터 삭제 및 캐시 갱신

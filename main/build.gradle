@@ -28,6 +28,14 @@ repositories {
 dependencies {
     implementation 'io.helidon.webclient:helidon-webclient-security:3.2.2'
     implementation 'io.helidon.webclient:helidon-webclient-security:3.2.2'
+    implementation 'com.asayama.docs.gwt.angular.examples:HttpClient:1.0.3'
+    implementation 'com.asayama.docs.gwt.angular.examples:HttpClient:1.0.3'
+    implementation 'com.github.jalasoft:HttpClient:1.0.5'
+    implementation 'com.github.jalasoft:HttpClient:1.0.5'
+    implementation 'io.github.noobdogcloud:HttpClient:0.0.1'
+    implementation 'io.github.noobdogcloud:HttpClient:0.0.1'
+    implementation 'com.github.jalasoft:HttpClient:1.0.5'
+    implementation 'com.github.jalasoft:HttpClient:1.0.5'
 
 //    implementation project(path: ':')
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
