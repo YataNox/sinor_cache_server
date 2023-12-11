@@ -3,7 +3,7 @@ package com.sinor.cache.main.controller;
 import java.util.Map;
 
 import com.sinor.cache.common.BaseResponse;
-import com.sinor.cache.main.model.UserCacheResponse;
+import com.sinor.cache.main.model.MainCacheResponse;
 
 // https://www.baeldung.com/jackson-mapping-dynamic-object#using-jsonanysetter
 // 어떤 형태로 요청이 들어오든 json 타입이라는 가정만 있으면 모두 Map<String, Object> 형식으로 저장 가능하다고 생각
@@ -34,7 +34,7 @@ public interface IMainCacheControllerV1<Response, RequestBodyDto> {
 	 * @param body 요청에 전달된 RequestBody 내용에 매핑된 RequestBodyDto 객체
 	 */
 	Response postDataReadCache(String path, String queryString,
-		UserCacheResponse body);
+		MainCacheResponse body);
 
 	/**
 	 * 데이터 삭제 및 캐시 갱신

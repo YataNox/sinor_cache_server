@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class UserCacheResponse {
+public class MainCacheResponse {
 	@JsonSerialize
 	private String response;
 }

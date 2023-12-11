@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sinor.cache.common.BaseException;
 import com.sinor.cache.common.BaseResponse;
 import com.sinor.cache.common.BaseResponseStatus;
-import com.sinor.cache.main.model.UserCacheResponse;
+import com.sinor.cache.main.model.MainCacheResponse;
 import com.sinor.cache.main.service.MainCacheService;
 
 import lombok.AllArgsConstructor;
 
 @RestController
 @AllArgsConstructor
-public class MainCacheController implements IMainCacheControllerV1<UserCacheResponse, UserCacheResponse> {
+public class MainCacheController implements IMainCacheControllerV1<MainCacheResponse, MainCacheResponse> {
 	private final MainCacheService mainCacheService;
 
 	/**
@@ -55,7 +55,7 @@ public class MainCacheController implements IMainCacheControllerV1<UserCacheResp
 	 * @param body 요청에 전달된 RequestBody 내용에 매핑된 RequestBodyDto 객체
 	 */
 	@Override
-	public UserCacheResponse postDataReadCache(String path, String queryString, UserCacheResponse body) {
+	public MainCacheResponse postDataReadCache(String path, String queryString, MainCacheResponse body) {
 
 		return null;
 	}
@@ -69,7 +69,7 @@ public class MainCacheController implements IMainCacheControllerV1<UserCacheResp
 	 * @param body 요청에 전달된 RequestBody 내용에 매핑된 RequestBodyDto 객체
 	 */
 	@Override
-	public UserCacheResponse deleteDataRefreshCache(String path, String queryString, UserCacheResponse body) {
+	public MainCacheResponse deleteDataRefreshCache(String path, String queryString, MainCacheResponse body) {
 		return null;
 	}
 
@@ -81,7 +81,7 @@ public class MainCacheController implements IMainCacheControllerV1<UserCacheResp
 	 * @param body 요청에 전달된 RequestBody 내용에 매핑된 RequestBodyDto 객체
 	 */
 	@Override
-	public UserCacheResponse updateDataRefreshCache(String path, String queryString, UserCacheResponse body) {
+	public MainCacheResponse updateDataRefreshCache(String path, String queryString, MainCacheResponse body) {
 		return null;
 	}
 }

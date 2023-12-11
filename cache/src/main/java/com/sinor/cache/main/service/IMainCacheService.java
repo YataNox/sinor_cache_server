@@ -2,7 +2,7 @@ package com.sinor.cache.main.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sinor.cache.common.BaseException;
-import com.sinor.cache.main.model.UserCacheResponse;
+import com.sinor.cache.main.model.MainCacheResponse;
 
 public interface IMainCacheService {
 	/**
@@ -25,5 +25,5 @@ public interface IMainCacheService {
 	 * @param path 검색할 캐시의 Path
 	 * @param queryString 각 캐시의 구별을 위한 QueryString
 	 */
-	UserCacheResponse postInCache(String path, String queryString) throws BaseException;
+	MainCacheResponse postInCache(String path, String queryString) throws BaseException;
 }

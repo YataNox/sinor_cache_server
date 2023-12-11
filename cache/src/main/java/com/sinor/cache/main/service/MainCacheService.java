@@ -11,7 +11,7 @@ import com.sinor.cache.common.BaseException;
 import com.sinor.cache.common.BaseResponseStatus;
 import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
 import com.sinor.cache.admin.metadata.service.MetadataService;
-import com.sinor.cache.main.model.UserCacheResponse;
+import com.sinor.cache.main.model.MainCacheResponse;
 
 import lombok.AllArgsConstructor;
 
@@ -60,11 +60,11 @@ public class MainCacheService implements IMainCacheService{
 	 * @param path 검색할 캐시의 Path
 	 * @param queryString 각 캐시의 구별을 위한 QueryString
 	 */
-	public UserCacheResponse postInCache(String path, String queryString) throws BaseException {
+	public MainCacheResponse postInCache(String path, String queryString) throws BaseException {
 		try {
 			String response = getMainPathData(path, queryString);
 
-			UserCacheResponse userCacheResponse = UserCacheResponse.builder()
+			MainCacheResponse userCacheResponse = MainCacheResponse.builder()
 				.response(response)
 				.build();
 
