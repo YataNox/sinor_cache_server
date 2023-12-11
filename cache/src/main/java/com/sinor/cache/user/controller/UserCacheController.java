@@ -1,5 +1,7 @@
 package com.sinor.cache.user.controller;
 
+import java.util.Map;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,18 +23,18 @@ public class UserCacheController implements IUserCacheControllerV1<UserCacheResp
 
 	/** 미완성
 	 * @param path        요청에 전달된 path
-	 * @param queryString 요청에 전달된 queryString
+	 * @param queryParams 요청에 전달된 queryString
 	 * @return
 	 */
 	@Override
 	@GetMapping("/{path}")
 	@ResponseBody
 	public BaseResponse<?> getDataReadCache(@PathVariable String path,
-		@RequestParam(required = false) String queryString) {
+		@RequestParam(required = false) Map<String, String> queryParams) {
 		try {
 			String pathCache = userCacheService.getDataInCache(path);
 			if (pathCache == null) {
-				return new BaseResponse<UserCacheResponse>(BaseResponseStatus.SUCCESS, userCacheService.postInCache(path, queryString));
+				return new BaseResponse<>(BaseResponseStatus.SUCCESS, userCacheService.postInCache(path, queryParams.get(0)));
 			}
 
 			return new BaseResponse<>(BaseResponseStatus.SUCCESS, pathCache);

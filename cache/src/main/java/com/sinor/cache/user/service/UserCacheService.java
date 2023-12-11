@@ -1,8 +1,5 @@
 package com.sinor.cache.user.service;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +9,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sinor.cache.common.BaseException;
 import com.sinor.cache.common.BaseResponseStatus;
-import com.sinor.cache.metadata.Metadata;
 import com.sinor.cache.metadata.model.MetadataGetResponse;
 import com.sinor.cache.metadata.service.MetadataService;
 import com.sinor.cache.user.model.UserCacheResponse;
@@ -62,17 +58,15 @@ public class UserCacheService {
 	public UserCacheResponse postInCache(String path, String queryString) throws BaseException {
 		try {
 			String response = getMainPathData(path, queryString);
-			// 현재 옵션이 없을 때 옵션을 생성해서 반환하는 코드를 추가 작성 필요
-			MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
 
-			redisTemplate.opsForValue().set(path, response, metadata.getMetadataTtlSecond());
-
-			return UserCacheResponse.builder()
-				.url(path)
-				.ttl(metadata.getMetadataTtlSecond())
-				.createAt(LocalDateTime.now())
+			UserCacheResponse userCacheResponse = UserCacheResponse.builder()
 				.response(response)
 				.build();
+
+			MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
+			redisTemplate.opsForValue().set(path, objectMapper.writeValueAsString(userCacheResponse), metadata.getMetadataTtlSecond());
+
+			return userCacheResponse;
 
 		} catch (JsonProcessingException e) {
 			throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
