@@ -27,8 +27,28 @@ public class MetadataService implements IMetadataServiceV1 {
 	}
 
 	@Override
+	public MetadataGetResponse findOrCreateMetadataById(String path) throws BaseException {
+		// 옵션 조회, 없으면 기본 10분으로 Metadata 생성
+		Metadata metadata = metadataRepository.findById(path)
+			.orElse(
+				metadataRepository.save(
+					Metadata.builder()
+						.metadataUrl(path)
+						.metadataTtlSecond(600L)
+						.build()
+				)
+			);
+
+		// response 반환
+		return MetadataGetResponse.builder()
+			.metadataUrl(metadata.getMetadataUrl())
+			.metadataTtlSecond(metadata.getMetadataTtlSecond())
+			.build();
+	}
+
+	@Override
 	public MetadataGetResponse findMetadataById(String path) throws BaseException {
-		// 옵션 조회
+		// 옵션 조회, 없으면 기본 10분으로 Metadata 생성
 		Metadata metadata = metadataRepository.findById(path)
 			.orElseThrow(() -> new BaseException(BaseResponseStatus.DATA_NOT_FOUND));
 
@@ -93,5 +113,10 @@ public class MetadataService implements IMetadataServiceV1 {
 			.metadataUrl(value.getMetadataUrl())
 			.metadataTtlSecond(value.getMetadataTtlSecond())
 			.build()).toList();
+	}
+
+	@Override
+	public Boolean isExistById(String path) {
+		return metadataRepository.existsById(path);
 	}
 }

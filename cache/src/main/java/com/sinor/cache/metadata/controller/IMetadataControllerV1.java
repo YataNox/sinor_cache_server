@@ -45,4 +45,11 @@ public interface IMetadataControllerV1 {
 	@DeleteMapping("/admin/metadata")
 	BaseResponse<MetadataGetResponse> deleteMetadata(@RequestParam("path") String path);
 
+	/**
+	 * 해당 path의 옵션이 있는지 확인
+	 * @param path 유무를 파악할 path 값
+	 */
+	@GetMapping
+	BaseResponse<Boolean> isExistMetadata(@RequestParam("path") String path);
+
 }

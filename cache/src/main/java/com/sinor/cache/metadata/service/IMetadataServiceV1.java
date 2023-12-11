@@ -11,7 +11,13 @@ import com.sinor.cache.metadata.model.MetadataGetResponse;
 @Service
 public interface IMetadataServiceV1 {
 	/**
-	 * 옵션 조회
+	 * 옵션 조회 없으면 기본 10분 생성 후 반환
+	 * @param path 조회할 옵션의 path
+	 */
+	MetadataGetResponse findOrCreateMetadataById(String path) throws BaseException;
+
+	/**
+	 * 옵션 조회 없으면 예외 발생
 	 * @param path 조회할 옵션의 path
 	 */
 	MetadataGetResponse findMetadataById(String path) throws BaseException;
@@ -42,4 +48,10 @@ public interface IMetadataServiceV1 {
 	 * @param pageRequest 조회할 목록의 size, page 번호가 들어 있는 Paging 클래스
 	 */
 	List<MetadataGetResponse> findAll(PageRequest pageRequest);
+
+	/**
+	 * 옵션이 있는 지 확인
+	 * @param path 유무를 확인할 path 값
+	 */
+	Boolean isExistById(String path);
 }

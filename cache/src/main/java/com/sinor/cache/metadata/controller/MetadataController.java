@@ -15,7 +15,6 @@ import com.sinor.cache.cache.service.ICacheServiceV1;
 import com.sinor.cache.common.BaseException;
 import com.sinor.cache.common.BaseResponse;
 import com.sinor.cache.common.BaseResponseStatus;
-import com.sinor.cache.metadata.Metadata;
 import com.sinor.cache.metadata.model.MetadataGetResponse;
 import com.sinor.cache.metadata.service.IMetadataServiceV1;
 
@@ -83,5 +82,10 @@ public class MetadataController implements IMetadataControllerV1{
 		} catch (BaseException e) {
 			return new BaseResponse<>(e.getStatus());
 		}
+	}
+
+	@Override
+	public BaseResponse<Boolean> isExistMetadata(String path) {
+		return new BaseResponse<>(BaseResponseStatus.SUCCESS, metadataService.isExistById(path));
 	}
 }
