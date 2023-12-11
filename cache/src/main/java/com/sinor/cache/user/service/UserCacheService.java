@@ -12,6 +12,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sinor.cache.common.BaseException;
 import com.sinor.cache.common.BaseResponseStatus;
+import com.sinor.cache.metadata.Metadata;
+import com.sinor.cache.metadata.model.MetadataGetResponse;
+import com.sinor.cache.metadata.service.MetadataService;
 import com.sinor.cache.user.model.UserCacheResponse;
 
 import lombok.AllArgsConstructor;
@@ -23,6 +26,7 @@ public class UserCacheService {
 	private WebClient webClient;
 	private final RedisTemplate<String, String> redisTemplate;
 	private final ObjectMapper objectMapper;
+	private final MetadataService metadataService;
 
 	public String getMainPathData(String path, String queryString) throws JsonProcessingException {
 		String mainResponse = webClient.get()
@@ -41,8 +45,7 @@ public class UserCacheService {
 	/**
 	 * 캐시에 데이터가 있는지 확인하고 없으면 데이터를 조회해서 있으면 데이터를 조회해서 반환해주는 메소드
 	 * opsForValue() - Strings를 쉽게 Serialize / Deserialize 해주는 Interface
-	 * @parampath
-	 * @paramqueryString
+	 * @param path
 	 * @return
 	 */
 	public String getDataInCache(String path) {
@@ -59,12 +62,13 @@ public class UserCacheService {
 	public UserCacheResponse postInCache(String path, String queryString) throws BaseException {
 		try {
 			String response = getMainPathData(path, queryString);
-			// ttl을 Matadata에서 받아오도록 수정할 것.
-			redisTemplate.opsForValue().set(path, response, 10 * 60);
+			MetadataGetResponse metadata = metadataService.findMetadataById(path);
+
+			redisTemplate.opsForValue().set(path, response, metadata.getMetadataTtlSecond());
 
 			return UserCacheResponse.builder()
 				.url(path)
-				.ttl(600L)
+				.ttl(metadata.getMetadataTtlSecond())
 				.createAt(LocalDateTime.now())
 				.response(response)
 				.build();
