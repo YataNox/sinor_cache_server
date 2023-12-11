@@ -1,20 +1,17 @@
 package com.sinor.cache.admin.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ser.Serializers;
-import com.sinor.cache.cache.model.CacheGetResponse;
-import com.sinor.cache.common.BaseException;
-import com.sinor.cache.common.BaseResponse;
-import com.sinor.cache.common.BaseResponseStatus;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sinor.cache.admin.model.CacheGetResponse;
 import com.sinor.cache.admin.service.ICacheServiceV1;
-
-import java.util.List;
+import com.sinor.cache.common.BaseException;
+import com.sinor.cache.common.BaseResponse;
+import com.sinor.cache.common.BaseResponseStatus;
 
 @RestController
 public class CacheController implements ICacheControllerV1{

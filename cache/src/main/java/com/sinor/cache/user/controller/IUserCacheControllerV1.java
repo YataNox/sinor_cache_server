@@ -1,5 +1,7 @@
 package com.sinor.cache.user.controller;
 
+import java.util.Map;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,12 +31,12 @@ public interface IUserCacheControllerV1<Response, RequestBodyDto> {
 	 * 데이터 조회 및 캐시 조회
 	 *
 	 * @param path        요청에 전달된 path
-	 * @param queryString 요청에 전달된 queryString
+	 * @param queryParams 요청에 전달된 queryString
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@GetMapping("/{path}")
 	@ResponseBody
-	BaseResponse<?> getDataReadCache(@PathVariable String path, @RequestParam String queryString);
+	BaseResponse<?> getDataReadCache(@PathVariable String path, @RequestParam(required = false) Map<String, String> queryParams);
 
 	/**
 	 * 데이터 조회 또는 생성 및 캐시 조회
