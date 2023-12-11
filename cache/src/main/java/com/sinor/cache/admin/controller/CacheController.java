@@ -1,4 +1,4 @@
-package com.sinor.cache.cache.controller;
+package com.sinor.cache.admin.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ser.Serializers;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sinor.cache.cache.service.ICacheServiceV1;
+import com.sinor.cache.admin.service.ICacheServiceV1;
 
 import java.util.List;
 

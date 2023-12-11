@@ -1,4 +1,4 @@
-package com.sinor.cache.cache.controller;
+package com.sinor.cache.admin.controller;
 
 import com.sinor.cache.cache.model.CacheGetResponse;
 import com.sinor.cache.common.BaseResponse;
@@ -10,7 +10,6 @@ import java.util.List;
 
 @RestController
 public interface ICacheControllerV1 {
-
 	/**
 	 * 단일 캐시 조회
 	 *

@@ -1,4 +1,4 @@
-package com.sinor.cache.cache.model;
+package com.sinor.cache.admin.model;
 
 import java.time.LocalDateTime;
 

@@ -5,7 +5,8 @@ import java.util.List;
 import com.sinor.cache.common.BaseException;
 import org.springframework.stereotype.Service;
 
-import com.sinor.cache.cache.model.CacheGetResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.sinor.cache.admin.model.CacheGetResponse;
 
 @Service
 public interface ICacheServiceV1 {
