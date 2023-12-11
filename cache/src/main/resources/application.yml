@@ -2,8 +2,9 @@ server.port: 8000
 
 spring:
   redis:
-    host: redisHost
-    port: 6379
+    data:
+      host: redisHost
+      port: 6379
 
   jpa:
     hibernate:

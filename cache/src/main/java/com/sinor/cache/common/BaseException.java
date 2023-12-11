@@ -10,7 +10,8 @@ public class BaseException extends Exception {
 
 	public BaseException(BaseResponseStatus status) {
 		super(status.getMessage());
-		printStackTrace();
+		fillInStackTrace();
 		this.status = status;
 	}
+
 }
