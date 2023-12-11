@@ -22,9 +22,9 @@ public class ExpressionController {
 	private final ExpressionService expressionService;
 
 	@GetMapping
-	public BaseResponse<ExpressionResponse> getExpression() {
+	public ExpressionResponse getExpression() {
 		log.info("getPopular 실행");
 		List<Expression> expressionList = expressionService.getExpression();
-		return new BaseResponse<>(new ExpressionResponse(true, expressionList));
+		return new ExpressionResponse(true, expressionList);
 	}
 }

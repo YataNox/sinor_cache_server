@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sinor.cache.common.BaseException;
+import com.sinor.cache.common.BaseResponse;
 import com.sinor.cache.user.model.UserCacheResponse;
 import com.sinor.cache.user.service.UserCacheService;
 
@@ -17,25 +19,26 @@ public class UserCacheController implements IUserCacheControllerV1<UserCacheResp
 	private final UserCacheService userCacheService;
 
 	/**
-	 *
-	 * @param path 요청에 전달된 path
+	 * @param path        요청에 전달된 path
 	 * @param queryString 요청에 전달된 queryString
 	 * @return
 	 */
 	@Override
 	@GetMapping("/{path}")
 	@ResponseBody
-	public UserCacheResponse getDataReadCache(@PathVariable String path,
+	public BaseResponse<?> getDataReadCache(@PathVariable String path,
 		@RequestParam(required = false) String queryString) {
 		try {
-			if (userCacheService.getDataInCache(path) == null) {
-				return userCacheService.postInCache(path, queryString);
+			String pathCache = userCacheService.getDataInCache(path);
+			if (pathCache == null) {
+				return new BaseResponse<UserCacheResponse>(userCacheService.postInCache(path, queryString));
 			}
-		} catch (Exception e) {
-			e.fillInStackTrace();
-			return null;
+
+			return new BaseResponse<>(pathCache);
+		} catch (BaseException e) {
+			System.out.println(e.getMessage());
+			return new BaseResponse<>(e.getStatus());
 		}
-		return null;
 	}
 
 	@Override

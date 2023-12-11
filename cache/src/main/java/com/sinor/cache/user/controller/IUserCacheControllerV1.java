@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sinor.cache.common.BaseResponse;
 import com.sinor.cache.user.model.UserCacheResponse;
 
 // https://www.baeldung.com/jackson-mapping-dynamic-object#using-jsonanysetter
@@ -27,13 +28,13 @@ public interface IUserCacheControllerV1<Response, RequestBodyDto> {
 	/**
 	 * 데이터 조회 및 캐시 조회
 	 *
-	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
-	 * @param path 요청에 전달된 path
+	 * @param path        요청에 전달된 path
 	 * @param queryString 요청에 전달된 queryString
+	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@GetMapping("/{path}")
 	@ResponseBody
-	Response getDataReadCache(@PathVariable String path, @RequestParam String queryString);
+	BaseResponse<?> getDataReadCache(@PathVariable String path, @RequestParam String queryString);
 
 	/**
 	 * 데이터 조회 또는 생성 및 캐시 조회
