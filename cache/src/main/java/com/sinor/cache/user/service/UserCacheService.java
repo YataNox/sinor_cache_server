@@ -62,6 +62,7 @@ public class UserCacheService {
 	public UserCacheResponse postInCache(String path, String queryString) throws BaseException {
 		try {
 			String response = getMainPathData(path, queryString);
+			// 현재 옵션이 없을 때 옵션을 생성해서 반환하는 코드를 추가 작성 필요
 			MetadataGetResponse metadata = metadataService.findMetadataById(path);
 
 			redisTemplate.opsForValue().set(path, response, metadata.getMetadataTtlSecond());
