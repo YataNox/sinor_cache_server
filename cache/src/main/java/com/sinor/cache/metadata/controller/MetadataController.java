@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sinor.cache.cache.service.ICacheServiceV1;
 import com.sinor.cache.common.BaseException;
 import com.sinor.cache.common.BaseResponse;
 import com.sinor.cache.common.BaseResponseStatus;
+import com.sinor.cache.metadata.Metadata;
 import com.sinor.cache.metadata.model.MetadataGetResponse;
 import com.sinor.cache.metadata.service.IMetadataServiceV1;
 
@@ -21,10 +23,12 @@ import com.sinor.cache.metadata.service.IMetadataServiceV1;
 public class MetadataController implements IMetadataControllerV1{
 
 	private final IMetadataServiceV1 metadataService;
+	private final ICacheServiceV1 cacheService;
 
 	@Autowired
-	public MetadataController(IMetadataServiceV1 metadataService) {
+	public MetadataController(IMetadataServiceV1 metadataService, ICacheServiceV1 cacheService) {
 		this.metadataService = metadataService;
+		this.cacheService = cacheService;
 	}
 
 	@Override
@@ -40,6 +44,7 @@ public class MetadataController implements IMetadataControllerV1{
 	@Override
 	@GetMapping("/admin/metadata/all")
 	public BaseResponse<List<MetadataGetResponse>> getMetadataAll(@RequestParam("page") int page) {
+		// 조회할 Metadata Page 설정 1 Page 당 데이터 10개
 		PageRequest pageRequest = PageRequest.of(page, 10);
 		return new BaseResponse<List<MetadataGetResponse>>(BaseResponseStatus.SUCCESS, metadataService.findAll(pageRequest));
 	}
@@ -58,7 +63,13 @@ public class MetadataController implements IMetadataControllerV1{
 	@PutMapping("/admin/metadata")
 	public BaseResponse<MetadataGetResponse> updateMetadata(@RequestParam("path") String path, @RequestParam("newExpiredTime") Long newExpiredTime) {
 		try {
-			return new BaseResponse<MetadataGetResponse>(BaseResponseStatus.SUCCESS, metadataService.updateMetadata(path, newExpiredTime));
+			// 캐시 수정
+			MetadataGetResponse updatedMetadata = metadataService.updateMetadata(path, newExpiredTime);
+			
+			// 수정된 Path URL 캐시 목록 삭제
+			cacheService.deleteCacheList(updatedMetadata.getMetadataUrl());
+
+			return new BaseResponse<MetadataGetResponse>(BaseResponseStatus.SUCCESS, updatedMetadata);
 		}catch (BaseException e) {
 			return new BaseResponse<>(e.getStatus());
 		}
