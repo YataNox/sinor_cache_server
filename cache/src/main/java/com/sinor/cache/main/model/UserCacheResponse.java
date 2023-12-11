@@ -1,4 +1,4 @@
-package com.sinor.cache.user.model;
+package com.sinor.cache.main.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
