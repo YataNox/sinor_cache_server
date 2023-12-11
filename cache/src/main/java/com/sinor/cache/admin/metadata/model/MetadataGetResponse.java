@@ -1,4 +1,4 @@
-package com.sinor.cache.metadata.model;
+package com.sinor.cache.admin.metadata.model;
 
 import lombok.Builder;
 import lombok.Getter;

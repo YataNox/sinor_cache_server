@@ -3,8 +3,6 @@ package com.sinor.cache.config;
 import java.time.Duration;
 import java.util.Objects;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -15,6 +13,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @Configuration
 public class RedisConfig {
@@ -43,15 +43,6 @@ public class RedisConfig {
 			.cacheDefaults(cacheConfig)
 			.build();
 	}
-
-    /*@Bean
-    public Map<String, RedisCacheManager> redisCacheManagers() {
-        // 여러 RedisCacheManager를 저장할 Map
-        Map<String, RedisCacheManager> redisCacheManagers = new HashMap<>();
-        redisCacheManagers.put("appProducts", redisCacheManager(redisTemplate(redisConnectionFactory())));
-        redisCacheManagers.put("appUsers", redisCacheManager(redisTemplate(redisConnectionFactory())));
-        return redisCacheManagers;
-    }*/
 
 	@Bean
 	public ObjectMapper objectMapper() {

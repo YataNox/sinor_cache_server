@@ -1,4 +1,4 @@
-package com.sinor.cache.metadata.controller;
+package com.sinor.cache.admin.metadata.controller;
 
 import java.util.List;
 
@@ -11,25 +11,28 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sinor.cache.admin.service.ICacheServiceV1;
+import com.sinor.cache.admin.api.service.IApiServiceV1;
 import com.sinor.cache.common.BaseException;
 import com.sinor.cache.common.BaseResponse;
 import com.sinor.cache.common.BaseResponseStatus;
-import com.sinor.cache.metadata.model.MetadataGetResponse;
-import com.sinor.cache.metadata.service.IMetadataServiceV1;
+import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
+import com.sinor.cache.admin.metadata.service.IMetadataServiceV1;
 
 @RestController
 public class MetadataController implements IMetadataControllerV1{
 
 	private final IMetadataServiceV1 metadataService;
-	private final ICacheServiceV1 cacheService;
+	private final IApiServiceV1 cacheService;
 
 	@Autowired
-	public MetadataController(IMetadataServiceV1 metadataService, ICacheServiceV1 cacheService) {
+	public MetadataController(IMetadataServiceV1 metadataService, IApiServiceV1 cacheService) {
 		this.metadataService = metadataService;
 		this.cacheService = cacheService;
 	}
 
+	/**
+	 * @param path 조회할 옵션의 path
+	 */
 	@Override
 	@GetMapping("/admin/metadata")
 	public BaseResponse<MetadataGetResponse> getMetadata(@RequestParam("path") String path) {
@@ -40,6 +43,10 @@ public class MetadataController implements IMetadataControllerV1{
 		}
 	}
 
+	/**
+	 * Metadata 목록 조회, 10개 씩 Paging
+	 * @param page 목록의 Page 번호
+	 */
 	@Override
 	@GetMapping("/admin/metadata/all")
 	public BaseResponse<List<MetadataGetResponse>> getMetadataAll(@RequestParam("page") int page) {
@@ -48,6 +55,9 @@ public class MetadataController implements IMetadataControllerV1{
 		return new BaseResponse<List<MetadataGetResponse>>(BaseResponseStatus.SUCCESS, metadataService.findAll(pageRequest));
 	}
 
+	/**
+	 * @param path 생성할 옵션의 path
+	 */
 	@Override
 	@PostMapping("/admin/metadata")
 	public BaseResponse<MetadataGetResponse> createMetadata(@RequestParam("path") String path) {
@@ -58,6 +68,9 @@ public class MetadataController implements IMetadataControllerV1{
 		}
 	}
 
+	/**
+	 * @param path 수정할 옵션의 path
+	 */
 	@Override
 	@PutMapping("/admin/metadata")
 	public BaseResponse<MetadataGetResponse> updateMetadata(@RequestParam("path") String path, @RequestParam("newExpiredTime") Long newExpiredTime) {
@@ -74,6 +87,9 @@ public class MetadataController implements IMetadataControllerV1{
 		}
 	}
 
+	/**
+	 * @param path 삭제할 옵션의 path
+	 */
 	@DeleteMapping("/admin/metadata")
 	public BaseResponse<MetadataGetResponse> deleteMetadata(@RequestParam("path") String path) {
 		try {
@@ -84,6 +100,10 @@ public class MetadataController implements IMetadataControllerV1{
 		}
 	}
 
+	/**
+	 * 해당 path의 옵션이 있는지 확인
+	 * @param path 유무를 파악할 path 값
+	 */
 	@Override
 	public BaseResponse<Boolean> isExistMetadata(String path) {
 		return new BaseResponse<>(BaseResponseStatus.SUCCESS, metadataService.isExistById(path));

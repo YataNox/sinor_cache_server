@@ -1,49 +1,64 @@
-package com.sinor.cache.admin.controller;
+package com.sinor.cache.admin.api.controller;
 
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sinor.cache.admin.model.CacheGetResponse;
-import com.sinor.cache.admin.service.ICacheServiceV1;
+import com.sinor.cache.admin.api.model.ApiGetResponse;
+import com.sinor.cache.admin.api.service.IApiServiceV1;
 import com.sinor.cache.common.BaseException;
 import com.sinor.cache.common.BaseResponse;
 import com.sinor.cache.common.BaseResponseStatus;
 
 @RestController
-public class CacheController implements ICacheControllerV1{
+public class ApiController implements IApiControllerV1 {
 	// 해당 컨트롤러의 API 구조는 캐시의 Key 값에 의해 수정될 필요가 있음
-	private final ICacheServiceV1 cacheService;
+	private final IApiServiceV1 cacheService;
 
 	@Autowired
-	public CacheController(ICacheServiceV1 cacheService) {
+	public ApiController(IApiServiceV1 cacheService) {
 		this.cacheService = cacheService;
 	}
 
+	/**
+	 * 단일 캐시 조회
+	 * @param key 조회할 캐시의 Key 값
+	 */
 	@Override
-	public BaseResponse<CacheGetResponse> getCache(@RequestParam("key") String key) {
+	@GetMapping("/admin/cache")
+	public BaseResponse<ApiGetResponse> getCache(@RequestParam("key") String key) {
 
 		try {
-			return new BaseResponse<CacheGetResponse>(BaseResponseStatus.SUCCESS, cacheService.findCacheById(key));
+			return new BaseResponse<ApiGetResponse>(BaseResponseStatus.SUCCESS, cacheService.findCacheById(key));
 		} catch (BaseException e) {
 			return new BaseResponse<>(e.getStatus());
 		}
     }
 
+	/**
+	 * URL 별 캐시 목록 조회
+	 * @param url 조회할 캐시들의 공통 url 값
+	 */
 	@Override
-	public BaseResponse<List<CacheGetResponse>> getCacheListByKeyParams(@RequestParam("url") String url) {
+	@GetMapping("/admin/cache/list")
+	public BaseResponse<List<ApiGetResponse>> getCacheListByKeyParams(@RequestParam("url") String url) {
 		try {
-			return new BaseResponse<List<CacheGetResponse>>(BaseResponseStatus.SUCCESS, cacheService.findCacheList(url));
+			return new BaseResponse<List<ApiGetResponse>>(BaseResponseStatus.SUCCESS, cacheService.findCacheList(url));
 		} catch (BaseException e) {
 			return new BaseResponse<>(e.getStatus());
 		}
 	}
 
+	/**
+	 * 전체 캐시 목록 조회
+	 */
 	@Override
-	public BaseResponse<List<CacheGetResponse>> getCacheListAll() {
+	@GetMapping("/admin/cache/list/all")
+	public BaseResponse<List<ApiGetResponse>> getCacheListAll() {
 		return null;
 	}
 

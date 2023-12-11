@@ -1,4 +1,4 @@
-package com.sinor.cache.admin.model;
+package com.sinor.cache.admin.api.model;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CacheGetResponse {
+public class ApiGetResponse {
 	// 캐시를 생성하거나, Admin측에서 조회하기 위한 Response
 	// 유저에게는 하위에 들어갈 response만 반환
 	//@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")

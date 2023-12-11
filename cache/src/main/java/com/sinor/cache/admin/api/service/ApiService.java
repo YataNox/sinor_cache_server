@@ -1,6 +1,6 @@
-package com.sinor.cache.admin.service;
+package com.sinor.cache.admin.api.service;
 
-import static com.sinor.cache.common.BaseResponseStatus.DATA_NOT_FOUND;
+import static com.sinor.cache.common.BaseResponseStatus.*;
 import static java.nio.charset.StandardCharsets.*;
 
 import java.util.ArrayList;
@@ -8,9 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.sinor.cache.common.BaseException;
-import com.sinor.cache.common.BaseResponseStatus;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,28 +18,31 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sinor.cache.admin.model.CacheGetResponse;
+import com.sinor.cache.admin.api.model.ApiGetResponse;
+import com.sinor.cache.common.BaseException;
+import com.sinor.cache.common.BaseResponseStatus;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional
 @Slf4j
-public class CacheService implements ICacheServiceV1{
+public class ApiService implements IApiServiceV1 {
 	private final RedisTemplate<String, String> redisTemplate;
 	private final ObjectMapper objectMapper;
 
 	@Autowired
-	public CacheService(RedisTemplate<String, String> redisTemplate, ObjectMapper objectMapper) {
+	public ApiService(RedisTemplate<String, String> redisTemplate, ObjectMapper objectMapper) {
 		this.redisTemplate = redisTemplate;
 		this.objectMapper = objectMapper;
 	}
 
 
 	/**
-	 * key를 받아서 Cache를 CacheGetResponse의 형태
-	 * @param key Redis에 조회할 Cache의 키 값
-	 * @throws BaseException 값이 없으면 데이터 없음 반환
+	 * 캐시 조회
+	 * @param key 조회할 캐시의 Key 값
 	 */
-	public CacheGetResponse findCacheById(String key) throws BaseException {
+	public ApiGetResponse findCacheById(String key) throws BaseException {
 		ValueOperations<String, String> ops = redisTemplate.opsForValue();
 		String value = ops.get(key);
 
@@ -53,13 +53,12 @@ public class CacheService implements ICacheServiceV1{
 	}
 
 	/**
-	 * pattern을 받아서 key에 pattern을 포함하는 Cache들을 List<CacheGetResponse>의 형태로 반환
-	 * @param pattern Redis에 조회할 key가 포함하는 문자열
-	 * @throws BaseException 값이 없으면 데이터 없음 반환
+	 * 패턴과 일치하는 캐시 조회
+	 * @param pattern 조회할 캐시들의 공통 패턴
 	 */
 	@Override
-	public List<CacheGetResponse> findCacheList(String pattern) throws BaseException {
-		List<CacheGetResponse> list = new ArrayList<>();
+	public List<ApiGetResponse> findCacheList(String pattern) throws BaseException {
+		List<ApiGetResponse> list = new ArrayList<>();
 
 		Cursor<byte[]> cursor = redisTemplate.executeWithStickyConnection(connection -> {
 			ScanOptions options = ScanOptions.scanOptions().match("*" + pattern + "*").build();
@@ -74,23 +73,40 @@ public class CacheService implements ICacheServiceV1{
 		return list;
 	}
 
+	/**
+	 * 전체 캐시 조회
+	 */
 	@Override
-	public List<CacheGetResponse> findAllCache() { // 수많은 오류로 인해 임시 삭제 
+	public List<ApiGetResponse> findAllCache() { // 수많은 오류로 인해 임시 삭제
 		// 구조를 다시 정해서 작성해야함
 		return null;
 	}
 
+	/**
+	 * 캐시 생성 및 덮어쓰기
+	 * @param key 생성할 캐시의 Key
+	 * @param value 생성할 캐시의 Value
+	 * @param expiredTime 생성할 캐시의 만료시간
+	 */
 	@Override
-	public CacheGetResponse saveOrUpdate(String key, String value, int expiredTime) throws BaseException {
+	public ApiGetResponse saveOrUpdate(String key, String value, int expiredTime) throws BaseException {
 		redisTemplate.opsForValue().set(key, value, expiredTime, TimeUnit.SECONDS);
 		return mapJsonToCacheGetResponse(redisTemplate.opsForValue().get(key));
 	}
 
+	/**
+	 * 캐시 삭제
+	 * @param key 삭제할 캐시의 Key
+	 */
 	@Override
 	public void deleteCacheById(String key) throws BaseException {
 		redisTemplate.delete(key);
 	}
 
+	/**
+	 * 패턴과 일치하는 캐시 삭제
+	 * @param pattern 삭제할 캐시들의 공통 패턴
+	 */
 	@Override
 	public void deleteCacheList(String pattern) throws BaseException {
 		// scan으로 키 조회
@@ -114,7 +130,7 @@ public class CacheService implements ICacheServiceV1{
 	 * @param list cursor를 역직렬화해서 넣어줄 List 객체
 	 * @throws BaseException 역직렬화 시 JsonProcessingException이 발생했을 때 Throw될 BaseException
 	 */
-	private void processCursor(Cursor<byte[]> cursor, List<CacheGetResponse> list) throws BaseException {
+	private void processCursor(Cursor<byte[]> cursor, List<ApiGetResponse> list) throws BaseException {
 		while (cursor.hasNext()) {
 			byte[] keyBytes = cursor.next();
 			String key = new String(keyBytes, UTF_8);
@@ -130,15 +146,18 @@ public class CacheService implements ICacheServiceV1{
 	 * @return
 	 * @throws BaseException
 	 */
-	private CacheGetResponse mapJsonToCacheGetResponse(String jsonValue) throws BaseException {
+	private ApiGetResponse mapJsonToCacheGetResponse(String jsonValue) throws BaseException {
 		try {
-			return objectMapper.readValue(jsonValue, CacheGetResponse.class);
+			return objectMapper.readValue(jsonValue, ApiGetResponse.class);
 		} catch (JsonProcessingException e) {
 			throw new BaseException(BaseResponseStatus.DESERIALIZATION_ERROR);
 		}
 	}
 
 
+
+	// 미사용
+	//-----------------------------------------------------------------------------------------------------------------
 	/**
 	 * 캐시 생성 함수
 	 * @param key 캐시 조회 시 활용할 Key 값

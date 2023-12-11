@@ -1,14 +1,12 @@
-package com.sinor.cache.metadata.service;
+package com.sinor.cache.admin.metadata.service;
 
 import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
 
+import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
 import com.sinor.cache.common.BaseException;
-import com.sinor.cache.metadata.model.MetadataGetResponse;
 
-@Service
 public interface IMetadataServiceV1 {
 	/**
 	 * 옵션 조회 없으면 기본 10분 생성 후 반환

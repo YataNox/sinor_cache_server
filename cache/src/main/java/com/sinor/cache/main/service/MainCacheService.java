@@ -1,4 +1,4 @@
-package com.sinor.cache.user.service;
+package com.sinor.cache.main.service;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -9,21 +9,26 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sinor.cache.common.BaseException;
 import com.sinor.cache.common.BaseResponseStatus;
-import com.sinor.cache.metadata.model.MetadataGetResponse;
-import com.sinor.cache.metadata.service.MetadataService;
-import com.sinor.cache.user.model.UserCacheResponse;
+import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
+import com.sinor.cache.admin.metadata.service.MetadataService;
+import com.sinor.cache.main.model.UserCacheResponse;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @Transactional
 @AllArgsConstructor
-public class UserCacheService {
+public class MainCacheService implements IMainCacheService{
 	private WebClient webClient;
 	private final RedisTemplate<String, String> redisTemplate;
 	private final ObjectMapper objectMapper;
 	private final MetadataService metadataService;
 
+	/**
+	 * Main 서버에 요청을 보내는 메서드
+	 * @param path 요청 path
+	 * @param queryString 요청 queryString
+	 */
 	public String getMainPathData(String path, String queryString) throws JsonProcessingException {
 		String mainResponse = webClient.get()
 			.uri("http://mainHost:8080/{path}", path)
