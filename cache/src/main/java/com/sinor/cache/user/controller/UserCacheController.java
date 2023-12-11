@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sinor.cache.common.BaseException;
 import com.sinor.cache.common.BaseResponse;
+import com.sinor.cache.common.BaseResponseStatus;
 import com.sinor.cache.user.model.UserCacheResponse;
 import com.sinor.cache.user.service.UserCacheService;
 
@@ -31,10 +32,10 @@ public class UserCacheController implements IUserCacheControllerV1<UserCacheResp
 		try {
 			String pathCache = userCacheService.getDataInCache(path);
 			if (pathCache == null) {
-				return new BaseResponse<UserCacheResponse>(userCacheService.postInCache(path, queryString));
+				return new BaseResponse<UserCacheResponse>(BaseResponseStatus.SUCCESS, userCacheService.postInCache(path, queryString));
 			}
 
-			return new BaseResponse<>(pathCache);
+			return new BaseResponse<>(BaseResponseStatus.SUCCESS, pathCache);
 		} catch (BaseException e) {
 			System.out.println(e.getMessage());
 			return new BaseResponse<>(e.getStatus());
