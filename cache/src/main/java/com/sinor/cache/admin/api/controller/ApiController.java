@@ -1,18 +1,15 @@
 package com.sinor.cache.admin.api.controller;
 
-
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sinor.cache.admin.api.model.ApiGetResponse;
 import com.sinor.cache.admin.api.service.IApiServiceV1;
-import com.sinor.cache.common.BaseException;
-import com.sinor.cache.common.BaseResponse;
-import com.sinor.cache.common.BaseResponseStatus;
+import com.sinor.cache.common.AdminResponse;
+import com.sinor.cache.common.CustomException;
+import com.sinor.cache.common.ResponseStatus;
 
 @RestController
 public class ApiController implements IApiControllerV1 {
@@ -29,13 +26,12 @@ public class ApiController implements IApiControllerV1 {
 	 * @param key 조회할 캐시의 Key 값
 	 */
 	@Override
-	@GetMapping("/admin/cache")
-	public BaseResponse<ApiGetResponse> getCache(@RequestParam("key") String key) {
+	public AdminResponse<ApiGetResponse> getCache(String key) {
 
 		try {
-			return new BaseResponse<ApiGetResponse>(BaseResponseStatus.SUCCESS, cacheService.findCacheById(key));
-		} catch (BaseException e) {
-			return new BaseResponse<>(e.getStatus());
+			return new AdminResponse<ApiGetResponse>(ResponseStatus.SUCCESS, cacheService.findCacheById(key));
+		} catch (CustomException e) {
+			return new AdminResponse<>(e.getStatus());
 		}
     }
 
@@ -44,12 +40,11 @@ public class ApiController implements IApiControllerV1 {
 	 * @param url 조회할 캐시들의 공통 url 값
 	 */
 	@Override
-	@GetMapping("/admin/cache/list")
-	public BaseResponse<List<ApiGetResponse>> getCacheListByKeyParams(@RequestParam("url") String url) {
+	public AdminResponse<List<ApiGetResponse>> getCacheListByKeyParams(String url) {
 		try {
-			return new BaseResponse<List<ApiGetResponse>>(BaseResponseStatus.SUCCESS, cacheService.findCacheList(url));
-		} catch (BaseException e) {
-			return new BaseResponse<>(e.getStatus());
+			return new AdminResponse<List<ApiGetResponse>>(ResponseStatus.SUCCESS, cacheService.findCacheList(url));
+		} catch (CustomException e) {
+			return new AdminResponse<>(e.getStatus());
 		}
 	}
 
@@ -57,8 +52,7 @@ public class ApiController implements IApiControllerV1 {
 	 * 전체 캐시 목록 조회
 	 */
 	@Override
-	@GetMapping("/admin/cache/list/all")
-	public BaseResponse<List<ApiGetResponse>> getCacheListAll() {
+	public AdminResponse<List<ApiGetResponse>> getCacheListAll() {
 		return null;
 	}
 

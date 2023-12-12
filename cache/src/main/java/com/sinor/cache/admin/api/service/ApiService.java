@@ -1,6 +1,6 @@
 package com.sinor.cache.admin.api.service;
 
-import static com.sinor.cache.common.BaseResponseStatus.*;
+import static com.sinor.cache.common.ResponseStatus.*;
 import static java.nio.charset.StandardCharsets.*;
 
 import java.util.ArrayList;
@@ -19,14 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sinor.cache.admin.api.model.ApiGetResponse;
-import com.sinor.cache.common.BaseException;
-import com.sinor.cache.common.BaseResponseStatus;
+import com.sinor.cache.common.CustomException;
+import com.sinor.cache.common.ResponseStatus;
 
 import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @Transactional
-@Slf4j
 public class ApiService implements IApiServiceV1 {
 	private final RedisTemplate<String, String> redisTemplate;
 	private final ObjectMapper objectMapper;
@@ -42,12 +42,12 @@ public class ApiService implements IApiServiceV1 {
 	 * 캐시 조회
 	 * @param key 조회할 캐시의 Key 값
 	 */
-	public ApiGetResponse findCacheById(String key) throws BaseException {
+	public ApiGetResponse findCacheById(String key) throws CustomException {
 		ValueOperations<String, String> ops = redisTemplate.opsForValue();
 		String value = ops.get(key);
 
 		if(value == null)
-            throw new BaseException(BaseResponseStatus.DATA_NOT_FOUND);
+            throw new CustomException(ResponseStatus.API_CACHE_NOT_FOUND);
 
 		return mapJsonToCacheGetResponse(value);
 	}
@@ -57,7 +57,7 @@ public class ApiService implements IApiServiceV1 {
 	 * @param pattern 조회할 캐시들의 공통 패턴
 	 */
 	@Override
-	public List<ApiGetResponse> findCacheList(String pattern) throws BaseException {
+	public List<ApiGetResponse> findCacheList(String pattern) throws CustomException {
 		List<ApiGetResponse> list = new ArrayList<>();
 
 		Cursor<byte[]> cursor = redisTemplate.executeWithStickyConnection(connection -> {
@@ -68,7 +68,7 @@ public class ApiService implements IApiServiceV1 {
 		processCursor(cursor, list);
 
 		if (list.isEmpty())
-			throw new BaseException(DATA_NOT_FOUND);
+			throw new CustomException(API_CACHE_NOT_FOUND);
 
 		return list;
 	}
@@ -89,7 +89,7 @@ public class ApiService implements IApiServiceV1 {
 	 * @param expiredTime 생성할 캐시의 만료시간
 	 */
 	@Override
-	public ApiGetResponse saveOrUpdate(String key, String value, int expiredTime) throws BaseException {
+	public ApiGetResponse saveOrUpdate(String key, String value, int expiredTime) throws CustomException {
 		redisTemplate.opsForValue().set(key, value, expiredTime, TimeUnit.SECONDS);
 		return mapJsonToCacheGetResponse(redisTemplate.opsForValue().get(key));
 	}
@@ -99,7 +99,7 @@ public class ApiService implements IApiServiceV1 {
 	 * @param key 삭제할 캐시의 Key
 	 */
 	@Override
-	public void deleteCacheById(String key) throws BaseException {
+	public void deleteCacheById(String key) throws CustomException {
 		redisTemplate.delete(key);
 	}
 
@@ -108,7 +108,7 @@ public class ApiService implements IApiServiceV1 {
 	 * @param pattern 삭제할 캐시들의 공통 패턴
 	 */
 	@Override
-	public void deleteCacheList(String pattern) throws BaseException {
+	public void deleteCacheList(String pattern) throws CustomException {
 		// scan으로 키 조회
 		Cursor<byte[]> cursor = redisTemplate.executeWithStickyConnection(
 				connection -> {
@@ -116,7 +116,7 @@ public class ApiService implements IApiServiceV1 {
 					return connection.scan(options);
 				});
 
-		if(cursor == null) throw new BaseException(DATA_NOT_FOUND);
+		if(cursor == null) throw new CustomException(API_CACHE_NOT_FOUND);
 
         // unlink로 키 삭제
 		while (cursor.hasNext()) {
@@ -128,9 +128,9 @@ public class ApiService implements IApiServiceV1 {
 	 * RedisTemplate에서 얻은 byte Cursor 값을 CacheGetResponse List 형태로 담아 반환하는 메소드
 	 * @param cursor Redis에서 조회로 얻은 Byte 값
 	 * @param list cursor를 역직렬화해서 넣어줄 List 객체
-	 * @throws BaseException 역직렬화 시 JsonProcessingException이 발생했을 때 Throw될 BaseException
+	 * @throws CustomException 역직렬화 시 JsonProcessingException이 발생했을 때 Throw될 BaseException
 	 */
-	private void processCursor(Cursor<byte[]> cursor, List<ApiGetResponse> list) throws BaseException {
+	private void processCursor(Cursor<byte[]> cursor, List<ApiGetResponse> list) throws CustomException {
 		while (cursor.hasNext()) {
 			byte[] keyBytes = cursor.next();
 			String key = new String(keyBytes, UTF_8);
@@ -144,13 +144,13 @@ public class ApiService implements IApiServiceV1 {
 	 * Json을 CacheGetResponse 객체로 역직렬화하기 위한 메소드
 	 * @param jsonValue
 	 * @return
-	 * @throws BaseException
+	 * @throws CustomException
 	 */
-	private ApiGetResponse mapJsonToCacheGetResponse(String jsonValue) throws BaseException {
+	private ApiGetResponse mapJsonToCacheGetResponse(String jsonValue) throws CustomException {
 		try {
 			return objectMapper.readValue(jsonValue, ApiGetResponse.class);
 		} catch (JsonProcessingException e) {
-			throw new BaseException(BaseResponseStatus.DESERIALIZATION_ERROR);
+			throw new CustomException(JSON_PROCESSING_EXCEPTION);
 		}
 	}
 

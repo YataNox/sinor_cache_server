@@ -9,14 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sinor.cache.admin.metadata.Metadata;
 import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
-import com.sinor.cache.common.BaseException;
-import com.sinor.cache.common.BaseResponseStatus;
 import com.sinor.cache.admin.metadata.repository.MetadataRepository;
+import com.sinor.cache.common.CustomException;
+import com.sinor.cache.common.ResponseStatus;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Service
 @Slf4j
+@Service
 @Transactional
 public class MetadataService implements IMetadataServiceV1 {
 	private final MetadataRepository metadataRepository;
@@ -31,7 +31,7 @@ public class MetadataService implements IMetadataServiceV1 {
 	 * @param path 조회할 옵션의 path
 	 */
 	@Override
-	public MetadataGetResponse findOrCreateMetadataById(String path) throws BaseException {
+	public MetadataGetResponse findOrCreateMetadataById(String path) throws CustomException {
 		// 옵션 조회, 없으면 기본 10분으로 Metadata 생성
 		Metadata metadata = metadataRepository.findById(path)
 			.orElse(
@@ -55,10 +55,10 @@ public class MetadataService implements IMetadataServiceV1 {
 	 * @param path 조회할 옵션의 path
 	 */
 	@Override
-	public MetadataGetResponse findMetadataById(String path) throws BaseException {
+	public MetadataGetResponse findMetadataById(String path) throws CustomException {
 		// 옵션 조회, 없으면 기본 10분으로 Metadata 생성
 		Metadata metadata = metadataRepository.findById(path)
-			.orElseThrow(() -> new BaseException(BaseResponseStatus.DATA_NOT_FOUND));
+			.orElseThrow(() -> new CustomException(ResponseStatus.METADATA_NOT_FOUND));
 
 		// response 반환
 		return MetadataGetResponse.builder()
@@ -73,10 +73,10 @@ public class MetadataService implements IMetadataServiceV1 {
 	 * @param newExpiredTime 새로 적용할 만료시간
 	 */
 	@Override
-	public MetadataGetResponse updateMetadata(String path, Long newExpiredTime) throws BaseException {
+	public MetadataGetResponse updateMetadata(String path, Long newExpiredTime) throws CustomException {
 		// 해당 url 유무 파악
 		if(!metadataRepository.existsById(path))
-			throw new BaseException(BaseResponseStatus.DATA_NOT_FOUND);
+			throw new CustomException(ResponseStatus.METADATA_NOT_FOUND);
 
 		// 변경 값으로 저장
 		Metadata metadata = metadataRepository.save(new Metadata(path, newExpiredTime));
@@ -93,10 +93,10 @@ public class MetadataService implements IMetadataServiceV1 {
 	 * @param path 삭제할 path
 	 */
 	@Override
-	public void deleteMetadataById(String path) throws BaseException{
+	public void deleteMetadataById(String path) throws CustomException {
 		// 유무 파악
 		if(!metadataRepository.existsById(path))
-			throw new BaseException(BaseResponseStatus.DATA_NOT_FOUND);
+			throw new CustomException(ResponseStatus.METADATA_NOT_FOUND);
 		
 		// 캐시 삭제
 		metadataRepository.deleteById(path);
@@ -109,7 +109,7 @@ public class MetadataService implements IMetadataServiceV1 {
 	 * @param expiredTime 적용할 만료시간
 	 */
 	@Override
-	public MetadataGetResponse createMetadata(String path, Long expiredTime) throws BaseException{
+	public MetadataGetResponse createMetadata(String path, Long expiredTime) throws CustomException {
 		// url 옵션이 이미 있는지 조회
 		if(metadataRepository.existsById(path))
 			throw new RuntimeException("해당 옵션 값이 있습니다..");

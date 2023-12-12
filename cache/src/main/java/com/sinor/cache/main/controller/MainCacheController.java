@@ -1,44 +1,43 @@
 package com.sinor.cache.main.controller;
 
+import java.util.Map;
 
-import com.sinor.cache.main.model.MainCacheRequset;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.sinor.cache.common.BaseException;
-import com.sinor.cache.common.BaseResponse;
-import com.sinor.cache.common.BaseResponseStatus;
+import com.sinor.cache.common.AdminResponse;
+import com.sinor.cache.common.CustomException;
+import com.sinor.cache.common.ResponseStatus;
+import com.sinor.cache.main.model.MainCacheResponse;
 import com.sinor.cache.main.service.MainCacheService;
 
 import lombok.AllArgsConstructor;
 
-@RestController
-@AllArgsConstructor
-public class MainCacheController implements IMainCacheControllerV1 {
 
+@AllArgsConstructor
+@RestController
+public class MainCacheController implements IMainCacheControllerV1<MainCacheResponse, MainCacheResponse> {
 	private final MainCacheService mainCacheService;
 
 	/**
 	 * 데이터 조회 및 캐시 조회
 	 *
 	 * @param path        요청에 전달된 path
-	 * @param queryString 요청에 전달된 queryString
+	 * @param queryParams 요청에 전달된 queryString
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@Override
-	@GetMapping("/{path}")
-	public BaseResponse<?> getDataReadCache(@PathVariable String path,
-		@RequestParam(required = false) MultiValueMap<String, String> queryString) {
+	public AdminResponse<?> getDataReadCache(String path,
+		Map<String, String> queryParams) {
 		try {
 			String pathCache = mainCacheService.getDataInCache(path);
 			if (pathCache == null) {
-				return new BaseResponse<>(BaseResponseStatus.SUCCESS, mainCacheService.postInCache(path, queryString));
+				return new AdminResponse<>(ResponseStatus.SUCCESS, mainCacheService.postInCache(path, queryParams.get(0)));
 			}
 
-			return new BaseResponse<>(BaseResponseStatus.SUCCESS, pathCache);
-		} catch (BaseException e) {
+			return new AdminResponse<>(ResponseStatus.SUCCESS, pathCache);
+		} catch (CustomException e) {
 			System.out.println(e.getMessage());
-			return new BaseResponse<>(e.getStatus());
+			return new AdminResponse<>(e.getStatus());
 		}
 	}
 
@@ -51,10 +50,9 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	 * @param body 요청에 전달된 RequestBody 내용에 매핑된 RequestBodyDto 객체
 	 */
 	@Override
-	@PostMapping("/{path}")
-	public BaseResponse<?> postDataReadCache(String path, MultiValueMap<String, String> queryString, MainCacheRequset body) {
+	public MainCacheResponse postDataReadCache(String path, String queryString, MainCacheResponse body) {
 
-		return new BaseResponse<>(BaseResponseStatus.SUCCESS, mainCacheService.postMainPathData(path, queryString, body));
+		return null;
 	}
 
 	/**
@@ -63,12 +61,11 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 * @param path 요청에 전달된 path
 	 * @param queryString 요청에 전달된 queryString
+	 * @param body 요청에 전달된 RequestBody 내용에 매핑된 RequestBodyDto 객체
 	 */
 	@Override
-	@DeleteMapping("/{path}")
-	public BaseResponse<?> deleteDataRefreshCache(String path, MultiValueMap<String, String> queryString) {
-
-		return new BaseResponse<>(BaseResponseStatus.SUCCESS, mainCacheService.deleteMainPathData(path, queryString));
+	public MainCacheResponse deleteDataRefreshCache(String path, String queryString, MainCacheResponse body) {
+		return null;
 	}
 
 	/**
@@ -79,9 +76,7 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	 * @param body 요청에 전달된 RequestBody 내용에 매핑된 RequestBodyDto 객체
 	 */
 	@Override
-	@PutMapping("/{path}")
-	public BaseResponse<?> updateDataRefreshCache(String path, MultiValueMap<String, String> queryString, MainCacheRequset body) {
-
-		return new BaseResponse<>(BaseResponseStatus.SUCCESS, mainCacheService.updateMainPathData(path, queryString, body));
+	public MainCacheResponse updateDataRefreshCache(String path, String queryString, MainCacheResponse body) {
+		return null;
 	}
 }
