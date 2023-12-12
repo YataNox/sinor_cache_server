@@ -18,7 +18,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @Service
 @Transactional
-public class MainCacheService implements IMainCacheService{
+public class MainCacheService implements IMainCacheServiceV1 {
 	private WebClient webClient;
 	private final RedisTemplate<String, String> redisTemplate;
 	private final ObjectMapper objectMapper;

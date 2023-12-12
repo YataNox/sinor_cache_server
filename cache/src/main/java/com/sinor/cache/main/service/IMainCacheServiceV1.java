@@ -9,7 +9,7 @@ import com.sinor.cache.main.model.MainCacheResponse;
 
 @Service
 @Transactional
-public interface IMainCacheService {
+public interface IMainCacheServiceV1 {
 	/**
 	 * Main 서버에 요청을 보내는 메서드
 	 * @param path 요청 path
