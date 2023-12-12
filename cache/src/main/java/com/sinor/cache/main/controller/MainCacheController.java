@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sinor.cache.common.BaseException;
-import com.sinor.cache.common.BaseResponse;
-import com.sinor.cache.common.BaseResponseStatus;
+import com.sinor.cache.common.CustomException;
+import com.sinor.cache.common.AdminResponse;
+import com.sinor.cache.common.ResponseStatus;
 import com.sinor.cache.main.model.MainCacheResponse;
 import com.sinor.cache.main.service.MainCacheService;
 
@@ -31,18 +31,18 @@ public class MainCacheController implements IMainCacheControllerV1<MainCacheResp
 	@Override
 	@GetMapping("/{path}")
 	@ResponseBody
-	public BaseResponse<?> getDataReadCache(@PathVariable String path,
+	public AdminResponse<?> getDataReadCache(@PathVariable String path,
 		@RequestParam(required = false) Map<String, String> queryParams) {
 		try {
 			String pathCache = mainCacheService.getDataInCache(path);
 			if (pathCache == null) {
-				return new BaseResponse<>(BaseResponseStatus.SUCCESS, mainCacheService.postInCache(path, queryParams.get(0)));
+				return new AdminResponse<>(ResponseStatus.SUCCESS, mainCacheService.postInCache(path, queryParams.get(0)));
 			}
 
-			return new BaseResponse<>(BaseResponseStatus.SUCCESS, pathCache);
-		} catch (BaseException e) {
+			return new AdminResponse<>(ResponseStatus.SUCCESS, pathCache);
+		} catch (CustomException e) {
 			System.out.println(e.getMessage());
-			return new BaseResponse<>(e.getStatus());
+			return new AdminResponse<>(e.getStatus());
 		}
 	}
 

@@ -7,8 +7,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sinor.cache.common.BaseException;
-import com.sinor.cache.common.BaseResponseStatus;
+import com.sinor.cache.common.CustomException;
+import com.sinor.cache.common.ResponseStatus;
 import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
 import com.sinor.cache.admin.metadata.service.MetadataService;
 import com.sinor.cache.main.model.MainCacheResponse;
@@ -60,7 +60,7 @@ public class MainCacheService implements IMainCacheService{
 	 * @param path 검색할 캐시의 Path
 	 * @param queryString 각 캐시의 구별을 위한 QueryString
 	 */
-	public MainCacheResponse postInCache(String path, String queryString) throws BaseException {
+	public MainCacheResponse postInCache(String path, String queryString) throws CustomException {
 		try {
 			String response = getMainPathData(path, queryString);
 
@@ -74,7 +74,7 @@ public class MainCacheService implements IMainCacheService{
 			return userCacheResponse;
 
 		} catch (JsonProcessingException e) {
-			throw new BaseException(BaseResponseStatus.DATABASE_ERROR);
+			throw new CustomException(ResponseStatus.JSON_PROCESSING_EXCEPTION);
 		}
 	}
 

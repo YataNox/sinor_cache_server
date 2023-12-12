@@ -2,7 +2,7 @@ package com.sinor.cache.main.controller;
 
 import java.util.Map;
 
-import com.sinor.cache.common.BaseResponse;
+import com.sinor.cache.common.AdminResponse;
 import com.sinor.cache.main.model.MainCacheResponse;
 
 // https://www.baeldung.com/jackson-mapping-dynamic-object#using-jsonanysetter
@@ -23,7 +23,7 @@ public interface IMainCacheControllerV1<Response, RequestBodyDto> {
 	 * @param queryParams 요청에 전달된 queryString
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
-	BaseResponse<?> getDataReadCache(String path, Map<String, String> queryParams);
+	AdminResponse<?> getDataReadCache(String path, Map<String, String> queryParams);
 
 	/**
 	 * 데이터 조회 또는 생성 및 캐시 조회
