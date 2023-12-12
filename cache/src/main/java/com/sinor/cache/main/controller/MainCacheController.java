@@ -37,7 +37,8 @@ public class MainCacheController implements IMainCacheControllerV1<MainCacheResp
 			return new AdminSuccessResponse<>(ResponseStatus.SUCCESS, pathCache);
 		} catch (CustomException e) {
 			System.out.println(e.getMessage());
-			return new AdminSuccessResponse<>(e.getStatus());
+			return null;
+			//return new AdminSuccessResponse<>(e.getStatus());
 		}
 	}
 

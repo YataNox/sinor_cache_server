@@ -31,7 +31,8 @@ public class ApiController implements IApiControllerV1 {
 		try {
 			return new AdminSuccessResponse<ApiGetResponse>(ResponseStatus.SUCCESS, apiService.findCacheById(key));
 		} catch (CustomException e) {
-			return new AdminSuccessResponse<>(e.getStatus());
+			return null;
+			//return new AdminSuccessResponse<>(e.getStatus());
 		}
     }
 
@@ -44,7 +45,8 @@ public class ApiController implements IApiControllerV1 {
 		try {
 			return new AdminSuccessResponse<List<ApiGetResponse>>(ResponseStatus.SUCCESS, apiService.findCacheList(url));
 		} catch (CustomException e) {
-			return new AdminSuccessResponse<>(e.getStatus());
+			return null;
+			//return new AdminSuccessResponse<>(e.getStatus());
 		}
 	}
 
