@@ -21,7 +21,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Service
 @Transactional
 @AllArgsConstructor
-public class MainCacheService implements IMainCacheService {
+public class MainCacheService implements IMainCacheServiceV1 {
 	private WebClient webClient;
 	private final RedisTemplate<String, String> redisTemplate;
 	private final ObjectMapper objectMapper;
