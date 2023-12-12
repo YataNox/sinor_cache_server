@@ -73,6 +73,7 @@ public class MetadataController implements IMetadataControllerV1{
 	 */
 	@Override
 	public ResponseEntity<AdminSuccessResponse<?>> deleteMetadata(String path) {
+		metadataService.deleteMetadataById(path);
 		AdminSuccessResponse<?> adminResponse = AdminSuccessResponse.fromNoData(ResponseStatus.SUCCESS);
 		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(adminResponse);
 	}
