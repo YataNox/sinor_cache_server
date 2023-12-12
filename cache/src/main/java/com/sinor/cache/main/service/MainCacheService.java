@@ -116,8 +116,8 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	/**
 	 * 캐시에 데이터가 있는지 확인하고 없으면 데이터를 조회해서 있으면 데이터를 조회해서 반환해주는 메소드
 	 * opsForValue() - Strings를 쉽게 Serialize / Deserialize 해주는 Interface
-	 * @param path
-	 * @return
+	 * @param path path에 해당하는 캐시를 찾기 위한 파라미터
+	 * @return path에 해당하는 캐시가 있으면 Value, 없으면 null
 	 */
 	public String getDataInCache(String path) {
 		String cachedData = redisTemplate.opsForValue().get(path);
