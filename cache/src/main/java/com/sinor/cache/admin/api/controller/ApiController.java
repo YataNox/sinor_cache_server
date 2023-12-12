@@ -1,15 +1,11 @@
-/*
 package com.sinor.cache.admin.api.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sinor.cache.admin.api.model.ApiGetResponse;
 import com.sinor.cache.admin.api.service.IApiServiceV1;
 import com.sinor.cache.common.AdminSuccessResponse;
-import com.sinor.cache.common.CustomException;
 import com.sinor.cache.common.ResponseStatus;
 
 @RestController
@@ -22,51 +18,42 @@ public class ApiController implements IApiControllerV1 {
 		this.apiService = apiService;
 	}
 
-	*/
-/**
+	/**
 	 * 단일 캐시 조회
+	 *
 	 * @param key 조회할 캐시의 Key 값
-	 *//*
+	 */
 
 	@Override
-	public AdminSuccessResponse<ApiGetResponse> getCache(String key) {
+	public ResponseEntity<AdminSuccessResponse<?>> getCache(String key) {
+		AdminSuccessResponse<?> adminResponse = AdminSuccessResponse.from(ResponseStatus.SUCCESS, apiService.findCacheById(key));
+		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(adminResponse);
 
-		try {
-			return new AdminSuccessResponse<ApiGetResponse>(ResponseStatus.SUCCESS, apiService.findCacheById(key));
-		} catch (CustomException e) {
-			return null;
-			//return new AdminSuccessResponse<>(e.getStatus());
-		}
-    }
+	}
 
-	*/
-/**
+	/**
 	 * URL 별 캐시 목록 조회
 	 * @param url 조회할 캐시들의 공통 url 값
-	 *//*
+	 */
 
 	@Override
-	public AdminSuccessResponse<List<ApiGetResponse>> getCacheListByKeyParams(String url) {
-		try {
-			return new AdminSuccessResponse<List<ApiGetResponse>>(ResponseStatus.SUCCESS, apiService.findCacheList(url));
-		} catch (CustomException e) {
-			return null;
-			//return new AdminSuccessResponse<>(e.getStatus());
-		}
+	public ResponseEntity<AdminSuccessResponse<?>> getCacheListByKeyParams(String url) {
+		AdminSuccessResponse<?> adminResponse = AdminSuccessResponse.from(ResponseStatus.SUCCESS, apiService.findCacheList(url));
+		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(adminResponse);
 	}
 
-	*/
-/**
+
+	/**
 	 * 전체 캐시 목록 조회
-	 *//*
+	 */
 
 	@Override
-	public AdminSuccessResponse<List<ApiGetResponse>> getCacheListAll() {
+	public ResponseEntity<AdminSuccessResponse<?>> getCacheListAll() {
 		return null;
 	}
+}
 
 
-	*/
 /**
 	 * API로 캐시를 생성
 	 * value 값을 현재 Path로 받는 멍청한 짓을 하고 있음 RequestBody로 수정 필요 (멍청한 챗 GPT)

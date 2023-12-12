@@ -3,6 +3,7 @@ package com.sinor.cache.main.service;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,6 +15,9 @@ import com.sinor.cache.common.ResponseStatus;
 import com.sinor.cache.main.model.MainCacheResponse;
 
 import lombok.AllArgsConstructor;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.Map;
 
 @AllArgsConstructor
 @Service
@@ -29,25 +33,105 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 * @param path 요청 path
 	 * @param queryString 요청 queryString
 	 */
-	public String getMainPathData(String path, String queryString) throws JsonProcessingException {
+	public String getMainPathData(String path, MultiValueMap<String, String> queryString) {
+
+		//테스트 Main uri
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/{path}");
+		builder.path(path);
+
+		if(queryString != null) builder.queryParams(queryString);
+		// uri 확인
+		System.out.println(builder.toUriString());
+
 		String mainResponse = webClient.get()
-			.uri("http://mainHost:8080/{path}", path)
-			.retrieve()
-			.bodyToMono(String.class) // 메인 서버에서 오는 요청을 String으로 받는다.
-			// main 서버는 모든 데이터에 대해 ok, data형태로 넘어온다. 이를 받을 Response 객체를 활용할 수 없을까?
-			.log()
-			.block();
+				.uri(builder.build().toUri())
+				.retrieve()
+				.bodyToMono(String.class) // 메인 서버에서 오는 요청을 String 으로 받는다.
+				// main 서버는 모든 데이터에 대해 ok, data 형태로 넘어온다. 이를 받을 Response 객체를 활용할 수 없을까?
+				.log()
+				.block();
 		System.out.println(mainResponse);
-		// 여기서 그냥 반환을 MainServerResponse로 하는 것
-		// 캐시 서버에서 Main의 데이터를 활용할 것도 아닌데 String에서 꼭 변환을 해야할까?
+		// 여기서 그냥 반환을 MainServerResponse 로 하는 것
+		// 캐시 서버에서 Main 의 데이터를 활용할 것도 아닌데 String 에서 꼭 변환을 해야할까?
 		return mainResponse;
 	}
 
 	/**
+	 * Main 서버에 요청을 보내는 메서드
+	 * @param path 요청 path
+	 * @param queryString 요청 queryString
+	 * @param body Requestbody
+	 */
+	public String postMainPathData(String path, MultiValueMap<String, String> queryString, Map<String, String> body) {
+
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/{path}");
+		builder.path(path);
+
+		if(queryString != null) builder.queryParams(queryString);
+		// uri 확인
+		System.out.println(builder.toUriString());
+
+		return webClient.post()
+				.uri(builder.build().toUri())
+				.bodyValue(body)
+				.retrieve()
+				.bodyToMono(String.class)
+				.log()
+				.block();
+	}
+
+	/**
+	 * Main 서버에 요청을 보내는 메서드
+	 * @param path 요청 path
+	 * @param queryString 요청 queryString
+	 */
+	public String deleteMainPathData(String path, MultiValueMap<String, String> queryString) {
+
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/{path}");
+		builder.path(path);
+
+		if(queryString != null) builder.queryParams(queryString);
+		// uri 확인
+		System.out.println(builder.toUriString());
+
+		return webClient.delete()
+				.uri(builder.build().toUri())
+				.retrieve()
+				.bodyToMono(String.class)
+				.log()
+				.block();
+	}
+
+	/**
+	 * Main 서버에 요청을 보내는 메서드
+	 * @param path 요청 path
+	 * @param queryString 요청 queryString
+	 * @param body Requestbody
+	 */
+	public String updateMainPathData(String path, MultiValueMap<String, String> queryString, Map<String, String> body) {
+
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/{path}");
+		builder.path(path);
+
+		if(queryString != null) builder.queryParams(queryString);
+		// uri 확인
+		System.out.println(builder.toUriString());
+
+		return webClient.put()
+				.uri(builder.build().toUri())
+				.bodyValue(body)
+				.retrieve()
+				.bodyToMono(String.class)
+				.log()
+				.block();
+	}
+
+
+	/**
 	 * 캐시에 데이터가 있는지 확인하고 없으면 데이터를 조회해서 있으면 데이터를 조회해서 반환해주는 메소드
-	 * opsForValue() - Strings를 쉽게 Serialize / Deserialize 해주는 Interface
-	 * @param path
-	 * @return
+	 * opsForValue() - Strings 를 쉽게 Serialize / Deserialize 해주는 Interface
+	 * @param path 특정 path에 캐시가 있나 확인하기 위한 파라미터
+	 * @return 값이 있다면 value, 없다면 null
 	 */
 	public String getDataInCache(String path) {
 		String cachedData = redisTemplate.opsForValue().get(path);
@@ -60,21 +144,21 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 * @param path 검색할 캐시의 Path
 	 * @param queryString 각 캐시의 구별을 위한 QueryString
 	 */
-	public MainCacheResponse postInCache(String path, String queryString) throws CustomException {
+	public String postInCache(String path, MultiValueMap<String, String> queryString) {
 		try {
 			String response = getMainPathData(path, queryString);
 
 			MainCacheResponse userCacheResponse = MainCacheResponse.builder()
-				.response(response)
-				.build();
+					.response(response)
+					.build();
 
 			MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
 			redisTemplate.opsForValue().set(path, objectMapper.writeValueAsString(userCacheResponse), metadata.getMetadataTtlSecond());
 
-			return userCacheResponse;
+			return userCacheResponse.getResponse();
 
 		} catch (JsonProcessingException e) {
-			throw new CustomException(ResponseStatus.DESERIALIZATION_ERROR);
+			throw new CustomException(ResponseStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 

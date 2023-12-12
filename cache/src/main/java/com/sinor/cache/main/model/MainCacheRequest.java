@@ -9,7 +9,7 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MainCacheRequset {
+public class MainCacheRequest {
 
-    private Map<String, String> Requsetbody;
+    private Map<String, String> requestBody;
 }
