@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sinor.cache.common.AdminResponse;
+import com.sinor.cache.common.AdminSuccessResponse;
 import com.sinor.cache.common.CustomException;
 import com.sinor.cache.common.ResponseStatus;
 import com.sinor.cache.main.model.MainCacheResponse;
@@ -26,18 +26,18 @@ public class MainCacheController implements IMainCacheControllerV1<MainCacheResp
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@Override
-	public AdminResponse<?> getDataReadCache(String path,
+	public AdminSuccessResponse<?> getDataReadCache(String path,
 		Map<String, String> queryParams) {
 		try {
 			String pathCache = mainCacheService.getDataInCache(path);
 			if (pathCache == null) {
-				return new AdminResponse<>(ResponseStatus.SUCCESS, mainCacheService.postInCache(path, queryParams.get(0)));
+				return new AdminSuccessResponse<>(ResponseStatus.SUCCESS, mainCacheService.postInCache(path, queryParams.get(0)));
 			}
 
-			return new AdminResponse<>(ResponseStatus.SUCCESS, pathCache);
+			return new AdminSuccessResponse<>(ResponseStatus.SUCCESS, pathCache);
 		} catch (CustomException e) {
 			System.out.println(e.getMessage());
-			return new AdminResponse<>(e.getStatus());
+			return new AdminSuccessResponse<>(e.getStatus());
 		}
 	}
 

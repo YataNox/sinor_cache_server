@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sinor.cache.admin.api.model.ApiGetResponse;
 import com.sinor.cache.admin.api.service.IApiServiceV1;
-import com.sinor.cache.common.AdminResponse;
+import com.sinor.cache.common.AdminSuccessResponse;
 import com.sinor.cache.common.CustomException;
 import com.sinor.cache.common.ResponseStatus;
 
@@ -26,12 +26,12 @@ public class ApiController implements IApiControllerV1 {
 	 * @param key 조회할 캐시의 Key 값
 	 */
 	@Override
-	public AdminResponse<ApiGetResponse> getCache(String key) {
+	public AdminSuccessResponse<ApiGetResponse> getCache(String key) {
 
 		try {
-			return new AdminResponse<ApiGetResponse>(ResponseStatus.SUCCESS, apiService.findCacheById(key));
+			return new AdminSuccessResponse<ApiGetResponse>(ResponseStatus.SUCCESS, apiService.findCacheById(key));
 		} catch (CustomException e) {
-			return new AdminResponse<>(e.getStatus());
+			return new AdminSuccessResponse<>(e.getStatus());
 		}
     }
 
@@ -40,11 +40,11 @@ public class ApiController implements IApiControllerV1 {
 	 * @param url 조회할 캐시들의 공통 url 값
 	 */
 	@Override
-	public AdminResponse<List<ApiGetResponse>> getCacheListByKeyParams(String url) {
+	public AdminSuccessResponse<List<ApiGetResponse>> getCacheListByKeyParams(String url) {
 		try {
-			return new AdminResponse<List<ApiGetResponse>>(ResponseStatus.SUCCESS, apiService.findCacheList(url));
+			return new AdminSuccessResponse<List<ApiGetResponse>>(ResponseStatus.SUCCESS, apiService.findCacheList(url));
 		} catch (CustomException e) {
-			return new AdminResponse<>(e.getStatus());
+			return new AdminSuccessResponse<>(e.getStatus());
 		}
 	}
 
@@ -52,7 +52,7 @@ public class ApiController implements IApiControllerV1 {
 	 * 전체 캐시 목록 조회
 	 */
 	@Override
-	public AdminResponse<List<ApiGetResponse>> getCacheListAll() {
+	public AdminSuccessResponse<List<ApiGetResponse>> getCacheListAll() {
 		return null;
 	}
 

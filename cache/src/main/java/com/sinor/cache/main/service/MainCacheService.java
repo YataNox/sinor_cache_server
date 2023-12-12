@@ -74,7 +74,7 @@ public class MainCacheService implements IMainCacheServiceV1 {
 			return userCacheResponse;
 
 		} catch (JsonProcessingException e) {
-			throw new CustomException(ResponseStatus.JSON_PROCESSING_EXCEPTION);
+			throw new CustomException(ResponseStatus.DESERIALIZATION_ERROR);
 		}
 	}
 

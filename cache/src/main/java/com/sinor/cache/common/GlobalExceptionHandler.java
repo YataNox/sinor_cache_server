@@ -1,9 +1,5 @@
 package com.sinor.cache.common;
 
-import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,11 +18,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<?> customException(CustomException e){
 		log.error("Base exception occurred : " + e.getStatus().getCode(), e);
 
-		Map<String, Object> responseBody = new LinkedHashMap<>();
-		responseBody.put("timestamp", LocalDateTime.now());
-		responseBody.put("isSuccess", e.getStatus().isSuccess());
-		responseBody.put("status", e.getStatus().getCode());
-		responseBody.put("message", e.getStatus().getMessage());
+		AdminFailureResponse responseBody = AdminFailureResponse.from(e.getStatus());
 
 		return ResponseEntity.status((e).getStatus().getCode()).body(responseBody);
 	}
@@ -39,11 +31,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<?> Exception(Exception e){
 		log.error("Internal Server Error occurred : " + HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
 
-		Map<String, Object> responseBody = new LinkedHashMap<>();
-		responseBody.put("timestamp", LocalDateTime.now());
-		responseBody.put("isSuccess", false);
-		responseBody.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-		responseBody.put("message", "Internal Server Error occurred");
+		AdminFailureResponse responseBody = AdminFailureResponse.from(com.sinor.cache.common.ResponseStatus.INTERNAL_SERVER_ERROR);
 
 		return ResponseEntity.internalServerError().body(responseBody);
 	}

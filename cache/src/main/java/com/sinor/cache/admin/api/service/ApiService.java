@@ -20,7 +20,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sinor.cache.admin.api.model.ApiGetResponse;
 import com.sinor.cache.common.CustomException;
-import com.sinor.cache.common.ResponseStatus;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,7 +46,7 @@ public class ApiService implements IApiServiceV1 {
 		String value = ops.get(key);
 
 		if(value == null)
-            throw new CustomException(ResponseStatus.API_CACHE_NOT_FOUND);
+            throw new CustomException(CACHE_NOT_FOUND);
 
 		return mapJsonToCacheGetResponse(value);
 	}
@@ -68,7 +67,7 @@ public class ApiService implements IApiServiceV1 {
 		processCursor(cursor, list);
 
 		if (list.isEmpty())
-			throw new CustomException(API_CACHE_NOT_FOUND);
+			throw new CustomException(CACHE_LIST_NOT_FOUND);
 
 		return list;
 	}
@@ -116,7 +115,7 @@ public class ApiService implements IApiServiceV1 {
 					return connection.scan(options);
 				});
 
-		if(cursor == null) throw new CustomException(API_CACHE_NOT_FOUND);
+		if(cursor == null) throw new CustomException(CACHE_LIST_NOT_FOUND);
 
         // unlink로 키 삭제
 		while (cursor.hasNext()) {
@@ -150,7 +149,7 @@ public class ApiService implements IApiServiceV1 {
 		try {
 			return objectMapper.readValue(jsonValue, ApiGetResponse.class);
 		} catch (JsonProcessingException e) {
-			throw new CustomException(JSON_PROCESSING_EXCEPTION);
+			throw new CustomException(DESERIALIZATION_ERROR);
 		}
 	}
 

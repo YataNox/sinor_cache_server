@@ -1,7 +1,5 @@
 package com.sinor.cache.common;
 
-import org.springframework.http.HttpStatus;
-
 import lombok.Getter;
 
 /**
@@ -9,31 +7,42 @@ import lombok.Getter;
  */
 @Getter
 public enum ResponseStatus {
-	/**
-	 * 2xx : 요청 성공
-	 */
-	SUCCESS(true, HttpStatus.OK.value(), "요청에 성공하였습니다."),
-	CREATED(true, HttpStatus.CREATED.value(), "새로운 리소스가 생성되었습니다."),
-	ACCEPTED(true, HttpStatus.ACCEPTED.value(), "처리가 완료되지 않았습니다."),
-	NO_CONTENT(true, HttpStatus.NO_CONTENT.value(), "요청에 성공하였습니다."),
+	SUCCESS(true,200, "요청에 성공하였습니다."),
+	INTERNAL_SERVER_ERROR(false, 500, "내부 서버의 오류가 발생했습니다."),
 
-	/**
-	 * 4xx : Request, Response 오류
-	 */
-	BAD_REQUEST(false, HttpStatus.BAD_REQUEST.value(), "잘못된 요청입니다."),
-	UNAUTHORIZED(false, HttpStatus.UNAUTHORIZED.value(), "액세스 권한이 없습니다."),
-	NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "리소스를 찾을 수 없습니다."),
-	METHOD_NOT_ALLOWED(false, HttpStatus.METHOD_NOT_ALLOWED.value(), "허용되지 않은 메소드"),
+	//캐시 관련
+	CACHE_CREATED(true, 201, "캐시 생성에 성공하였습니다."),
+	SAVED_CACHE_NOT_FOUND(false, 404, "찾을 수 없는 저장된 캐시를 액세스하려고 합니다."),
+	CACHE_LIST_NOT_FOUND(false, 404, "캐시 리스트를 찾을 수 없습니다."),
+	CACHE_NOT_FOUND(false, 404, "캐시를 찾을 수 없습니다."),
+	CACHE_DELETED_LIST_NOT_FOUND(false, 500, "삭제한 캐시 리스트를 찾을 수 없습니다."),
+	CACHE_CREATION_FAILED(false, 500, "캐시 생성를 실패하였습니다."),
+	CACHE_DELETION_FAILED(false, 500, "캐시 삭제를 실패하였습니다."),
+	CACHE_UPDATE_FAILED(false, 500, "캐시 업데이트를 실패하였습니다."),
 
-	/**
-	 * 5xx :  Database, Server 오류
-	 */
-	API_CACHE_NOT_FOUND(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "해당 Cache를 찾지 못했습니다."),
-	JSON_PROCESSING_EXCEPTION(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "직렬화/역직렬화에 실패했습니다."),
-	METADATA_NOT_FOUND(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "해당 Metadata를 찾지 못했습니다."),
-	INTERNAL_SERVER_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "내부의 서버 오류가 발생했습니다."),
-	NOT_IMPLEMENTED(false, HttpStatus.NOT_IMPLEMENTED.value(), "구현되지 않은 요청입니다."),
-	BAD_GATEWAY(false, HttpStatus.BAD_GATEWAY.value(), "잘못된 게이트웨이");
+	//메타데이터
+	INVALID_PARAMETER(false, 400, "path 값을 확인해주세요."),
+	METADATA_NOT_FOUND(false, 404, "해당 옵션값이 없습니다."),
+	METADATA_CREATION_FAILED(false, 404, "메타데이터 생성를 실패하였습니다."),
+	METADATA_ALREADY_EXISTS(false, 409, "메타데이터가 이미 존재합니다."),
+	METADATA_FAIR(false, 500, "메타데이터 코드의 문제가 있습니다."),
+
+	//메인 데이터
+	MAINDATA_NOT_FOUND(false, 500, "메인 데이터 조회를 실패하였습니다."),
+
+	//인증과인가, 요청처리
+	//400 BAD_REQUEST 잘못된 요청
+	DESERIALIZATION_ERROR(false, 400, "JSON 형식이 아닙니다."),
+	//401 UNAUTHORIZED 인증 실패
+	CACHE_UNAUTHORIZED(false, 401, "인증에 실패하였습니다."),
+	//403 FORBIDDEN 권한 없음
+	ADMIN_ONLY(false, 403, "관리자만 접근 가능합니다."),
+
+
+	//404 NOT_FOUND 잘못된 리소스 접근
+	DISPLAY_NOT_FOUND(false, 404, "페이지 오류입니다."),
+	//503 SERVICE_UNAVAILABLE 서비스 이용 불가
+	SERVICE_UNAVAILABLE(false, 503, "서비스 이용이 불가합니다.");
 
 
 	private final boolean isSuccess;
