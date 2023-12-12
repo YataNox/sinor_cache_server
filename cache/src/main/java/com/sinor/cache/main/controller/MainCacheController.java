@@ -2,22 +2,19 @@ package com.sinor.cache.main.controller;
 
 import java.util.Map;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sinor.cache.common.CustomException;
 import com.sinor.cache.common.AdminResponse;
+import com.sinor.cache.common.CustomException;
 import com.sinor.cache.common.ResponseStatus;
 import com.sinor.cache.main.model.MainCacheResponse;
 import com.sinor.cache.main.service.MainCacheService;
 
 import lombok.AllArgsConstructor;
 
-@RestController
+
 @AllArgsConstructor
+@RestController
 public class MainCacheController implements IMainCacheControllerV1<MainCacheResponse, MainCacheResponse> {
 	private final MainCacheService mainCacheService;
 
@@ -29,10 +26,8 @@ public class MainCacheController implements IMainCacheControllerV1<MainCacheResp
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@Override
-	@GetMapping("/{path}")
-	@ResponseBody
-	public AdminResponse<?> getDataReadCache(@PathVariable String path,
-		@RequestParam(required = false) Map<String, String> queryParams) {
+	public AdminResponse<?> getDataReadCache(String path,
+		Map<String, String> queryParams) {
 		try {
 			String pathCache = mainCacheService.getDataInCache(path);
 			if (pathCache == null) {

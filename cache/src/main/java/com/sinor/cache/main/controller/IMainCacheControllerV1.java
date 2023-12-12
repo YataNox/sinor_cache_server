@@ -2,6 +2,11 @@ package com.sinor.cache.main.controller;
 
 import java.util.Map;
 
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.sinor.cache.common.AdminResponse;
 import com.sinor.cache.main.model.MainCacheResponse;
 
@@ -15,15 +20,17 @@ import com.sinor.cache.main.model.MainCacheResponse;
  * @param <Response>
  * @param <RequestBodyDto>
  */
+@RestController
 public interface IMainCacheControllerV1<Response, RequestBodyDto> {
 	/**
 	 * 데이터 조회 및 캐시 조회
 	 *
-	 * @param path        요청에 전달된 path
+	 * @param path 요청에 전달된 path
 	 * @param queryParams 요청에 전달된 queryString
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
-	AdminResponse<?> getDataReadCache(String path, Map<String, String> queryParams);
+	@GetMapping("/{path}")
+	AdminResponse<?> getDataReadCache(@PathVariable String path, @RequestParam(required = false) Map<String, String> queryParams);
 
 	/**
 	 * 데이터 조회 또는 생성 및 캐시 조회

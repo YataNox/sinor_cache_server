@@ -1,9 +1,14 @@
 package com.sinor.cache.main.service;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sinor.cache.common.CustomException;
 import com.sinor.cache.main.model.MainCacheResponse;
 
+@Service
+@Transactional
 public interface IMainCacheService {
 	/**
 	 * Main 서버에 요청을 보내는 메서드

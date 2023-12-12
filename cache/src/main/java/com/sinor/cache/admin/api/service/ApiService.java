@@ -24,9 +24,9 @@ import com.sinor.cache.common.ResponseStatus;
 
 import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @Transactional
-@Slf4j
 public class ApiService implements IApiServiceV1 {
 	private final RedisTemplate<String, String> redisTemplate;
 	private final ObjectMapper objectMapper;

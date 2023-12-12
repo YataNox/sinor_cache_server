@@ -7,17 +7,17 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sinor.cache.common.CustomException;
-import com.sinor.cache.common.ResponseStatus;
 import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
 import com.sinor.cache.admin.metadata.service.MetadataService;
+import com.sinor.cache.common.CustomException;
+import com.sinor.cache.common.ResponseStatus;
 import com.sinor.cache.main.model.MainCacheResponse;
 
 import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 @Service
 @Transactional
-@AllArgsConstructor
 public class MainCacheService implements IMainCacheService{
 	private WebClient webClient;
 	private final RedisTemplate<String, String> redisTemplate;

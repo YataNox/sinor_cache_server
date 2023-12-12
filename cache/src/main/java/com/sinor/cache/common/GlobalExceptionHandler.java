@@ -1,7 +1,6 @@
 package com.sinor.cache.common;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -15,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestControllerAdvice
-public class GlobalBindingControllerAdvice {
+public class GlobalExceptionHandler {
 	/**
 	 * CustomException Handler
 	 */
@@ -23,7 +22,7 @@ public class GlobalBindingControllerAdvice {
 	public ResponseEntity<?> customException(CustomException e){
 		log.error("Base exception occurred : " + e.getStatus().getCode(), e);
 
-		Map<String, Object> responseBody = new HashMap<>();
+		Map<String, Object> responseBody = new LinkedHashMap<>();
 		responseBody.put("timestamp", LocalDateTime.now());
 		responseBody.put("isSuccess", e.getStatus().isSuccess());
 		responseBody.put("status", e.getStatus().getCode());

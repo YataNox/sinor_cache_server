@@ -9,14 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sinor.cache.admin.metadata.Metadata;
 import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
+import com.sinor.cache.admin.metadata.repository.MetadataRepository;
 import com.sinor.cache.common.CustomException;
 import com.sinor.cache.common.ResponseStatus;
-import com.sinor.cache.admin.metadata.repository.MetadataRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Service
 @Slf4j
+@Service
 @Transactional
 public class MetadataService implements IMetadataServiceV1 {
 	private final MetadataRepository metadataRepository;
