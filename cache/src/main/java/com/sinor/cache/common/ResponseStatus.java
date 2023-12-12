@@ -12,9 +12,9 @@ public enum ResponseStatus {
 
 	//캐시 관련
 	CACHE_CREATED(true, 201, "캐시 생성에 성공하였습니다."),
-	SAVED_CACHE_NOT_FOUND(false, 404, "찾을 수 없는 저장된 캐시를 액세스하려고 합니다."),
-	CACHE_LIST_NOT_FOUND(false, 404, "캐시 리스트를 찾을 수 없습니다."),
-	CACHE_NOT_FOUND(false, 404, "캐시를 찾을 수 없습니다."),
+	SAVED_CACHE_NOT_FOUND(false, 500, "찾을 수 없는 저장된 캐시를 액세스하려고 합니다."),
+	CACHE_LIST_NOT_FOUND(false, 500, "캐시 리스트를 찾을 수 없습니다."),
+	CACHE_NOT_FOUND(false, 500, "캐시를 찾을 수 없습니다."),
 	CACHE_DELETED_LIST_NOT_FOUND(false, 500, "삭제한 캐시 리스트를 찾을 수 없습니다."),
 	CACHE_CREATION_FAILED(false, 500, "캐시 생성를 실패하였습니다."),
 	CACHE_DELETION_FAILED(false, 500, "캐시 삭제를 실패하였습니다."),
@@ -22,9 +22,9 @@ public enum ResponseStatus {
 
 	//메타데이터
 	INVALID_PARAMETER(false, 400, "path 값을 확인해주세요."),
-	METADATA_NOT_FOUND(false, 404, "해당 옵션값이 없습니다."),
-	METADATA_CREATION_FAILED(false, 404, "메타데이터 생성를 실패하였습니다."),
-	METADATA_ALREADY_EXISTS(false, 409, "메타데이터가 이미 존재합니다."),
+	METADATA_NOT_FOUND(false, 500, "해당 옵션값이 없습니다."),
+	METADATA_CREATION_FAILED(false, 500, "메타데이터 생성를 실패하였습니다."),
+	METADATA_ALREADY_EXISTS(false, 500, "메타데이터가 이미 존재합니다."),
 	METADATA_FAIR(false, 500, "메타데이터 코드의 문제가 있습니다."),
 
 	//메인 데이터

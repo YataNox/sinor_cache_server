@@ -6,11 +6,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
 @JsonPropertyOrder({"timestamp", "isSuccess", "code", "message", "data"})
 public class AdminSuccessResponse<T> {
 	private final LocalDateTime timestamp;
@@ -22,7 +20,7 @@ public class AdminSuccessResponse<T> {
 	private final T data;
 
 	// 요청에 성공한 경우
-	public AdminSuccessResponse(ResponseStatus status, T data) {
+	private AdminSuccessResponse(ResponseStatus status, T data) {
 		this.timestamp = LocalDateTime.now();
 		this.isSuccess = status.isSuccess();
 		this.message = status.getMessage();
@@ -30,23 +28,20 @@ public class AdminSuccessResponse<T> {
 		this.data = data;
 	}
 
-	public static AdminSuccessResponse<?> fromNoData(ResponseStatus status){
-		return AdminSuccessResponse.builder()
-			.timestamp(LocalDateTime.now())
-			.isSuccess(status.isSuccess())
-			.code(status.getCode())
-			.message(status.getMessage())
-			.build();
+	private AdminSuccessResponse(ResponseStatus status) {
+		this.timestamp = LocalDateTime.now();
+		this.isSuccess = status.isSuccess();
+		this.message = status.getMessage();
+		this.code = status.getCode();
+		this.data = null;
 	}
 
-	public static <T> AdminSuccessResponse<?> fromData(ResponseStatus status, T data){
-		return AdminSuccessResponse.builder()
-			.timestamp(LocalDateTime.now())
-			.isSuccess(status.isSuccess())
-			.code(status.getCode())
-			.message(status.getMessage())
-			.data(data)
-			.build();
+	public static AdminSuccessResponse<?> fromNoData(ResponseStatus status){
+		return new AdminSuccessResponse<>(status);
+	}
+
+	public static <T> AdminSuccessResponse<?> from(ResponseStatus status, T data){
+		return new AdminSuccessResponse<>(status, data);
 	}
 }
 

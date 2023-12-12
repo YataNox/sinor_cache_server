@@ -1,3 +1,4 @@
+/*
 package com.sinor.cache.admin.api.controller;
 
 import java.util.List;
@@ -21,10 +22,12 @@ public class ApiController implements IApiControllerV1 {
 		this.apiService = apiService;
 	}
 
-	/**
+	*/
+/**
 	 * 단일 캐시 조회
 	 * @param key 조회할 캐시의 Key 값
-	 */
+	 *//*
+
 	@Override
 	public AdminSuccessResponse<ApiGetResponse> getCache(String key) {
 
@@ -36,10 +39,12 @@ public class ApiController implements IApiControllerV1 {
 		}
     }
 
-	/**
+	*/
+/**
 	 * URL 별 캐시 목록 조회
 	 * @param url 조회할 캐시들의 공통 url 값
-	 */
+	 *//*
+
 	@Override
 	public AdminSuccessResponse<List<ApiGetResponse>> getCacheListByKeyParams(String url) {
 		try {
@@ -50,16 +55,19 @@ public class ApiController implements IApiControllerV1 {
 		}
 	}
 
-	/**
+	*/
+/**
 	 * 전체 캐시 목록 조회
-	 */
+	 *//*
+
 	@Override
 	public AdminSuccessResponse<List<ApiGetResponse>> getCacheListAll() {
 		return null;
 	}
 
 
-	/**
+	*/
+/**
 	 * API로 캐시를 생성
 	 * value 값을 현재 Path로 받는 멍청한 짓을 하고 있음 RequestBody로 수정 필요 (멍청한 챗 GPT)
 	 * @param key
@@ -67,6 +75,8 @@ public class ApiController implements IApiControllerV1 {
 	 * @param expirationTime
 	 * @return
 	 *//*
+*/
+/*
 	@PostMapping("/setCache/{key}/{value}/{expirationTime}")
 	public String setCache(
 		@PathVariable String key,
@@ -77,13 +87,17 @@ public class ApiController implements IApiControllerV1 {
 		return "Cache set successfully!";
 	}
 
-	*//**
+	*//*
+*/
+/**
 	 * URL 만료기간 재설정
 	 * @param key ex) /userAccount
 	 * @param queryString ex) ?id=12 or /12
 	 * @param newExpirationTime
 	 * @return 변경 성공 메시지
 	 *//*
+*/
+/*
 	@PutMapping("/updateExpirationTime/{key}/{queryString}/{newExpirationTime}")
 	public String updateExpirationTime(
 		@PathVariable String key,
@@ -96,11 +110,15 @@ public class ApiController implements IApiControllerV1 {
 		return "Expiration time updated successfully!";
 	}
 
-	*//**
+	*//*
+*/
+/**
 	 * 매개변수 Key의 패턴과 유사한 캐시들의 목록을 조회
 	 * @param key 찾을 Key의 패턴
 	 * @return key 값을 포함하는 Key들 SET 목록
 	 *//*
+*/
+/*
 	@GetMapping("/getKeys/{key}")
 	public String getKeys(@PathVariable String key) {
 		Set<String> value = cacheService.getKeys(key);
@@ -112,13 +130,17 @@ public class ApiController implements IApiControllerV1 {
 
 	// sean 코드 추가
 
-	*//**
+	*//*
+*/
+/**
 	 * URL 만료기간 재설정
 	 * @param key 키를 조회할 때 특정 문자열
 	 * @param queryString ex) ?id=12 or /12
 	 * @param newExpirationTime
 	 * @return 변경 성공 메시지
 	 *//*
+*/
+/*
 	@PutMapping("/updateExpirationTimeByScan/{key}/{queryString}/{newExpirationTime}")
 	public String updateExpirationTimeByScan(
 		@PathVariable String key,
@@ -130,23 +152,35 @@ public class ApiController implements IApiControllerV1 {
 		return "Expiration time updated successfully!";
 	}
 
-	*//*    /**
+	*//*
+*/
+/*    /**
 	 * 매개변수 Key의 패턴과 유사한 캐시들을 삭제(Scan 성능이 더 좋음)
 	 * @param key 찾을 Key의 패턴
 	 * @return
-	 *//**//*
+	 *//*
+*/
+/**//*
+*/
+/*
     @PostMapping("/deleteDataContainingStringByKeys/{key}")
     public String deleteDataContainingStringByKeys(@PathVariable String key) {
         cacheService.deleteDataContainingStringByKeys(key);
 
         return "Delete Cache: " + key;
     }*//*
+*/
+/*
 
-	*//**
+	*//*
+*/
+/**
 	 * 매개변수 Key의 패턴과 유사한 캐시들을 삭제
 	 * @param key 찾을 Key의 패턴
 	 * @return
 	 *//*
+*/
+/*
 	@PostMapping("/deleteDataContainingStringByScan/{key}")
 	public String deleteData(@PathVariable String key) {
 		cacheService.deleteData(key);
@@ -154,11 +188,15 @@ public class ApiController implements IApiControllerV1 {
 		return "Delete Cache";
 	}
 
-	*//**
+	*//*
+*/
+/**
 	 * 매개변수 Key의 패턴과 유사한 캐시들을 삭제
 	 * @param url 찾을 Key의 패턴
 	 * @return
 	 *//*
+*/
+/*
 	@PostMapping("/deleteDataContainingStringByScan/{url}")
 	public String deleteDataContainingStringByScan(@PathVariable String url) {
 		cacheService.deleteDataContainingStringByScan(url);
@@ -166,11 +204,16 @@ public class ApiController implements IApiControllerV1 {
 		return "Delete Cache";
 	}
 
-	*//**
+	*//*
+*/
+/**
 
 	 *//*
+*/
+/*
 	@GetMapping("/searchDataContainingString/{url}")
 	public Set<String> searchDataContainingString(@PathVariable String url) {
 		return cacheService.searchDataContainingString(url);
-	}*/
-}
+	}*//*
+
+}*/

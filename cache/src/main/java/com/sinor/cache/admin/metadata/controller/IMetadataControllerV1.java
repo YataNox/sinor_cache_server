@@ -1,7 +1,5 @@
 package com.sinor.cache.admin.metadata.controller;
 
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,7 +7,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
 import com.sinor.cache.common.AdminSuccessResponse;
 
 public interface IMetadataControllerV1 {
@@ -17,7 +14,7 @@ public interface IMetadataControllerV1 {
 	 * @param path 조회할 옵션의 path
 	 */
 	@GetMapping("/admin/metadata")
-	ResponseEntity<AdminSuccessResponse<MetadataGetResponse>> getMetadata(@RequestParam String path);
+	ResponseEntity<AdminSuccessResponse<?>> getMetadata(@RequestParam String path);
 
 	/**
 	 * Metadata 목록 조회, 10개 씩 Paging
@@ -25,19 +22,19 @@ public interface IMetadataControllerV1 {
 	 * @param page 목록의 Page 번호
 	 */
 	@GetMapping("/admin/metadata/all")
-	ResponseEntity<AdminSuccessResponse<List<MetadataGetResponse>>> getMetadataAll(@RequestParam int page);
+	ResponseEntity<AdminSuccessResponse<?>> getMetadataAll(@RequestParam int page);
 
 	/**
 	 * @param path 생성할 옵션의 path
 	 */
 	@PostMapping("/admin/metadata")
-	ResponseEntity<AdminSuccessResponse<MetadataGetResponse>> createMetadata(@RequestParam String path);
+	ResponseEntity<AdminSuccessResponse<?>> createMetadata(@RequestParam String path);
 
 	/**
 	 * @param path 수정할 옵션의 path
 	 */
 	@PutMapping("/admin/metadata")
-	ResponseEntity<AdminSuccessResponse<MetadataGetResponse>> updateMetadata(@RequestParam String path, @RequestParam Long newExpiredTime);
+	ResponseEntity<AdminSuccessResponse<?>> updateMetadata(@RequestParam String path, @RequestParam Long newExpiredTime);
 
 	/**
 	 * @param path 삭제할 옵션의 path
