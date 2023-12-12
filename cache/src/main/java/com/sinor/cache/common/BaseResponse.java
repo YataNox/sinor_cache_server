@@ -19,7 +19,7 @@ public class BaseResponse<T> {
 	private T data;
 
 	// 요청에 성공한 경우
-	public BaseResponse(BaseResponseStatus status, T data) {
+	public BaseResponse(ResponseStatus status, T data) {
 		this.isSuccess = status.isSuccess();
 		this.message = status.getMessage();
 		this.code = status.getCode();
@@ -27,7 +27,7 @@ public class BaseResponse<T> {
 	}
 
 	// 요청에 실패한 경우
-	public BaseResponse(BaseResponseStatus status) {
+	public BaseResponse(ResponseStatus status) {
 		this.isSuccess = status.isSuccess();
 		this.message = status.getMessage();
 		this.code = status.getCode();
