@@ -1,6 +1,5 @@
 package com.sinor.cache.main.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sinor.cache.common.CustomException;
 import org.springframework.util.MultiValueMap;
 

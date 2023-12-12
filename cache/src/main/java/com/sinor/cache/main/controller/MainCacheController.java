@@ -4,7 +4,6 @@ import com.sinor.cache.main.model.MainCacheRequest;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sinor.cache.common.CustomException;
 import com.sinor.cache.main.service.MainCacheService;
 
 @RestController
