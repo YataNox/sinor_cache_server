@@ -1,42 +1,38 @@
 package com.sinor.cache.main.controller;
 
-import java.util.Map;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import com.sinor.cache.main.model.MainCacheRequset;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.*;
 
 import com.sinor.cache.common.BaseException;
 import com.sinor.cache.common.BaseResponse;
 import com.sinor.cache.common.BaseResponseStatus;
-import com.sinor.cache.main.model.MainCacheResponse;
 import com.sinor.cache.main.service.MainCacheService;
 
 import lombok.AllArgsConstructor;
 
 @RestController
 @AllArgsConstructor
-public class MainCacheController implements IMainCacheControllerV1<MainCacheResponse, MainCacheResponse> {
+public class MainCacheController implements IMainCacheControllerV1 {
+
 	private final MainCacheService mainCacheService;
 
 	/**
 	 * 데이터 조회 및 캐시 조회
 	 *
 	 * @param path        요청에 전달된 path
-	 * @param queryParams 요청에 전달된 queryString
+	 * @param queryString 요청에 전달된 queryString
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@Override
 	@GetMapping("/{path}")
-	@ResponseBody
 	public BaseResponse<?> getDataReadCache(@PathVariable String path,
-		@RequestParam(required = false) Map<String, String> queryParams) {
+		@RequestParam(required = false) MultiValueMap<String, String> queryString) {
 		try {
 			String pathCache = mainCacheService.getDataInCache(path);
 			if (pathCache == null) {
-				return new BaseResponse<>(BaseResponseStatus.SUCCESS, mainCacheService.postInCache(path, queryParams.get(0)));
+				return new BaseResponse<>(BaseResponseStatus.SUCCESS, mainCacheService.postInCache(path, queryString));
 			}
 
 			return new BaseResponse<>(BaseResponseStatus.SUCCESS, pathCache);
@@ -55,9 +51,10 @@ public class MainCacheController implements IMainCacheControllerV1<MainCacheResp
 	 * @param body 요청에 전달된 RequestBody 내용에 매핑된 RequestBodyDto 객체
 	 */
 	@Override
-	public MainCacheResponse postDataReadCache(String path, String queryString, MainCacheResponse body) {
+	@PostMapping("/{path}")
+	public BaseResponse<?> postDataReadCache(String path, MultiValueMap<String, String> queryString, MainCacheRequset body) {
 
-		return null;
+		return new BaseResponse<>(BaseResponseStatus.SUCCESS, mainCacheService.postMainPathData(path, queryString, body));
 	}
 
 	/**
@@ -66,11 +63,12 @@ public class MainCacheController implements IMainCacheControllerV1<MainCacheResp
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 * @param path 요청에 전달된 path
 	 * @param queryString 요청에 전달된 queryString
-	 * @param body 요청에 전달된 RequestBody 내용에 매핑된 RequestBodyDto 객체
 	 */
 	@Override
-	public MainCacheResponse deleteDataRefreshCache(String path, String queryString, MainCacheResponse body) {
-		return null;
+	@DeleteMapping("/{path}")
+	public BaseResponse<?> deleteDataRefreshCache(String path, MultiValueMap<String, String> queryString) {
+
+		return new BaseResponse<>(BaseResponseStatus.SUCCESS, mainCacheService.deleteMainPathData(path, queryString));
 	}
 
 	/**
@@ -81,7 +79,9 @@ public class MainCacheController implements IMainCacheControllerV1<MainCacheResp
 	 * @param body 요청에 전달된 RequestBody 내용에 매핑된 RequestBodyDto 객체
 	 */
 	@Override
-	public MainCacheResponse updateDataRefreshCache(String path, String queryString, MainCacheResponse body) {
-		return null;
+	@PutMapping("/{path}")
+	public BaseResponse<?> updateDataRefreshCache(String path, MultiValueMap<String, String> queryString, MainCacheRequset body) {
+
+		return new BaseResponse<>(BaseResponseStatus.SUCCESS, mainCacheService.updateMainPathData(path, queryString, body));
 	}
 }

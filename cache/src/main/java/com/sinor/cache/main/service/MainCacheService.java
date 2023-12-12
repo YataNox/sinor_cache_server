@@ -1,8 +1,10 @@
 package com.sinor.cache.main.service;
 
+import com.sinor.cache.main.model.MainCacheRequset;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,11 +16,12 @@ import com.sinor.cache.admin.metadata.service.MetadataService;
 import com.sinor.cache.main.model.MainCacheResponse;
 
 import lombok.AllArgsConstructor;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 @Transactional
 @AllArgsConstructor
-public class MainCacheService implements IMainCacheService{
+public class MainCacheService implements IMainCacheService {
 	private WebClient webClient;
 	private final RedisTemplate<String, String> redisTemplate;
 	private final ObjectMapper objectMapper;
@@ -29,9 +32,20 @@ public class MainCacheService implements IMainCacheService{
 	 * @param path 요청 path
 	 * @param queryString 요청 queryString
 	 */
-	public String getMainPathData(String path, String queryString) throws JsonProcessingException {
+	public String getMainPathData(String path, MultiValueMap<String, String> queryString) throws JsonProcessingException {
+
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/{path}");
+
+		builder.path(path);
+
+		if (queryString != null) {
+			builder.queryParams(queryString);
+		}
+
+		System.out.println(builder.toUriString());
+
 		String mainResponse = webClient.get()
-			.uri("http://mainHost:8080/{path}", path)
+			.uri(builder.build().toUri())
 			.retrieve()
 			.bodyToMono(String.class) // 메인 서버에서 오는 요청을 String으로 받는다.
 			// main 서버는 모든 데이터에 대해 ok, data형태로 넘어온다. 이를 받을 Response 객체를 활용할 수 없을까?
@@ -41,6 +55,62 @@ public class MainCacheService implements IMainCacheService{
 		// 여기서 그냥 반환을 MainServerResponse로 하는 것
 		// 캐시 서버에서 Main의 데이터를 활용할 것도 아닌데 String에서 꼭 변환을 해야할까?
 		return mainResponse;
+	}
+
+	public String postMainPathData(String path, MultiValueMap<String, String> queryString, MainCacheRequset body) {
+
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/{path}");
+
+		builder.path(path);
+
+		if (queryString != null) {
+			builder.queryParams(queryString);
+		}
+
+		return webClient.post()
+				.uri(builder.build().toUri())
+				.bodyValue(body)
+				.retrieve()
+				.bodyToMono(String.class)
+				.log()
+				.block();
+	}
+
+	public String deleteMainPathData(String path, MultiValueMap<String, String> queryString) {
+
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/{path}");
+
+		builder.path(path);
+
+		if (queryString != null) {
+			builder.queryParams(queryString);
+		}
+
+		return webClient.delete()
+				.uri(builder.build().toUri())
+				.retrieve()
+				.bodyToMono(String.class)
+				.log()
+				.block();
+	}
+
+	public String updateMainPathData(String path, MultiValueMap<String, String> queryString, MainCacheRequset body) {
+
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/{path}");
+
+		builder.path(path);
+
+		if (queryString != null) {
+			builder.queryParams(queryString);
+		}
+
+		return webClient.put()
+				.uri(builder.build().toUri())
+				.bodyValue(body)
+				.retrieve()
+				.bodyToMono(String.class)
+				.log()
+				.block();
 	}
 
 	/**
@@ -60,7 +130,7 @@ public class MainCacheService implements IMainCacheService{
 	 * @param path 검색할 캐시의 Path
 	 * @param queryString 각 캐시의 구별을 위한 QueryString
 	 */
-	public MainCacheResponse postInCache(String path, String queryString) throws BaseException {
+	public MainCacheResponse postInCache(String path, MultiValueMap<String, String> queryString) throws BaseException {
 		try {
 			String response = getMainPathData(path, queryString);
 
