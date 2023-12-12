@@ -4,11 +4,10 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.sinor.cache.admin.api.model.ApiGetResponse;
 import com.sinor.cache.common.AdminResponse;
-@RestController
+
 public interface IApiControllerV1 {
 	/**
 	 * 단일 캐시 조회

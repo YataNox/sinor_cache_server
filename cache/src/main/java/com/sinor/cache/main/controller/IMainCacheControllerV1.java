@@ -5,7 +5,6 @@ import java.util.Map;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.sinor.cache.common.AdminResponse;
 import com.sinor.cache.main.model.MainCacheResponse;
@@ -20,7 +19,6 @@ import com.sinor.cache.main.model.MainCacheResponse;
  * @param <Response>
  * @param <RequestBodyDto>
  */
-@RestController
 public interface IMainCacheControllerV1<Response, RequestBodyDto> {
 	/**
 	 * 데이터 조회 및 캐시 조회

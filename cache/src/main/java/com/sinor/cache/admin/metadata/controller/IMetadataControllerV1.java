@@ -8,12 +8,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
 import com.sinor.cache.common.AdminResponse;
 
-@RestController
 public interface IMetadataControllerV1 {
 	/**
 	 * @param path 조회할 옵션의 path

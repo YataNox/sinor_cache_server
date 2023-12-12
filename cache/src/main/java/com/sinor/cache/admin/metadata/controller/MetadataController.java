@@ -17,12 +17,12 @@ import com.sinor.cache.common.ResponseStatus;
 public class MetadataController implements IMetadataControllerV1{
 
 	private final IMetadataServiceV1 metadataService;
-	private final IApiServiceV1 cacheService;
+	private final IApiServiceV1 apiService;
 
 	@Autowired
-	public MetadataController(IMetadataServiceV1 metadataService, IApiServiceV1 cacheService) {
+	public MetadataController(IMetadataServiceV1 metadataService, IApiServiceV1 apiService) {
 		this.metadataService = metadataService;
-		this.cacheService = cacheService;
+		this.apiService = apiService;
 	}
 
 	/**
@@ -65,7 +65,7 @@ public class MetadataController implements IMetadataControllerV1{
 		MetadataGetResponse updatedMetadata = metadataService.updateMetadata(path, newExpiredTime);
 		AdminResponse<MetadataGetResponse> adminResponse = new AdminResponse<>(ResponseStatus.SUCCESS, updatedMetadata);
 		// 수정된 Path URL 캐시 목록 삭제
-		cacheService.deleteCacheList(updatedMetadata.getMetadataUrl());
+		apiService.deleteCacheList(updatedMetadata.getMetadataUrl());
 
 		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(adminResponse);
 	}

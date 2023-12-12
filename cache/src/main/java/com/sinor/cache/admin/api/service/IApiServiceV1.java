@@ -2,14 +2,9 @@ package com.sinor.cache.admin.api.service;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.sinor.cache.admin.api.model.ApiGetResponse;
 import com.sinor.cache.common.CustomException;
 
-@Service
-@Transactional
 public interface IApiServiceV1 {
 
 	/**

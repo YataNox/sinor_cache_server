@@ -14,11 +14,11 @@ import com.sinor.cache.common.ResponseStatus;
 @RestController
 public class ApiController implements IApiControllerV1 {
 	// 해당 컨트롤러의 API 구조는 캐시의 Key 값에 의해 수정될 필요가 있음
-	private final IApiServiceV1 cacheService;
+	private final IApiServiceV1 apiService;
 
 	@Autowired
-	public ApiController(IApiServiceV1 cacheService) {
-		this.cacheService = cacheService;
+	public ApiController(IApiServiceV1 apiService) {
+		this.apiService = apiService;
 	}
 
 	/**
@@ -29,7 +29,7 @@ public class ApiController implements IApiControllerV1 {
 	public AdminResponse<ApiGetResponse> getCache(String key) {
 
 		try {
-			return new AdminResponse<ApiGetResponse>(ResponseStatus.SUCCESS, cacheService.findCacheById(key));
+			return new AdminResponse<ApiGetResponse>(ResponseStatus.SUCCESS, apiService.findCacheById(key));
 		} catch (CustomException e) {
 			return new AdminResponse<>(e.getStatus());
 		}
@@ -42,7 +42,7 @@ public class ApiController implements IApiControllerV1 {
 	@Override
 	public AdminResponse<List<ApiGetResponse>> getCacheListByKeyParams(String url) {
 		try {
-			return new AdminResponse<List<ApiGetResponse>>(ResponseStatus.SUCCESS, cacheService.findCacheList(url));
+			return new AdminResponse<List<ApiGetResponse>>(ResponseStatus.SUCCESS, apiService.findCacheList(url));
 		} catch (CustomException e) {
 			return new AdminResponse<>(e.getStatus());
 		}
