@@ -1,10 +1,13 @@
 package com.sinor.cache.main.service;
 
+import java.util.Map;
+
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,9 +18,6 @@ import com.sinor.cache.common.ResponseStatus;
 import com.sinor.cache.main.model.MainCacheResponse;
 
 import lombok.AllArgsConstructor;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import java.util.Map;
 
 @AllArgsConstructor
 @Service
@@ -36,20 +36,21 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	public String getMainPathData(String path, MultiValueMap<String, String> queryString) {
 
 		//테스트 Main uri
-		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/{path}");
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/");
 		builder.path(path);
 
-		if(queryString != null) builder.queryParams(queryString);
+		if (queryString != null)
+			builder.queryParams(queryString);
 		// uri 확인
 		System.out.println(builder.toUriString());
 
 		String mainResponse = webClient.get()
-				.uri(builder.build().toUri())
-				.retrieve()
-				.bodyToMono(String.class) // 메인 서버에서 오는 요청을 String 으로 받는다.
-				// main 서버는 모든 데이터에 대해 ok, data 형태로 넘어온다. 이를 받을 Response 객체를 활용할 수 없을까?
-				.log()
-				.block();
+			.uri(builder.build().toUri())
+			.retrieve()
+			.bodyToMono(String.class) // 메인 서버에서 오는 요청을 String 으로 받는다.
+			// main 서버는 모든 데이터에 대해 ok, data 형태로 넘어온다. 이를 받을 Response 객체를 활용할 수 없을까?
+			.log()
+			.block();
 		System.out.println(mainResponse);
 		// 여기서 그냥 반환을 MainServerResponse 로 하는 것
 		// 캐시 서버에서 Main 의 데이터를 활용할 것도 아닌데 String 에서 꼭 변환을 해야할까?
@@ -67,17 +68,18 @@ public class MainCacheService implements IMainCacheServiceV1 {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/{path}");
 		builder.path(path);
 
-		if(queryString != null) builder.queryParams(queryString);
+		if (queryString != null)
+			builder.queryParams(queryString);
 		// uri 확인
 		System.out.println(builder.toUriString());
 
 		return webClient.post()
-				.uri(builder.build().toUri())
-				.bodyValue(body)
-				.retrieve()
-				.bodyToMono(String.class)
-				.log()
-				.block();
+			.uri(builder.build().toUri())
+			.bodyValue(body)
+			.retrieve()
+			.bodyToMono(String.class)
+			.log()
+			.block();
 	}
 
 	/**
@@ -90,16 +92,17 @@ public class MainCacheService implements IMainCacheServiceV1 {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/{path}");
 		builder.path(path);
 
-		if(queryString != null) builder.queryParams(queryString);
+		if (queryString != null)
+			builder.queryParams(queryString);
 		// uri 확인
 		System.out.println(builder.toUriString());
 
 		return webClient.delete()
-				.uri(builder.build().toUri())
-				.retrieve()
-				.bodyToMono(String.class)
-				.log()
-				.block();
+			.uri(builder.build().toUri())
+			.retrieve()
+			.bodyToMono(String.class)
+			.log()
+			.block();
 	}
 
 	/**
@@ -113,19 +116,19 @@ public class MainCacheService implements IMainCacheServiceV1 {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/{path}");
 		builder.path(path);
 
-		if(queryString != null) builder.queryParams(queryString);
+		if (queryString != null)
+			builder.queryParams(queryString);
 		// uri 확인
 		System.out.println(builder.toUriString());
 
 		return webClient.put()
-				.uri(builder.build().toUri())
-				.bodyValue(body)
-				.retrieve()
-				.bodyToMono(String.class)
-				.log()
-				.block();
+			.uri(builder.build().toUri())
+			.bodyValue(body)
+			.retrieve()
+			.bodyToMono(String.class)
+			.log()
+			.block();
 	}
-
 
 	/**
 	 * 캐시에 데이터가 있는지 확인하고 없으면 데이터를 조회해서 있으면 데이터를 조회해서 반환해주는 메소드
@@ -149,11 +152,12 @@ public class MainCacheService implements IMainCacheServiceV1 {
 			String response = getMainPathData(path, queryString);
 
 			MainCacheResponse userCacheResponse = MainCacheResponse.builder()
-					.response(response)
-					.build();
+				.response(response)
+				.build();
 
 			MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
-			redisTemplate.opsForValue().set(path, objectMapper.writeValueAsString(userCacheResponse), metadata.getMetadataTtlSecond());
+			redisTemplate.opsForValue()
+				.set(path, objectMapper.writeValueAsString(userCacheResponse), metadata.getMetadataTtlSecond());
 
 			return userCacheResponse.getResponse();
 

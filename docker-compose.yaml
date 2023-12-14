@@ -4,6 +4,8 @@ name: sinor
 secrets:
   main_db-password:
     file: mysql/password.txt
+  keycloak_db-password:
+    file: keycloak/password.txt
 
 volumes:
   cache-redis_db-data: { }
@@ -109,3 +111,25 @@ services:
       - main_db-password
     volumes:
       - main-mysql_db-data:/var/lib/mysql
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_HTTP_PORT=8443
+      - DB_VENDOR=mysql
+      - DB_ADDR=main_db
+      - DB_PORT=3306
+      - DB_DATABASE=user
+      - DB_USER=root
+      - DB_PASSWORD_FILE=/run/secrets/keycloak_db-password
+    depends_on:
+      - main_db
+    command: [ "start-dev","--http-port=8443" ]
+    ports:
+      - "8443:8443"
+    secrets:
+      - keycloak_db-password
+
+

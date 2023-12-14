@@ -1,7 +1,8 @@
 package com.sinor.main.common;
 
-import lombok.Getter;
 import org.springframework.http.HttpStatus;
+
+import lombok.Getter;
 
 /**
  * 에러 코드 관리
@@ -26,7 +27,7 @@ public enum BaseResponseStatus {
 	/**
 	 * 410 : 클라이언트 에러
 	 */
-	CLIENT_ERROR(false,HttpStatus.BAD_REQUEST.value(),"클라이언트 오류"),
+	CLIENT_ERROR(false, HttpStatus.BAD_REQUEST.value(), "클라이언트 오류"),
 
 	/**
 	 * 500 :  Database, Server 오류
@@ -39,6 +40,7 @@ public enum BaseResponseStatus {
 	private final boolean isSuccess;
 	private final int code;
 	private final String message;
+
 	BaseResponseStatus(boolean isSuccess, int code, String message) {
 		this.isSuccess = isSuccess;
 		this.code = code;
