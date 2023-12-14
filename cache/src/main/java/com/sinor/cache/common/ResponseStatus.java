@@ -32,7 +32,7 @@ public enum ResponseStatus {
 
 	//인증과인가, 요청처리
 	//400 BAD_REQUEST 잘못된 요청
-	DESERIALIZATION_ERROR(false, 400, "JSON 형식이 아닙니다."),
+	DESERIALIZATION_ERROR(false, 500, "JSON 형식이 아닙니다."),
 	//401 UNAUTHORIZED 인증 실패
 	CACHE_UNAUTHORIZED(false, 401, "인증에 실패하였습니다."),
 	//403 FORBIDDEN 권한 없음

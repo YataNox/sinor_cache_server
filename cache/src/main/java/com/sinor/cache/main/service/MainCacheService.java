@@ -1,32 +1,30 @@
 package com.sinor.cache.main.service;
 
-import org.springframework.data.redis.core.RedisTemplate;
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sinor.cache.admin.api.model.ApiGetResponse;
 import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
 import com.sinor.cache.admin.metadata.service.MetadataService;
 import com.sinor.cache.common.CustomException;
-import com.sinor.cache.common.ResponseStatus;
-import com.sinor.cache.main.model.MainCacheResponse;
+import com.sinor.cache.utils.JsonToStringConverter;
+import com.sinor.cache.utils.RedisUtils;
 
 import lombok.AllArgsConstructor;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import java.util.Map;
 
 @AllArgsConstructor
 @Service
 @Transactional
 public class MainCacheService implements IMainCacheServiceV1 {
 	private WebClient webClient;
-	private final RedisTemplate<String, String> redisTemplate;
-	private final ObjectMapper objectMapper;
+	private final RedisUtils redisUtils;
 	private final MetadataService metadataService;
+	private final JsonToStringConverter jsonToStringConverter;
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드
@@ -36,7 +34,7 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	public String getMainPathData(String path, MultiValueMap<String, String> queryString) {
 
 		//테스트 Main uri
-		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/{path}");
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/");
 		builder.path(path);
 
 		if(queryString != null) builder.queryParams(queryString);
@@ -64,7 +62,7 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 */
 	public String postMainPathData(String path, MultiValueMap<String, String> queryString, Map<String, String> body) {
 
-		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/{path}");
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/");
 		builder.path(path);
 
 		if(queryString != null) builder.queryParams(queryString);
@@ -87,7 +85,7 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 */
 	public String deleteMainPathData(String path, MultiValueMap<String, String> queryString) {
 
-		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/{path}");
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/");
 		builder.path(path);
 
 		if(queryString != null) builder.queryParams(queryString);
@@ -110,7 +108,7 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 */
 	public String updateMainPathData(String path, MultiValueMap<String, String> queryString, Map<String, String> body) {
 
-		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/{path}");
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/");
 		builder.path(path);
 
 		if(queryString != null) builder.queryParams(queryString);
@@ -134,9 +132,16 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 * @return 값이 있다면 value, 없다면 null
 	 */
 	public String getDataInCache(String path) {
-		String cachedData = redisTemplate.opsForValue().get(path);
-		System.out.println("cachedData: " + cachedData + "값입니다.");
-		return cachedData;
+		if(!redisUtils.isExist(path))
+			return null;
+
+		ApiGetResponse cachedData = jsonToStringConverter.jsonToString(redisUtils.getRedisData(path), ApiGetResponse.class);
+		System.out.println("cachedData.response: " + cachedData.getResponse() + "값 입니다.");
+		System.out.println("cachedData.url: " + cachedData.getUrl() + "값 입니다.");
+		System.out.println("cachedData.ttl: " + cachedData.getTtl() + "값 입니다.");
+		System.out.println("cachedData.createAt: " + cachedData.getCreateAt() + "값 입니다.");
+
+		return cachedData.getResponse();
 	}
 
 	/**
@@ -144,22 +149,21 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 * @param path 검색할 캐시의 Path
 	 * @param queryString 각 캐시의 구별을 위한 QueryString
 	 */
-	public String postInCache(String path, MultiValueMap<String, String> queryString) {
-		try {
-			String response = getMainPathData(path, queryString);
+	public String postInCache(String path, MultiValueMap<String, String> queryString) throws CustomException{
 
-			MainCacheResponse userCacheResponse = MainCacheResponse.builder()
-					.response(response)
-					.build();
+		String data = getMainPathData(path, queryString);
 
-			MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
-			redisTemplate.opsForValue().set(path, objectMapper.writeValueAsString(userCacheResponse), metadata.getMetadataTtlSecond());
+		System.out.println(data);
 
-			return userCacheResponse.getResponse();
+		MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
 
-		} catch (JsonProcessingException e) {
-			throw new CustomException(ResponseStatus.INTERNAL_SERVER_ERROR);
-		}
+		ApiGetResponse apiGetResponse = ApiGetResponse.from(metadata, data);
+
+		data = jsonToStringConverter.objectToJson(apiGetResponse);
+		System.out.println(data);
+		redisUtils.setRedisData(path, data, apiGetResponse.getTtl());
+
+		return apiGetResponse.getResponse();
 	}
 
 	// 1. RequestBody에 다음과 같은 형식으로 전달하면 캐시에 저장해주는 API
