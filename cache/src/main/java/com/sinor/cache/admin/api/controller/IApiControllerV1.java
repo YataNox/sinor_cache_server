@@ -1,6 +1,7 @@
 package com.sinor.cache.admin.api.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -26,4 +27,11 @@ public interface IApiControllerV1 {
 	 */
 	@GetMapping("/admin/cache/list/all")
 	ResponseEntity<AdminSuccessResponse<?>> getCacheListAll();
+
+	/**
+	 * 단일 캐시 삭제
+	 * @param key 삭제할 캐시의 key 값
+	 */
+	@DeleteMapping("/admin/cache")
+	ResponseEntity<?> deletecache(@RequestParam String key);
 }

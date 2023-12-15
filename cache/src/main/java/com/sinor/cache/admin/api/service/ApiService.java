@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class ApiService implements IApiServiceV1 {
 	private final RedisTemplate<String, String> redisTemplate;
 	private final JsonToStringConverter jsonToStringConverter;
@@ -34,7 +34,6 @@ public class ApiService implements IApiServiceV1 {
 		this.jsonToStringConverter = jsonToStringConverter;
 	}
 
-
 	/**
 	 * 캐시 조회
 	 * @param key 조회할 캐시의 Key 값
@@ -42,8 +41,8 @@ public class ApiService implements IApiServiceV1 {
 	public ApiGetResponse findCacheById(String key) throws CustomException {
 		String value = redisTemplate.opsForValue().get(key);
 
-		if(value == null)
-            throw new CustomException(CACHE_NOT_FOUND);
+		if (value == null)
+			throw new CustomException(CACHE_NOT_FOUND);
 
 		return jsonToStringConverter.jsonToString(value, ApiGetResponse.class);
 	}
@@ -85,6 +84,7 @@ public class ApiService implements IApiServiceV1 {
 	 * @param expiredTime 생성할 캐시의 만료시간
 	 */
 	@Override
+	@Transactional
 	public ApiGetResponse saveOrUpdate(String key, String value, int expiredTime) throws CustomException {
 		redisTemplate.opsForValue().set(key, value, expiredTime, TimeUnit.SECONDS);
 		return jsonToStringConverter.jsonToString(redisTemplate.opsForValue().get(key), ApiGetResponse.class);
@@ -95,8 +95,8 @@ public class ApiService implements IApiServiceV1 {
 	 * @param key 삭제할 캐시의 Key
 	 */
 	@Override
-	public void deleteCacheById(String key) throws CustomException {
-		redisTemplate.delete(key);
+	public Boolean deleteCacheById(String key) throws CustomException {
+		return redisTemplate.delete(key);
 	}
 
 	/**
@@ -107,18 +107,19 @@ public class ApiService implements IApiServiceV1 {
 	public void deleteCacheList(String pattern) throws CustomException {
 		// scan으로 키 조회
 		Cursor<byte[]> cursor = redisTemplate.executeWithStickyConnection(
-				connection -> {
-					ScanOptions options = ScanOptions.scanOptions().match("*" + pattern + "*").build();
-					return connection.scan(options);
-				});
+			connection -> {
+				ScanOptions options = ScanOptions.scanOptions().match("*" + pattern + "*").build();
+				return connection.scan(options);
+			});
 
-		if(cursor == null) throw new CustomException(CACHE_LIST_NOT_FOUND);
+		if (cursor == null)
+			throw new CustomException(CACHE_LIST_NOT_FOUND);
 
-        // unlink로 키 삭제
+		// unlink로 키 삭제
 		while (cursor.hasNext()) {
 			redisTemplate.unlink(Arrays.toString(cursor.next()));
 		}
-    }
+	}
 
 	/**
 	 * RedisTemplate에서 얻은 byte Cursor 값을 CacheGetResponse List 형태로 담아 반환하는 메소드
@@ -135,8 +136,6 @@ public class ApiService implements IApiServiceV1 {
 			list.add(jsonToStringConverter.jsonToString(jsonValue, ApiGetResponse.class));
 		}
 	}
-
-
 
 	// 미사용
 	//-----------------------------------------------------------------------------------------------------------------

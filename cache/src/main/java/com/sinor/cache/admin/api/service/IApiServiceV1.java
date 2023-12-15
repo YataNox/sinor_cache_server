@@ -36,7 +36,7 @@ public interface IApiServiceV1 {
 	 * 캐시 삭제
 	 * @param key 삭제할 캐시의 Key
 	 */
-	void deleteCacheById(String key) throws CustomException;
+	Boolean deleteCacheById(String key) throws CustomException;
 
 	/**
 	 * 패턴과 일치하는 캐시 삭제

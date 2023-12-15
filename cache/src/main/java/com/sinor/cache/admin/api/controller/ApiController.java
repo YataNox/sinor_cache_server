@@ -26,7 +26,8 @@ public class ApiController implements IApiControllerV1 {
 
 	@Override
 	public ResponseEntity<AdminSuccessResponse<?>> getCache(String key) {
-		AdminSuccessResponse<?> adminResponse = AdminSuccessResponse.from(ResponseStatus.SUCCESS, apiService.findCacheById(key));
+		AdminSuccessResponse<?> adminResponse = AdminSuccessResponse.from(ResponseStatus.SUCCESS,
+			apiService.findCacheById(key));
 		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(adminResponse);
 
 	}
@@ -38,10 +39,10 @@ public class ApiController implements IApiControllerV1 {
 
 	@Override
 	public ResponseEntity<AdminSuccessResponse<?>> getCacheListByKeyParams(String url) {
-		AdminSuccessResponse<?> adminResponse = AdminSuccessResponse.from(ResponseStatus.SUCCESS, apiService.findCacheList(url));
+		AdminSuccessResponse<?> adminResponse = AdminSuccessResponse.from(ResponseStatus.SUCCESS,
+			apiService.findCacheList(url));
 		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(adminResponse);
 	}
-
 
 	/**
 	 * 전체 캐시 목록 조회
@@ -51,18 +52,26 @@ public class ApiController implements IApiControllerV1 {
 	public ResponseEntity<AdminSuccessResponse<?>> getCacheListAll() {
 		return null;
 	}
+
+	/**
+	 * 단일 캐시 삭제
+	 * @param key 삭제할 캐시의 key 값
+	 */
+	@Override
+	public ResponseEntity<?> deletecache(String key) {
+		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(apiService.deleteCacheById(key));
+	}
 }
 
-
 /**
-	 * API로 캐시를 생성
-	 * value 값을 현재 Path로 받는 멍청한 짓을 하고 있음 RequestBody로 수정 필요 (멍청한 챗 GPT)
-	 * @param key
-	 * @param value
-	 * @param expirationTime
-	 * @return
-	 *//*
-*/
+ * API로 캐시를 생성
+ * value 값을 현재 Path로 받는 멍청한 짓을 하고 있음 RequestBody로 수정 필요 (멍청한 챗 GPT)
+ * @param key
+ * @param value
+ * @param expirationTime
+ * @return
+ *//*
+ */
 /*
 	@PostMapping("/setCache/{key}/{value}/{expirationTime}")
 	public String setCache(
@@ -75,15 +84,15 @@ public class ApiController implements IApiControllerV1 {
 	}
 
 	*//*
-*/
+ */
 /**
-	 * URL 만료기간 재설정
-	 * @param key ex) /userAccount
-	 * @param queryString ex) ?id=12 or /12
-	 * @param newExpirationTime
-	 * @return 변경 성공 메시지
-	 *//*
-*/
+ * URL 만료기간 재설정
+ * @param key ex) /userAccount
+ * @param queryString ex) ?id=12 or /12
+ * @param newExpirationTime
+ * @return 변경 성공 메시지
+ *//*
+ */
 /*
 	@PutMapping("/updateExpirationTime/{key}/{queryString}/{newExpirationTime}")
 	public String updateExpirationTime(
@@ -98,13 +107,13 @@ public class ApiController implements IApiControllerV1 {
 	}
 
 	*//*
-*/
+ */
 /**
-	 * 매개변수 Key의 패턴과 유사한 캐시들의 목록을 조회
-	 * @param key 찾을 Key의 패턴
-	 * @return key 값을 포함하는 Key들 SET 목록
-	 *//*
-*/
+ * 매개변수 Key의 패턴과 유사한 캐시들의 목록을 조회
+ * @param key 찾을 Key의 패턴
+ * @return key 값을 포함하는 Key들 SET 목록
+ *//*
+ */
 /*
 	@GetMapping("/getKeys/{key}")
 	public String getKeys(@PathVariable String key) {
@@ -118,15 +127,15 @@ public class ApiController implements IApiControllerV1 {
 	// sean 코드 추가
 
 	*//*
-*/
+ */
 /**
-	 * URL 만료기간 재설정
-	 * @param key 키를 조회할 때 특정 문자열
-	 * @param queryString ex) ?id=12 or /12
-	 * @param newExpirationTime
-	 * @return 변경 성공 메시지
-	 *//*
-*/
+ * URL 만료기간 재설정
+ * @param key 키를 조회할 때 특정 문자열
+ * @param queryString ex) ?id=12 or /12
+ * @param newExpirationTime
+ * @return 변경 성공 메시지
+ *//*
+ */
 /*
 	@PutMapping("/updateExpirationTimeByScan/{key}/{queryString}/{newExpirationTime}")
 	public String updateExpirationTimeByScan(
@@ -140,15 +149,15 @@ public class ApiController implements IApiControllerV1 {
 	}
 
 	*//*
-*/
+ */
 /*    /**
-	 * 매개변수 Key의 패턴과 유사한 캐시들을 삭제(Scan 성능이 더 좋음)
-	 * @param key 찾을 Key의 패턴
-	 * @return
-	 *//*
-*/
+ * 매개변수 Key의 패턴과 유사한 캐시들을 삭제(Scan 성능이 더 좋음)
+ * @param key 찾을 Key의 패턴
+ * @return
+ *//*
+ */
 /**//*
-*/
+ */
 /*
     @PostMapping("/deleteDataContainingStringByKeys/{key}")
     public String deleteDataContainingStringByKeys(@PathVariable String key) {
@@ -156,17 +165,17 @@ public class ApiController implements IApiControllerV1 {
 
         return "Delete Cache: " + key;
     }*//*
-*/
+ */
 /*
 
-	*//*
-*/
+ *//*
+ */
 /**
-	 * 매개변수 Key의 패턴과 유사한 캐시들을 삭제
-	 * @param key 찾을 Key의 패턴
-	 * @return
-	 *//*
-*/
+ * 매개변수 Key의 패턴과 유사한 캐시들을 삭제
+ * @param key 찾을 Key의 패턴
+ * @return
+ *//*
+ */
 /*
 	@PostMapping("/deleteDataContainingStringByScan/{key}")
 	public String deleteData(@PathVariable String key) {
@@ -176,13 +185,13 @@ public class ApiController implements IApiControllerV1 {
 	}
 
 	*//*
-*/
+ */
 /**
-	 * 매개변수 Key의 패턴과 유사한 캐시들을 삭제
-	 * @param url 찾을 Key의 패턴
-	 * @return
-	 *//*
-*/
+ * 매개변수 Key의 패턴과 유사한 캐시들을 삭제
+ * @param url 찾을 Key의 패턴
+ * @return
+ *//*
+ */
 /*
 	@PostMapping("/deleteDataContainingStringByScan/{url}")
 	public String deleteDataContainingStringByScan(@PathVariable String url) {
@@ -192,11 +201,11 @@ public class ApiController implements IApiControllerV1 {
 	}
 
 	*//*
-*/
+ */
 /**
 
-	 *//*
-*/
+ *//*
+ */
 /*
 	@GetMapping("/searchDataContainingString/{url}")
 	public Set<String> searchDataContainingString(@PathVariable String url) {
