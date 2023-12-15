@@ -7,12 +7,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.sinor.cache.admin.api.model.ApiGetResponse;
 import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
 import com.sinor.cache.admin.metadata.service.MetadataService;
 import com.sinor.cache.common.CustomException;
+import com.sinor.cache.common.ResponseStatus;
 import com.sinor.cache.utils.JsonToStringConverter;
 import com.sinor.cache.utils.RedisUtils;
 
@@ -29,10 +32,11 @@ public class MainCacheService implements IMainCacheServiceV1 {
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드
-	 * @param path 요청 path
+	 *
+	 * @param path        요청 path
 	 * @param queryString 요청 queryString
 	 */
-	public String getMainPathData(String path, MultiValueMap<String, String> queryString) {
+	public ResponseEntity<JsonNode> getMainPathData(String path, MultiValueMap<String, String> queryString) throws CustomException {
 
 		//테스트 Main uri
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/");
@@ -42,28 +46,27 @@ public class MainCacheService implements IMainCacheServiceV1 {
 			builder.queryParams(queryString);
 		// uri 확인
 		System.out.println(builder.toUriString());
-
-		ResponseEntity<String> mainResponse = webClient.get()
-			.uri(builder.build().toUri())
-			.retrieve()
-			.toEntity(String.class) // 메인 서버에서 오는 요청을 String 으로 받는다.
-			// main 서버는 모든 데이터에 대해 ok, data 형태로 넘어온다. 이를 받을 Response 객체를 활용할 수 없을까?
-			.log()
-			.block();
-		System.out.println(mainResponse);
-		// 여기서 그냥 반환을 MainServerResponse 로 하는 것
-		// 캐시 서버에서 Main 의 데이터를 활용할 것도 아닌데 String 에서 꼭 변환을 해야할까?
-		//TODO toString()으로는 원하는 값이 안나온다면? => getStatusCode(), getHeaders(), getBody()로 직접 받자
-		return mainResponse.toString();
+		try {
+			//TODO toString()으로는 원하는 값이 안나온다면? => getStatusCode(), getHeaders(), getBody()로 직접 받자
+			return webClient.get()
+				.uri(builder.build().toUri())
+				.retrieve()
+				.toEntity(JsonNode.class)
+				.log()
+				.block();
+		}catch (WebClientResponseException e){
+			throw new CustomException(ResponseStatus.DISPLAY_NOT_FOUND);
+		}
 	}
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드
-	 * @param path 요청 path
+	 *
+	 * @param path        요청 path
 	 * @param queryString 요청 queryString
-	 * @param body Requestbody
+	 * @param body        Requestbody
 	 */
-	public String postMainPathData(String path, MultiValueMap<String, String> queryString, Map<String, String> body) {
+	public ResponseEntity<JsonNode> postMainPathData(String path, MultiValueMap<String, String> queryString, Map<String, String> body) {
 
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/");
 		builder.path(path);
@@ -72,24 +75,26 @@ public class MainCacheService implements IMainCacheServiceV1 {
 			builder.queryParams(queryString);
 		// uri 확인
 		System.out.println(builder.toUriString());
-
-		ResponseEntity<String> mainResponse = webClient.post()
-			.uri(builder.build().toUri())
-			.bodyValue(body)
-			.retrieve()
-			.toEntity(String.class)
-			.log()
-			.block();
-
-		return mainResponse.toString();
+		try{
+			return webClient.post()
+				.uri(builder.build().toUri())
+				.bodyValue(body)
+				.retrieve()
+				.toEntity(JsonNode.class)
+				.log()
+				.block();
+		}catch (WebClientResponseException e){
+			throw new CustomException(ResponseStatus.DISPLAY_NOT_FOUND);
+		}
 	}
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드
-	 * @param path 요청 path
+	 *
+	 * @param path        요청 path
 	 * @param queryString 요청 queryString
 	 */
-	public String deleteMainPathData(String path, MultiValueMap<String, String> queryString) {
+	public ResponseEntity<JsonNode> deleteMainPathData(String path, MultiValueMap<String, String> queryString) {
 
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/");
 		builder.path(path);
@@ -98,25 +103,27 @@ public class MainCacheService implements IMainCacheServiceV1 {
 			builder.queryParams(queryString);
 		// uri 확인
 		System.out.println(builder.toUriString());
-
-		ResponseEntity<String> mainResponse = webClient.delete()
-			.uri(builder.build().toUri())
-			//.exchangeToMono(response -> response.bodyToMono(String.class))
-			.retrieve()
-			.toEntity(String.class)
-			.log()
-			.block();
-
-		return mainResponse.toString();
+		try {
+			return webClient.delete()
+				.uri(builder.build().toUri())
+				//.exchangeToMono(response -> response.bodyToMono(String.class))
+				.retrieve()
+				.toEntity(JsonNode.class)
+				.log()
+				.block();
+		}catch (WebClientResponseException e){
+			throw new CustomException(ResponseStatus.DISPLAY_NOT_FOUND);
+		}
 	}
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드
-	 * @param path 요청 path
+	 *
+	 * @param path        요청 path
 	 * @param queryString 요청 queryString
-	 * @param body Requestbody
+	 * @param body        Requestbody
 	 */
-	public String updateMainPathData(String path, MultiValueMap<String, String> queryString, Map<String, String> body) {
+	public ResponseEntity<JsonNode> updateMainPathData(String path, MultiValueMap<String, String> queryString, Map<String, String> body) {
 
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/");
 		builder.path(path);
@@ -125,17 +132,18 @@ public class MainCacheService implements IMainCacheServiceV1 {
 			builder.queryParams(queryString);
 		// uri 확인
 		System.out.println(builder.toUriString());
-
-		ResponseEntity<String> mainResponse = webClient.put()
-			.uri(builder.build().toUri())
-			.bodyValue(body)
-			//.exchangeToMono(response -> response.bodyToMono(String.class))
-			.retrieve()
-			.toEntity(String.class)
-			.log()
-			.block();
-
-		return mainResponse.toString();
+		try {
+			return webClient.put()
+				.uri(builder.build().toUri())
+				.bodyValue(body)
+				//.exchangeToMono(response -> response.bodyToMono(String.class))
+				.retrieve()
+				.toEntity(JsonNode.class)
+				.log()
+				.block();
+		}catch (WebClientResponseException e){
+			throw new CustomException(ResponseStatus.DISPLAY_NOT_FOUND);
+		}
 	}
 
 	/**
@@ -165,17 +173,12 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 */
 	public String postInCache(String path, MultiValueMap<String, String> queryString) throws CustomException {
 
-		String data = getMainPathData(path, queryString);
-
-		System.out.println(data);
+		ResponseEntity<JsonNode> data = getMainPathData(path, queryString);
 
 		MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
-
-		ApiGetResponse apiGetResponse = ApiGetResponse.from(metadata, data);
-
-		data = jsonToStringConverter.objectToJson(apiGetResponse);
-		System.out.println(data);
-		redisUtils.setRedisData(path, data, apiGetResponse.getTtl());
+		ApiGetResponse apiGetResponse = ApiGetResponse.from(metadata, data.toString());
+		String response = jsonToStringConverter.objectToJson(apiGetResponse);
+		redisUtils.setRedisData(path, response, apiGetResponse.getTtl());
 
 		return apiGetResponse.getResponse();
 	}

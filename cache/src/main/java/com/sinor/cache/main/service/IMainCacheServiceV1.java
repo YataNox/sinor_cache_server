@@ -1,6 +1,9 @@
 package com.sinor.cache.main.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.sinor.cache.common.CustomException;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 
 import java.util.Map;
@@ -8,33 +11,37 @@ import java.util.Map;
 public interface IMainCacheServiceV1 {
 	/**
 	 * Main 서버에 요청을 보내는 메서드
-	 * @param path 요청 path
+	 *
+	 * @param path        요청 path
 	 * @param queryString 요청 queryString
 	 */
-	String getMainPathData(String path, MultiValueMap<String, String> queryString) throws CustomException;
+	ResponseEntity<JsonNode> getMainPathData(String path, MultiValueMap<String, String> queryString) throws CustomException;
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드
-	 * @param path 요청 path
+	 *
+	 * @param path        요청 path
 	 * @param queryString 요청 queryString
-	 * @param body Requestbody
+	 * @param body        Requestbody
 	 */
-	String postMainPathData(String path, MultiValueMap<String, String> queryString, Map<String, String> body) throws CustomException;
+	ResponseEntity<JsonNode> postMainPathData(String path, MultiValueMap<String, String> queryString, Map<String, String> body) throws CustomException;
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드
-	 * @param path 요청 path
+	 *
+	 * @param path        요청 path
 	 * @param queryString 요청 queryString
 	 */
-	String deleteMainPathData(String path, MultiValueMap<String, String> queryString) throws CustomException;
+	ResponseEntity<JsonNode> deleteMainPathData(String path, MultiValueMap<String, String> queryString) throws CustomException;
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드
-	 * @param path 요청 path
+	 *
+	 * @param path        요청 path
 	 * @param queryString 요청 queryString
-	 * @param body Requestbody
+	 * @param body        Requestbody
 	 */
-	String updateMainPathData(String path, MultiValueMap<String, String> queryString, Map<String, String> body) throws CustomException;
+	ResponseEntity<JsonNode> updateMainPathData(String path, MultiValueMap<String, String> queryString, Map<String, String> body) throws CustomException;
 
 	/**
 	 * 캐시에 데이터가 있는지 확인하고 없으면 데이터를 조회해서 있으면 데이터를 조회해서 반환해주는 메소드

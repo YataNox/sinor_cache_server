@@ -1,8 +1,16 @@
 package com.sinor.cache.main.controller;
 
-import com.sinor.cache.main.model.MainCacheRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.sinor.cache.main.model.MainCacheRequest;
 
 // https://www.baeldung.com/jackson-mapping-dynamic-object#using-jsonanysetter
 // 어떤 형태로 요청이 들어오든 json 타입이라는 가정만 있으면 모두 Map<String, Object> 형식으로 저장 가능하다고 생각
@@ -25,33 +33,34 @@ public interface IMainCacheControllerV1 {
 	/**
 	 * 데이터 조회 또는 생성 및 캐시 조회
 	 *
-	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
-	 * @param path 요청에 전달된 path
+	 * @param path        요청에 전달된 path
 	 * @param queryParams 요청에 전달된 queryString
-	 * @param body 요청에 전달된 RequestBody 내용에 매핑된 RequestBodyDto 객체
+	 * @param body        요청에 전달된 RequestBody 내용에 매핑된 RequestBodyDto 객체
+	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@PostMapping("/{path}")
-	String postDataReadCache(@PathVariable String path, @RequestParam(required = false) MultiValueMap<String, String> queryParams,
+	ResponseEntity<JsonNode> postDataReadCache(@PathVariable String path, @RequestParam(required = false) MultiValueMap<String, String> queryParams,
 							 MainCacheRequest body);
 
 	/**
 	 * 데이터 삭제 및 캐시 갱신
 	 *
-	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
-	 * @param path 요청에 전달된 path
+	 * @param path        요청에 전달된 path
 	 * @param queryParams 요청에 전달된 queryString
+	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@DeleteMapping("/{path}")
-	String deleteDataRefreshCache(@PathVariable String path, @RequestParam(required = false) MultiValueMap<String, String> queryParams);
+	ResponseEntity<JsonNode> deleteDataRefreshCache(@PathVariable String path, @RequestParam(required = false) MultiValueMap<String, String> queryParams);
 
 	/**
 	 * 데이터 수정 및 캐시 갱신
-	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
-	 * @param path 요청에 전달된 path
+	 *
+	 * @param path        요청에 전달된 path
 	 * @param queryParams 요청에 전달된 queryString
-	 * @param body 요청에 전달된 RequestBody 내용에 매핑된 RequestBodyDto 객체
+	 * @param body        요청에 전달된 RequestBody 내용에 매핑된 RequestBodyDto 객체
+	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@PutMapping("/{path}")
-	String updateDataRefreshCache(@PathVariable String path, @RequestParam(required = false) MultiValueMap<String, String> queryParams,
+	ResponseEntity<JsonNode> updateDataRefreshCache(@PathVariable String path, @RequestParam(required = false) MultiValueMap<String, String> queryParams,
 								  MainCacheRequest body);
 }
