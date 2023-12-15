@@ -23,9 +23,9 @@ import lombok.AllArgsConstructor;
 @Transactional
 public class MainCacheService implements IMainCacheServiceV1 {
 	private WebClient webClient;
-	private final RedisUtils redisUtils;
 	private final MetadataService metadataService;
 	private final JsonToStringConverter jsonToStringConverter;
+	private final RedisUtils redisUtils;
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드

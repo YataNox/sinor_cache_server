@@ -6,18 +6,16 @@ import static java.nio.charset.StandardCharsets.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sinor.cache.admin.api.model.ApiGetResponse;
 import com.sinor.cache.common.CustomException;
 import com.sinor.cache.utils.JsonToStringConverter;
+import com.sinor.cache.utils.RedisUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,12 +23,12 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Transactional(readOnly = true)
 public class ApiService implements IApiServiceV1 {
-	private final RedisTemplate<String, String> redisTemplate;
 	private final JsonToStringConverter jsonToStringConverter;
+	private final RedisUtils redisUtils;
 
 	@Autowired
-	public ApiService(RedisTemplate<String, String> redisTemplate, JsonToStringConverter jsonToStringConverter) {
-		this.redisTemplate = redisTemplate;
+	public ApiService(JsonToStringConverter jsonToStringConverter, RedisUtils redisUtils) {
+		this.redisUtils = redisUtils;
 		this.jsonToStringConverter = jsonToStringConverter;
 	}
 
@@ -39,11 +37,7 @@ public class ApiService implements IApiServiceV1 {
 	 * @param key 조회할 캐시의 Key 값
 	 */
 	public ApiGetResponse findCacheById(String key) throws CustomException {
-		String value = redisTemplate.opsForValue().get(key);
-
-		if (value == null)
-			throw new CustomException(CACHE_NOT_FOUND);
-
+		String value = redisUtils.getRedisData(key);
 		return jsonToStringConverter.jsonToString(value, ApiGetResponse.class);
 	}
 
@@ -55,10 +49,7 @@ public class ApiService implements IApiServiceV1 {
 	public List<ApiGetResponse> findCacheList(String pattern) throws CustomException {
 		List<ApiGetResponse> list = new ArrayList<>();
 
-		Cursor<byte[]> cursor = redisTemplate.executeWithStickyConnection(connection -> {
-			ScanOptions options = ScanOptions.scanOptions().match("*" + pattern + "*").build();
-			return connection.scan(options);
-		});
+		Cursor<byte[]> cursor = redisUtils.searchPatternKeys(pattern);
 
 		processCursor(cursor, list);
 
@@ -85,9 +76,9 @@ public class ApiService implements IApiServiceV1 {
 	 */
 	@Override
 	@Transactional
-	public ApiGetResponse saveOrUpdate(String key, String value, int expiredTime) throws CustomException {
-		redisTemplate.opsForValue().set(key, value, expiredTime, TimeUnit.SECONDS);
-		return jsonToStringConverter.jsonToString(redisTemplate.opsForValue().get(key), ApiGetResponse.class);
+	public ApiGetResponse saveOrUpdate(String key, String value, Long expiredTime) throws CustomException {
+		redisUtils.setRedisData(key, value, expiredTime);
+		return jsonToStringConverter.jsonToString(redisUtils.getRedisData(key), ApiGetResponse.class);
 	}
 
 	/**
@@ -96,7 +87,7 @@ public class ApiService implements IApiServiceV1 {
 	 */
 	@Override
 	public Boolean deleteCacheById(String key) throws CustomException {
-		return redisTemplate.delete(key);
+		return redisUtils.deleteCache(key);
 	}
 
 	/**
@@ -106,18 +97,14 @@ public class ApiService implements IApiServiceV1 {
 	@Override
 	public void deleteCacheList(String pattern) throws CustomException {
 		// scan으로 키 조회
-		Cursor<byte[]> cursor = redisTemplate.executeWithStickyConnection(
-			connection -> {
-				ScanOptions options = ScanOptions.scanOptions().match("*" + pattern + "*").build();
-				return connection.scan(options);
-			});
+		Cursor<byte[]> cursor = redisUtils.searchPatternKeys(pattern);
 
 		if (cursor == null)
 			throw new CustomException(CACHE_LIST_NOT_FOUND);
 
 		// unlink로 키 삭제
 		while (cursor.hasNext()) {
-			redisTemplate.unlink(Arrays.toString(cursor.next()));
+			redisUtils.unlinkCache(Arrays.toString(cursor.next()));
 		}
 	}
 
@@ -132,7 +119,7 @@ public class ApiService implements IApiServiceV1 {
 			byte[] keyBytes = cursor.next();
 			String key = new String(keyBytes, UTF_8);
 
-			String jsonValue = redisTemplate.opsForValue().get(key);
+			String jsonValue = redisUtils.getRedisData(key);
 			list.add(jsonToStringConverter.jsonToString(jsonValue, ApiGetResponse.class));
 		}
 	}
