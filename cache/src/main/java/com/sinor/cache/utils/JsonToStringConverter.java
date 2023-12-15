@@ -15,6 +15,7 @@ public class JsonToStringConverter {
 
 	public <T> T jsonToString(String jsonValue, Class<T> clazz) throws CustomException {
 		try {
+			System.out.println(jsonValue + " : " + clazz);
 			return objectMapper.readValue(jsonValue, clazz);
 		} catch (JsonProcessingException e) {
 			throw new CustomException(DESERIALIZATION_ERROR);

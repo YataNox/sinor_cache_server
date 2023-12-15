@@ -30,6 +30,7 @@ public class RedisUtils {
 
 	public Boolean isExist(String key) throws CustomException {
 		try {
+			System.out.println(redisTemplate.hasKey(key));
 			return redisTemplate.hasKey(key);
 		} catch (NullPointerException e){
 			throw new CustomException(ResponseStatus.CACHE_NOT_FOUND);

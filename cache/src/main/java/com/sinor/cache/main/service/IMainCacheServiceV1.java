@@ -1,12 +1,12 @@
 package com.sinor.cache.main.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.sinor.cache.common.CustomException;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 
-import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.sinor.cache.common.CustomException;
 
 public interface IMainCacheServiceV1 {
 	/**
@@ -46,15 +46,17 @@ public interface IMainCacheServiceV1 {
 	/**
 	 * 캐시에 데이터가 있는지 확인하고 없으면 데이터를 조회해서 있으면 데이터를 조회해서 반환해주는 메소드
 	 * opsForValue() - Strings를 쉽게 Serialize / Deserialize 해주는 Interface
+	 *
 	 * @param path 특정 path에 캐시가 있나 확인하기 위한 파라미터
 	 * @return 값이 있다면 value, 없다면 null
 	 */
-	String getDataInCache(String path) throws CustomException;
+	ResponseEntity<JsonNode> getDataInCache(String path, MultiValueMap<String, String> queryParams) throws CustomException;
 
 	/**
 	 * 캐시에 데이터가 없으면 메인 데이터를 조회해서 캐시에 저장하고 반환해주는 메소드
-	 * @param path 검색할 캐시의 Path
+	 *
+	 * @param path        검색할 캐시의 Path
 	 * @param queryString 각 캐시의 구별을 위한 QueryString
 	 */
-	String postInCache(String path, MultiValueMap<String, String> queryString) throws CustomException;
+	ResponseEntity<JsonNode> postInCache(String path, MultiValueMap<String, String> queryString) throws CustomException;
 }

@@ -39,17 +39,9 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	public ResponseEntity<JsonNode> getMainPathData(String path, MultiValueMap<String, String> queryString) throws CustomException {
 
 		//테스트 Main uri
-		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/");
-		builder.path(path);
-
-		if (queryString != null)
-			builder.queryParams(queryString);
-		// uri 확인
-		System.out.println(builder.toUriString());
 		try {
-			//TODO toString()으로는 원하는 값이 안나온다면? => getStatusCode(), getHeaders(), getBody()로 직접 받자
 			return webClient.get()
-				.uri(builder.build().toUri())
+				.uri(uriBuilder(path, queryString).build().toUri())
 				.retrieve()
 				.toEntity(JsonNode.class)
 				.log()
@@ -68,16 +60,9 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 */
 	public ResponseEntity<JsonNode> postMainPathData(String path, MultiValueMap<String, String> queryString, Map<String, String> body) {
 
-		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/");
-		builder.path(path);
-
-		if (queryString != null)
-			builder.queryParams(queryString);
-		// uri 확인
-		System.out.println(builder.toUriString());
 		try{
 			return webClient.post()
-				.uri(builder.build().toUri())
+				.uri(uriBuilder(path, queryString).build().toUri())
 				.bodyValue(body)
 				.retrieve()
 				.toEntity(JsonNode.class)
@@ -96,16 +81,9 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 */
 	public ResponseEntity<JsonNode> deleteMainPathData(String path, MultiValueMap<String, String> queryString) {
 
-		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/");
-		builder.path(path);
-
-		if (queryString != null)
-			builder.queryParams(queryString);
-		// uri 확인
-		System.out.println(builder.toUriString());
 		try {
 			return webClient.delete()
-				.uri(builder.build().toUri())
+				.uri(uriBuilder(path, queryString).build().toUri())
 				//.exchangeToMono(response -> response.bodyToMono(String.class))
 				.retrieve()
 				.toEntity(JsonNode.class)
@@ -124,17 +102,9 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 * @param body        Requestbody
 	 */
 	public ResponseEntity<JsonNode> updateMainPathData(String path, MultiValueMap<String, String> queryString, Map<String, String> body) {
-
-		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/");
-		builder.path(path);
-
-		if (queryString != null)
-			builder.queryParams(queryString);
-		// uri 확인
-		System.out.println(builder.toUriString());
 		try {
 			return webClient.put()
-				.uri(builder.build().toUri())
+				.uri(uriBuilder(path, queryString).build().toUri())
 				.bodyValue(body)
 				//.exchangeToMono(response -> response.bodyToMono(String.class))
 				.retrieve()
@@ -149,15 +119,16 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	/**
 	 * 캐시에 데이터가 있는지 확인하고 없으면 데이터를 조회해서 있으면 데이터를 조회해서 반환해주는 메소드
 	 * opsForValue() - Strings 를 쉽게 Serialize / Deserialize 해주는 Interface
+	 *
 	 * @param path 특정 path에 캐시가 있나 확인하기 위한 파라미터
 	 * @return 값이 있다면 value, 없다면 null
 	 */
-	public String getDataInCache(String path) {
-		if (!redisUtils.isExist(path))
+	public ResponseEntity<JsonNode> getDataInCache(String path, MultiValueMap<String, String> queryParams) throws CustomException{
+		String uri = uriBuilder(path, queryParams).build().toUriString();
+		if (!redisUtils.isExist(uri))
 			return null;
-
-		ApiGetResponse cachedData = jsonToStringConverter.jsonToString(redisUtils.getRedisData(path),
-			ApiGetResponse.class);
+		System.out.println(redisUtils.getRedisData(uri) + "확인");
+		ApiGetResponse cachedData = jsonToStringConverter.jsonToString(redisUtils.getRedisData(uri), ApiGetResponse.class);
 		System.out.println("cachedData.response: " + cachedData.getResponse() + "값 입니다.");
 		System.out.println("cachedData.url: " + cachedData.getUrl() + "값 입니다.");
 		System.out.println("cachedData.ttl: " + cachedData.getTtl() + "값 입니다.");
@@ -168,19 +139,30 @@ public class MainCacheService implements IMainCacheServiceV1 {
 
 	/**
 	 * 캐시에 데이터가 없으면 메인 데이터를 조회해서 캐시에 저장하고 반환해주는 메소드
-	 * @param path 검색할 캐시의 Path
-	 * @param queryString 각 캐시의 구별을 위한 QueryString
+	 *
+	 * @param path        검색할 캐시의 Path
+	 * @param queryParams 각 캐시의 구별을 위한 QueryString
 	 */
-	public String postInCache(String path, MultiValueMap<String, String> queryString) throws CustomException {
+	public ResponseEntity<JsonNode> postInCache(String path, MultiValueMap<String, String> queryParams) throws CustomException {
 
-		ResponseEntity<JsonNode> data = getMainPathData(path, queryString);
+		ResponseEntity<JsonNode> data = getMainPathData(path, queryParams);
 
 		MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
-		ApiGetResponse apiGetResponse = ApiGetResponse.from(metadata, data.toString());
+		ApiGetResponse apiGetResponse = ApiGetResponse.from(metadata, data);
 		String response = jsonToStringConverter.objectToJson(apiGetResponse);
-		redisUtils.setRedisData(path, response, apiGetResponse.getTtl());
+		redisUtils.setRedisData(uriBuilder(path, queryParams).build().toUriString(), response, apiGetResponse.getTtl());
 
 		return apiGetResponse.getResponse();
+	}
+
+	private UriComponentsBuilder uriBuilder(String path, MultiValueMap<String, String> queryParams){
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/");
+		builder.path(path);
+
+		if (queryParams != null)
+			builder.queryParams(queryParams);
+
+		return builder;
 	}
 
 	// 1. RequestBody에 다음과 같은 형식으로 전달하면 캐시에 저장해주는 API

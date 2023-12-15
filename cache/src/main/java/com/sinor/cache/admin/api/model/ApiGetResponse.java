@@ -3,6 +3,9 @@ package com.sinor.cache.admin.api.model;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
+import org.springframework.http.ResponseEntity;
+
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
 
@@ -24,9 +27,9 @@ public class ApiGetResponse {
 	private Long ttl; // 설정 만료 시간 (Metadata value)
 	private String url; // 상위 URL
 	@JsonSerialize
-	private String response; // 해당 캐시에 대한 응답
+	private ResponseEntity<JsonNode> response; // 해당 캐시에 대한 응답
 
-	public static ApiGetResponse from(MetadataGetResponse metadataGetResponse, String response){
+	public static ApiGetResponse from(MetadataGetResponse metadataGetResponse, ResponseEntity<JsonNode> response){
 		return ApiGetResponse.builder()
 			.createAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
 			.ttl(metadataGetResponse.getMetadataTtlSecond())

@@ -25,8 +25,8 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@Override
-	public String getDataReadCache(String path, MultiValueMap<String, String> queryParams) {
-		String pathCache = mainCacheService.getDataInCache(path);
+	public ResponseEntity<JsonNode> getDataReadCache(String path, MultiValueMap<String, String> queryParams) {
+		ResponseEntity<JsonNode> pathCache = mainCacheService.getDataInCache(path, queryParams);
 		if (pathCache == null) {
 			return mainCacheService.postInCache(path, queryParams);
 		}
