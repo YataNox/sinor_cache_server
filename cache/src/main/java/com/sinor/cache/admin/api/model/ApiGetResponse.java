@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
-import com.sinor.cache.common.CustomResponse;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -24,9 +23,9 @@ public class ApiGetResponse implements Serializable {
 	private LocalDateTime createAt; // 생성시간
 	private Long ttl; // 설정 만료 시간 (Metadata value)
 	private String url; // 상위 URL
-	private CustomResponse response; // 해당 캐시에 대한 응답
+	private String response; // 해당 캐시에 대한 응답
 
-	public static ApiGetResponse from(MetadataGetResponse metadataGetResponse, CustomResponse response){
+	public static ApiGetResponse from(MetadataGetResponse metadataGetResponse, String response){
 		return ApiGetResponse.builder()
 			.createAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
 			.ttl(metadataGetResponse.getMetadataTtlSecond())

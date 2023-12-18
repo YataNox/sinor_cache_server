@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.sinor.cache.main.model.MainCacheRequest;
 
 // https://www.baeldung.com/jackson-mapping-dynamic-object#using-jsonanysetter
@@ -27,7 +28,7 @@ public interface IMainCacheControllerV1 {
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@GetMapping("/{path}")
-	ResponseEntity<String> getDataReadCache(@PathVariable String path, @RequestParam(required = false) MultiValueMap<String, String> queryParams);
+	ResponseEntity<JsonNode> getDataReadCache(@PathVariable String path, @RequestParam(required = false) MultiValueMap<String, String> queryParams);
 
 	/**
 	 * 데이터 조회 또는 생성 및 캐시 조회

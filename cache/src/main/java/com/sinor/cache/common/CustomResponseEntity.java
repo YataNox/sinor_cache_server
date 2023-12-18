@@ -6,7 +6,9 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 
-public class CustomResponseEntity extends ResponseEntity<String> implements Serializable {
+import com.fasterxml.jackson.databind.JsonNode;
+
+public class CustomResponseEntity extends ResponseEntity<JsonNode> implements Serializable {
 
 private static final long serialVersionUID = 7156526077883281625L;
 
@@ -14,7 +16,7 @@ private static final long serialVersionUID = 7156526077883281625L;
 		super(status);
 	}
 
-	public CustomResponseEntity(String body, HttpStatusCode status) {
+	public CustomResponseEntity(JsonNode body, HttpStatusCode status) {
 		super(body, status);
 	}
 
@@ -22,15 +24,15 @@ private static final long serialVersionUID = 7156526077883281625L;
 		super(headers, status);
 	}
 
-	public CustomResponseEntity(String body, MultiValueMap<String, String> headers, HttpStatusCode status) {
+	public CustomResponseEntity(JsonNode body, MultiValueMap<String, String> headers, HttpStatusCode status) {
 		super(body, headers, status);
 	}
 
-	public CustomResponseEntity(String body, MultiValueMap<String, String> headers, int rawStatus) {
+	public CustomResponseEntity(JsonNode body, MultiValueMap<String, String> headers, int rawStatus) {
 		super(body, headers, rawStatus);
 	}
 
-	public CustomResponseEntity(ResponseEntity<String> responseEntity){
+	public CustomResponseEntity(ResponseEntity<JsonNode> responseEntity){
 		super(responseEntity.getBody(), responseEntity.getHeaders(), responseEntity.getStatusCode());
 	}
 }

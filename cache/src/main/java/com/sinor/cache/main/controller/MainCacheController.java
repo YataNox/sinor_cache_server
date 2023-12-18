@@ -1,10 +1,13 @@
 package com.sinor.cache.main.controller;
 
+import java.util.function.Consumer;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.sinor.cache.common.CustomResponse;
 import com.sinor.cache.main.model.MainCacheRequest;
 import com.sinor.cache.main.service.MainCacheService;
@@ -26,13 +29,13 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@Override
-	public ResponseEntity<String> getDataReadCache(String path, MultiValueMap<String, String> queryParams) {
+	public ResponseEntity<JsonNode> getDataReadCache(String path, MultiValueMap<String, String> queryParams) {
 		CustomResponse pathCache = mainCacheService.getDataInCache(path, queryParams);
 		if (pathCache == null) {
 			pathCache = mainCacheService.postInCache(path, queryParams);
 		}
 		return ResponseEntity.status(pathCache.getStatusCodeValue()).headers(
-			HttpHeaders.readOnlyHttpHeaders(pathCache.getHeaders())).body(pathCache.getBody());
+			(Consumer<HttpHeaders>)pathCache.getHeaders()).body(pathCache.getBody());
 	}
 
 	/**

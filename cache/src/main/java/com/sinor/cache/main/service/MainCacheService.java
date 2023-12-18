@@ -13,6 +13,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.sinor.cache.admin.api.model.ApiGetResponse;
 import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
 import com.sinor.cache.admin.metadata.service.MetadataService;
@@ -44,10 +45,10 @@ public class MainCacheService implements IMainCacheServiceV1 {
 
 		//테스트 Main uri
 		try {
-			ResponseEntity<String> response = webClient.get()
+			ResponseEntity<JsonNode> response = webClient.get()
 				.uri(uriComponentsBuilder(path, queryString).build().toUri())
 				.retrieve()
-				.toEntity(String.class)
+				.toEntity(JsonNode.class)
 				.log()
 				.block();
 
@@ -139,7 +140,7 @@ public class MainCacheService implements IMainCacheServiceV1 {
 		System.out.println("cachedData.url: " + cachedData.getUrl() + "값 입니다.");
 		System.out.println("cachedData.ttl: " + cachedData.getTtl() + "값 입니다.");
 		System.out.println("cachedData.createAt: " + cachedData.getCreateAt() + "값 입니다.");
-		return cachedData.getResponse();
+		return jsonToStringConverter.jsontoClass(cachedData.getResponse(), CustomResponse.class);
 	}
 
 	/**
@@ -162,7 +163,7 @@ public class MainCacheService implements IMainCacheServiceV1 {
 		for(String ss : test.keySet())
 			System.out.println(ss + " : " + test.get(ss));
 		MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
-		ApiGetResponse apiGetResponse = ApiGetResponse.from(metadata, customResponse);
+		ApiGetResponse apiGetResponse = ApiGetResponse.from(metadata, jsonToStringConverter.objectToJson(customResponse));
 		String response = jsonToStringConverter.objectToJson(apiGetResponse);
 
 		redisUtils.setRedisData(getUriPathQuery(path, queryParams), response, apiGetResponse.getTtl());
