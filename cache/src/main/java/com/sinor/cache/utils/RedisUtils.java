@@ -18,7 +18,8 @@ public class RedisUtils {
 
 	public String getRedisData(String key) throws CustomException{
 		try {
-			return redisTemplate.opsForValue().get(key).trim();
+			System.out.println("check : " + redisTemplate.opsForValue().get(key));
+			return redisTemplate.opsForValue().get(key);
 		} catch (NullPointerException e){
 			throw new CustomException(ResponseStatus.CACHE_NOT_FOUND);
 		}

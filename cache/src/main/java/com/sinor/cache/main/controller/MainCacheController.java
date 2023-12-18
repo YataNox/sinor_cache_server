@@ -1,10 +1,11 @@
 package com.sinor.cache.main.controller;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.sinor.cache.common.CustomResponse;
 import com.sinor.cache.main.model.MainCacheRequest;
 import com.sinor.cache.main.service.MainCacheService;
 
@@ -25,12 +26,13 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@Override
-	public ResponseEntity<JsonNode> getDataReadCache(String path, MultiValueMap<String, String> queryParams) {
-		ResponseEntity<JsonNode> pathCache = mainCacheService.getDataInCache(path, queryParams);
+	public ResponseEntity<String> getDataReadCache(String path, MultiValueMap<String, String> queryParams) {
+		CustomResponse pathCache = mainCacheService.getDataInCache(path, queryParams);
 		if (pathCache == null) {
-			return mainCacheService.postInCache(path, queryParams);
+			pathCache = mainCacheService.postInCache(path, queryParams);
 		}
-		return pathCache;
+		return ResponseEntity.status(pathCache.getStatusCodeValue()).headers(
+			HttpHeaders.readOnlyHttpHeaders(pathCache.getHeaders())).body(pathCache.getBody());
 	}
 
 	/**
@@ -42,7 +44,7 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@Override
-	public ResponseEntity<JsonNode> postDataReadCache(String path, MultiValueMap<String, String> queryParams, MainCacheRequest body) {
+	public ResponseEntity<String> postDataReadCache(String path, MultiValueMap<String, String> queryParams, MainCacheRequest body) {
 
 		return mainCacheService.postMainPathData(path, queryParams, body.getRequestBody());
 	}
@@ -55,7 +57,7 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@Override
-	public ResponseEntity<JsonNode> deleteDataRefreshCache(String path, MultiValueMap<String, String> queryParams) {
+	public ResponseEntity<String> deleteDataRefreshCache(String path, MultiValueMap<String, String> queryParams) {
 		return mainCacheService.deleteMainPathData(path, queryParams);
 	}
 
@@ -68,7 +70,7 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@Override
-	public ResponseEntity<JsonNode> updateDataRefreshCache(String path, MultiValueMap<String, String> queryParams, MainCacheRequest body) {
+	public ResponseEntity<String> updateDataRefreshCache(String path, MultiValueMap<String, String> queryParams, MainCacheRequest body) {
 		return mainCacheService.updateMainPathData(path, queryParams, body.getRequestBody());
 	}
 }

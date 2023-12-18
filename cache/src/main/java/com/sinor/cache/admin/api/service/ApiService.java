@@ -38,7 +38,7 @@ public class ApiService implements IApiServiceV1 {
 	 */
 	public ApiGetResponse findCacheById(String key) throws CustomException {
 		String value = redisUtils.getRedisData(key);
-		return jsonToStringConverter.jsonToString(value, ApiGetResponse.class);
+		return jsonToStringConverter.jsontoClass(value, ApiGetResponse.class);
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class ApiService implements IApiServiceV1 {
 	@Transactional
 	public ApiGetResponse saveOrUpdate(String key, String value, Long expiredTime) throws CustomException {
 		redisUtils.setRedisData(key, value, expiredTime);
-		return jsonToStringConverter.jsonToString(redisUtils.getRedisData(key), ApiGetResponse.class);
+		return jsonToStringConverter.jsontoClass(redisUtils.getRedisData(key), ApiGetResponse.class);
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class ApiService implements IApiServiceV1 {
 			String key = new String(keyBytes, UTF_8);
 
 			String jsonValue = redisUtils.getRedisData(key);
-			list.add(jsonToStringConverter.jsonToString(jsonValue, ApiGetResponse.class));
+			list.add(jsonToStringConverter.jsontoClass(jsonValue, ApiGetResponse.class));
 		}
 	}
 
