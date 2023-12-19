@@ -14,6 +14,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Main에서 받아온 ResponseEntity를 Status, Headers, Body로 나누기 위한 객체
+ */
 @Getter
 @Builder
 @AllArgsConstructor
@@ -26,6 +29,7 @@ public class CustomResponse {
 	public static CustomResponse from(ResponseEntity<JsonNode> entity){
 		Map<String, String> map = new HashMap<>();
 
+		// 헤더의 대문자 제거 후 적용
 		for(String key : entity.getHeaders().keySet()){
 			String s = Objects.requireNonNull(entity.getHeaders().get(key)).toString()
 				.replace("]", "")

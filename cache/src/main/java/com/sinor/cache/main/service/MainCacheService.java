@@ -130,17 +130,20 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 * @return 값이 있다면 value, 없다면 null
 	 */
 	public CustomResponse getDataInCache(String path, MultiValueMap<String, String> queryParams) throws CustomException{
+		// URI 조합
 		String uri = getUriPathQuery(path, queryParams);
+
 		if (!redisUtils.isExist(uri))
 			return null;
-		System.out.println(redisUtils.getRedisData(uri) + "확인");
-		String text = redisUtils.getRedisData(uri).replace("\\\"", "\"");
-		System.out.println(text);
-		ApiGetResponse cachedData = jsonToStringConverter.jsontoClass(text, ApiGetResponse.class);
+		
+		// Redis에서 받은 값 ApiGetResponse로 역직렬화
+		ApiGetResponse cachedData = jsonToStringConverter.jsontoClass(redisUtils.getRedisData(uri), ApiGetResponse.class);
+
 		System.out.println("cachedData.response: " + cachedData.getResponse() + "값 입니다.");
 		System.out.println("cachedData.url: " + cachedData.getUrl() + "값 입니다.");
 		System.out.println("cachedData.ttl: " + cachedData.getTtl() + "값 입니다.");
 		System.out.println("cachedData.createAt: " + cachedData.getCreateAt() + "값 입니다.");
+
 		return cachedData.getResponse();
 	}
 
@@ -152,15 +155,21 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 */
 	public CustomResponse postInCache(String path, MultiValueMap<String, String> queryParams) throws CustomException {
 
+		// Main에서 받은 값 CustomResponse로 Body, Header, Status 분할
 		ResponseEntity<JsonNode> data = getMainPathData(path, queryParams);
 		CustomResponse customResponse = CustomResponse.from(data);
 
+		// 옵션 값 찾기 or 생성
 		MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
+		
+		// 캐시 Response 객체를 위에 값을 이용해 생성하고 직렬화
 		ApiGetResponse apiGetResponse = ApiGetResponse.from(metadata, customResponse);
 		String response = jsonToStringConverter.objectToJson(apiGetResponse);
 
+		// 캐시 저장
 		redisUtils.setRedisData(getUriPathQuery(path, queryParams), response, apiGetResponse.getTtl());
 
+		// Response만 반환
 		return customResponse;
 	}
 

@@ -1,7 +1,7 @@
 package com.sinor.cache.main.controller;
 
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,10 +37,12 @@ public class MainCacheController implements IMainCacheControllerV1 {
 		HttpHeaders headers = new HttpHeaders();
 		pathCache.getHeaders().forEach(headers::set);
 
+		System.out.println(pathCache.getBody());
+		System.out.println(pathCache.getBody().toString());
 		return ResponseEntity
-			.status(HttpStatusCode.valueOf(pathCache.getStatusCodeValue()))
+			.status(HttpStatus.valueOf(pathCache.getStatusCodeValue()))
 			.headers(headers)
-			.body(pathCache.getBody().asText());
+			.body(pathCache.getBody().toString()); // 또는 다른 메서드 사용
 	}
 
 	/**
