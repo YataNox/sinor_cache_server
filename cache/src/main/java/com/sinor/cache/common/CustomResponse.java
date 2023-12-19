@@ -12,10 +12,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class CustomResponse {
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private JsonNode body;
@@ -25,9 +27,12 @@ public class CustomResponse {
 		Map<String, String> map = new HashMap<>();
 
 		for(String key : entity.getHeaders().keySet()){
-			map.put(key, Objects.requireNonNull(entity.getHeaders().get(key)).toString());
+			String s = Objects.requireNonNull(entity.getHeaders().get(key)).toString()
+				.replace("]", "")
+				.replace("[", "");
+			System.out.println(s);
+			map.put(key, s);
 		}
-
 		return CustomResponse.builder()
 			.body(Objects.requireNonNull(entity.getBody()))
 			.headers(map)

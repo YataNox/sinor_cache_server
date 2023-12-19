@@ -19,6 +19,7 @@ public class JsonToStringConverter {
 			System.out.println(jsonValue + " : " + clazz);
 			return objectMapper.readValue(jsonValue, clazz);
 		} catch (JsonProcessingException e) {
+			e.printStackTrace();
 			throw new CustomException(DESERIALIZATION_ERROR);
 		}
 	}

@@ -1,9 +1,7 @@
 package com.sinor.cache.main.service;
 
 import java.util.Map;
-import java.util.Objects;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +17,6 @@ import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
 import com.sinor.cache.admin.metadata.service.MetadataService;
 import com.sinor.cache.common.CustomException;
 import com.sinor.cache.common.CustomResponse;
-import com.sinor.cache.common.CustomResponseEntity;
 import com.sinor.cache.common.ResponseStatus;
 import com.sinor.cache.utils.JsonToStringConverter;
 import com.sinor.cache.utils.RedisUtils;
@@ -41,7 +38,7 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 * @param path        요청 path
 	 * @param queryString 요청 queryString
 	 */
-	public CustomResponseEntity getMainPathData(String path, MultiValueMap<String, String> queryString) throws CustomException {
+	public ResponseEntity<JsonNode> getMainPathData(String path, MultiValueMap<String, String> queryString) throws CustomException {
 
 		//테스트 Main uri
 		try {
@@ -52,7 +49,9 @@ public class MainCacheService implements IMainCacheServiceV1 {
 				.log()
 				.block();
 
-			return new CustomResponseEntity(Objects.requireNonNull(response));
+			System.out.println(response);
+
+			return response;
 		}catch (WebClientResponseException e){
 			throw new CustomException(ResponseStatus.DISPLAY_NOT_FOUND);
 		}
@@ -135,12 +134,14 @@ public class MainCacheService implements IMainCacheServiceV1 {
 		if (!redisUtils.isExist(uri))
 			return null;
 		System.out.println(redisUtils.getRedisData(uri) + "확인");
-		ApiGetResponse cachedData = jsonToStringConverter.jsontoClass(redisUtils.getRedisData(uri), ApiGetResponse.class);
+		String text = redisUtils.getRedisData(uri).replace("\\\"", "\"");
+		System.out.println(text);
+		ApiGetResponse cachedData = jsonToStringConverter.jsontoClass(text, ApiGetResponse.class);
 		System.out.println("cachedData.response: " + cachedData.getResponse() + "값 입니다.");
 		System.out.println("cachedData.url: " + cachedData.getUrl() + "값 입니다.");
 		System.out.println("cachedData.ttl: " + cachedData.getTtl() + "값 입니다.");
 		System.out.println("cachedData.createAt: " + cachedData.getCreateAt() + "값 입니다.");
-		return jsonToStringConverter.jsontoClass(cachedData.getResponse(), CustomResponse.class);
+		return cachedData.getResponse();
 	}
 
 	/**
@@ -151,19 +152,11 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 */
 	public CustomResponse postInCache(String path, MultiValueMap<String, String> queryParams) throws CustomException {
 
-		CustomResponseEntity data = getMainPathData(path, queryParams);
-		System.out.println("sc : " + data.getStatusCode().value());
+		ResponseEntity<JsonNode> data = getMainPathData(path, queryParams);
 		CustomResponse customResponse = CustomResponse.from(data);
-		String s = jsonToStringConverter.objectToJson(data.getHeaders());
-		System.out.println(s);
-		String sc = jsonToStringConverter.objectToJson(data.getStatusCode());
-		Object httpStatus = jsonToStringConverter.jsontoClass(sc, Object.class);
-		System.out.println(httpStatus);
-		MultiValueMap<String, String> test = jsonToStringConverter.jsontoClass(s, HttpHeaders.class);
-		for(String ss : test.keySet())
-			System.out.println(ss + " : " + test.get(ss));
+
 		MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
-		ApiGetResponse apiGetResponse = ApiGetResponse.from(metadata, jsonToStringConverter.objectToJson(customResponse));
+		ApiGetResponse apiGetResponse = ApiGetResponse.from(metadata, customResponse);
 		String response = jsonToStringConverter.objectToJson(apiGetResponse);
 
 		redisUtils.setRedisData(getUriPathQuery(path, queryParams), response, apiGetResponse.getTtl());
