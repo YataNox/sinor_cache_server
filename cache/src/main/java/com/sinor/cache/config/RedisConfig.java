@@ -10,11 +10,16 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.sinor.cache.utils.JsonToStringConverter;
+import com.sinor.cache.utils.RedisUtils;
 
 @Configuration
 public class RedisConfig {
@@ -34,6 +39,25 @@ public class RedisConfig {
 	}
 
 	@Bean
+	public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory) {
+		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+		container.setConnectionFactory(connectionFactory);
+
+		MessageListenerAdapter listenerAdapter = new MessageListenerAdapter(new CacheMessageListener());
+		container.addMessageListener(listenerAdapter, new ChannelTopic("__keyevent@0__:expired"));
+
+		return container;
+	}
+
+	public static class CacheMessageListener {
+
+		public void handleMessage(String message) {
+			System.out.println("Received Redis expiration event for key: " + message);
+			// 여기서 캐시 만료 이벤트 처리 로직을 수행
+		}
+	}
+
+	@Bean
 	public RedisCacheManager redisCacheManager(RedisTemplate<String, String> redisTemplate) {
 		RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
 			.entryTtl(Duration.ofMinutes(10))
@@ -50,5 +74,15 @@ public class RedisConfig {
 		objectMapper.registerModule(new JavaTimeModule())
 				.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 		return objectMapper;
+	}
+
+	@Bean
+	public JsonToStringConverter jsonToStringConverter(){
+		return new JsonToStringConverter(objectMapper());
+	}
+
+	@Bean
+	public RedisUtils redisUtils(){
+		return new RedisUtils(redisTemplate(redisConnectionFactory()));
 	}
 }

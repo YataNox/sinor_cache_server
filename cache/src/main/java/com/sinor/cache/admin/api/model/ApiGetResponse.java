@@ -1,8 +1,9 @@
 package com.sinor.cache.admin.api.model;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,14 @@ public class ApiGetResponse {
 	private LocalDateTime createAt; // 생성시간
 	private Long ttl; // 설정 만료 시간 (Metadata value)
 	private String url; // 상위 URL
-	@JsonSerialize
 	private String response; // 해당 캐시에 대한 응답
+
+	public static ApiGetResponse from(MetadataGetResponse metadataGetResponse, String response) {
+		return ApiGetResponse.builder()
+			.createAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+			.ttl(metadataGetResponse.getMetadataTtlSecond())
+			.url(metadataGetResponse.getMetadataUrl())
+			.response(response)
+			.build();
+	}
 }

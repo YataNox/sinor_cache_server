@@ -1,182 +1,207 @@
 package com.sinor.cache.main.service;
 
+import static com.sinor.cache.common.ResponseStatus.*;
+
+import java.util.Map;
+
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sinor.cache.admin.api.model.ApiGetResponse;
 import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
 import com.sinor.cache.admin.metadata.service.MetadataService;
 import com.sinor.cache.common.CustomException;
 import com.sinor.cache.common.ResponseStatus;
-import com.sinor.cache.main.model.MainCacheResponse;
+import com.sinor.cache.utils.JsonToStringConverter;
+import com.sinor.cache.utils.RedisUtils;
 
-import lombok.AllArgsConstructor;
-import org.springframework.web.util.UriComponentsBuilder;
+import lombok.RequiredArgsConstructor;
 
-import java.util.Map;
-
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class MainCacheService implements IMainCacheServiceV1 {
-	private WebClient webClient;
-	private final RedisTemplate<String, String> redisTemplate;
-	private final ObjectMapper objectMapper;
+
+	private final WebClient webClient;
 	private final MetadataService metadataService;
+	private final JsonToStringConverter jsonToStringConverter;
+	private final RedisUtils redisUtils;
+	private final ObjectMapper objectMapper;
+	private final RedisTemplate<String, String> redisTemplate;
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드
-	 * @param path 요청 path
+	 *
+	 * @param path        요청 path
 	 * @param queryString 요청 queryString
 	 */
-	public String getMainPathData(String path, MultiValueMap<String, String> queryString) {
+	public String getMainPathData(String path, MultiValueMap<String, String> queryString) throws
+		CustomException {
 
 		//테스트 Main uri
-		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/{path}");
-		builder.path(path);
-
-		if(queryString != null) builder.queryParams(queryString);
-		// uri 확인
-		System.out.println(builder.toUriString());
-
-		String mainResponse = webClient.get()
-				.uri(builder.build().toUri())
+		try {
+			ResponseEntity<String> response = webClient.get()
+				.uri(uriBuilder(path, queryString).build().toUri())
 				.retrieve()
-				.bodyToMono(String.class) // 메인 서버에서 오는 요청을 String 으로 받는다.
-				// main 서버는 모든 데이터에 대해 ok, data 형태로 넘어온다. 이를 받을 Response 객체를 활용할 수 없을까?
+				.toEntity(String.class)
 				.log()
 				.block();
-		System.out.println(mainResponse);
-		// 여기서 그냥 반환을 MainServerResponse 로 하는 것
-		// 캐시 서버에서 Main 의 데이터를 활용할 것도 아닌데 String 에서 꼭 변환을 해야할까?
-		return mainResponse;
+
+			return response.toString();
+
+		} catch (WebClientResponseException e) {
+			throw new CustomException(ResponseStatus.DISPLAY_NOT_FOUND);
+		}
 	}
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드
-	 * @param path 요청 path
+	 *
+	 * @param path        요청 path
 	 * @param queryString 요청 queryString
-	 * @param body Requestbody
+	 * @param body        Requestbody
 	 */
-	public String postMainPathData(String path, MultiValueMap<String, String> queryString, Map<String, String> body) {
+	public ResponseEntity<String> postMainPathData(String path, MultiValueMap<String, String> queryString,
+		Map<String, String> body) {
 
-		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/{path}");
-		builder.path(path);
-
-		if(queryString != null) builder.queryParams(queryString);
-		// uri 확인
-		System.out.println(builder.toUriString());
-
-		return webClient.post()
-				.uri(builder.build().toUri())
+		try {
+			return webClient.post()
+				.uri(uriBuilder(path, queryString).build().toUri())
 				.bodyValue(body)
 				.retrieve()
-				.bodyToMono(String.class)
+				.toEntity(String.class)
 				.log()
 				.block();
+		} catch (WebClientResponseException e) {
+			throw new CustomException(ResponseStatus.DISPLAY_NOT_FOUND);
+		}
 	}
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드
-	 * @param path 요청 path
+	 *
+	 * @param path        요청 path
 	 * @param queryString 요청 queryString
 	 */
-	public String deleteMainPathData(String path, MultiValueMap<String, String> queryString) {
+	public ResponseEntity<String> deleteMainPathData(String path, MultiValueMap<String, String> queryString) {
 
-		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/{path}");
-		builder.path(path);
-
-		if(queryString != null) builder.queryParams(queryString);
-		// uri 확인
-		System.out.println(builder.toUriString());
-
-		return webClient.delete()
-				.uri(builder.build().toUri())
+		try {
+			return webClient.delete()
+				.uri(uriBuilder(path, queryString).build().toUri())
+				//.exchangeToMono(response -> response.bodyToMono(String.class))
 				.retrieve()
-				.bodyToMono(String.class)
+				.toEntity(String.class)
 				.log()
 				.block();
+		} catch (WebClientResponseException e) {
+			throw new CustomException(ResponseStatus.DISPLAY_NOT_FOUND);
+		}
 	}
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드
-	 * @param path 요청 path
+	 *
+	 * @param path        요청 path
 	 * @param queryString 요청 queryString
-	 * @param body Requestbody
+	 * @param body        Requestbody
 	 */
-	public String updateMainPathData(String path, MultiValueMap<String, String> queryString, Map<String, String> body) {
-
-		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/{path}");
-		builder.path(path);
-
-		if(queryString != null) builder.queryParams(queryString);
-		// uri 확인
-		System.out.println(builder.toUriString());
-
-		return webClient.put()
-				.uri(builder.build().toUri())
+	public ResponseEntity<String> updateMainPathData(String path, MultiValueMap<String, String> queryString,
+		Map<String, String> body) {
+		try {
+			return webClient.put()
+				.uri(uriBuilder(path, queryString).build().toUri())
 				.bodyValue(body)
+				//.exchangeToMono(response -> response.bodyToMono(String.class))
 				.retrieve()
-				.bodyToMono(String.class)
+				.toEntity(String.class)
 				.log()
 				.block();
+		} catch (WebClientResponseException e) {
+			throw new CustomException(ResponseStatus.DISPLAY_NOT_FOUND);
+		}
 	}
-
 
 	/**
 	 * 캐시에 데이터가 있는지 확인하고 없으면 데이터를 조회해서 있으면 데이터를 조회해서 반환해주는 메소드
 	 * opsForValue() - Strings 를 쉽게 Serialize / Deserialize 해주는 Interface
+	 *
 	 * @param path 특정 path에 캐시가 있나 확인하기 위한 파라미터
 	 * @return 값이 있다면 value, 없다면 null
 	 */
-	public String getDataInCache(String path) {
-		String cachedData = redisTemplate.opsForValue().get(path);
-		System.out.println("cachedData: " + cachedData + "값입니다.");
-		return cachedData;
+	public String getDataInCache(String path, MultiValueMap<String, String> queryParams) throws
+		CustomException {
+		String uri = uriBuilder(path, queryParams).build().toUriString();
+
+		System.out.println(uri);
+
+		if (!redisUtils.isExist(uri))
+			return postInCache(path, queryParams);
+
+		try {
+			System.out.println("역직렬화 시작");
+			ApiGetResponse cachedData = objectMapper.readValue(redisTemplate.opsForValue().get(uri),
+				ApiGetResponse.class);
+			System.out.println("역직렬화 성공");
+			return cachedData.getResponse();
+
+		} catch (JsonProcessingException e) {
+			throw new CustomException(DESERIALIZATION_ERROR);
+		}
 	}
 
 	/**
 	 * 캐시에 데이터가 없으면 메인 데이터를 조회해서 캐시에 저장하고 반환해주는 메소드
-	 * @param path 검색할 캐시의 Path
-	 * @param queryString 각 캐시의 구별을 위한 QueryString
+	 *
+	 * @param path        검색할 캐시의 Path
+	 * @param queryParams 각 캐시의 구별을 위한 QueryString
 	 */
-	public String postInCache(String path, MultiValueMap<String, String> queryString) {
-		try {
-			String response = getMainPathData(path, queryString);
+	public String postInCache(String path, MultiValueMap<String, String> queryParams) throws
+		CustomException {
 
-			MainCacheResponse userCacheResponse = MainCacheResponse.builder()
-					.response(response)
-					.build();
+		//mainServer에서 받은 response
+		String data = getMainPathData(path, queryParams);
 
-			MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
-			redisTemplate.opsForValue().set(path, objectMapper.writeValueAsString(userCacheResponse), metadata.getMetadataTtlSecond());
+		System.out.println(data);
 
-			return userCacheResponse.getResponse();
+		MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
+		ApiGetResponse apiGetResponse = ApiGetResponse.from(metadata, data);
+		String response = jsonToStringConverter.objectToJson(apiGetResponse);
 
-		} catch (JsonProcessingException e) {
-			throw new CustomException(ResponseStatus.INTERNAL_SERVER_ERROR);
-		}
+		redisUtils.setRedisData(uriBuilder(path, queryParams).build().toUriString(), response, apiGetResponse.getTtl());
+
+		System.out.println("value : " + response);
+
+		System.out.println("createAt : " + apiGetResponse.getCreateAt());
+		System.out.println("ttl : " + apiGetResponse.getTtl());
+		System.out.println("url : " + apiGetResponse.getUrl());
+		System.out.println("response : " + apiGetResponse.getResponse());
+
+		return apiGetResponse.getResponse();
 	}
 
-	// 1. RequestBody에 다음과 같은 형식으로 전달하면 캐시에 저장해주는 API
-	// application/json
-	// {
-	//  "key": /main/expression,
-	//  "value": { "url": "http://localhost:8080/main/expression", "createAt": "2021-08-31T15:00:00", "ttl": 600 }
-	// }
-	// public UserCacheResponse postCache(String key, Object value) {
-	// 	try {
-	// 		String jsonValue = objectMapper.writeValueAsString(value);
-	// 		redisTemplate.opsForValue().set(key, jsonValue);
-	// 		System.out.println("redisTemplate.opsForValue().get(key) = " + redisTemplate.opsForValue().get(key));
-	// 		return objectMapper.readValue(jsonValue, UserCacheResponse.class);
-	// 	} catch (Exception e) {
-	// 		e.fillInStackTrace();
-	// 		return null;
-	// 	}
-	// }
+	/**
+	 * uri를 생성해주는 메소드
+	 *
+	 * @param path        검색할 캐시의 Path
+	 * @param queryParams 각 캐시의 구별을 위한 QueryString
+	 */
+	public UriComponentsBuilder uriBuilder(String path, MultiValueMap<String, String> queryParams) {
+
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/");
+		builder.path(path);
+
+		if (queryParams != null)
+			builder.queryParams(queryParams);
+
+		return builder;
+	}
+
 }

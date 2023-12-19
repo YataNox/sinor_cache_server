@@ -7,7 +7,13 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class MainCacheResponse {
+public class MainCacheResponse<T> {
 	@JsonSerialize
-	private String response;
+	private T response;
+
+	public static <T> MainCacheResponse<Object> from(T response){
+		return MainCacheResponse.builder()
+			.response(response)
+			.build();
+	}
 }

@@ -16,7 +16,7 @@ public class GlobalExceptionHandler {
 	 */
 	@ExceptionHandler(CustomException.class)
 	public ResponseEntity<?> customException(CustomException e){
-		log.error("Base exception occurred : " + e.getStatus().getCode(), e);
+		log.error("Custom Exception Occurred : " + e.getStatus().getCode(), e);
 
 		AdminFailureResponse responseBody = AdminFailureResponse.from(e.getStatus());
 

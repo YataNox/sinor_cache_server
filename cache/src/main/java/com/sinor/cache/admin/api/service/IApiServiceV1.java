@@ -30,13 +30,13 @@ public interface IApiServiceV1 {
 	 * @param value 생성할 캐시의 Value
 	 * @param expiredTime 생성할 캐시의 만료시간
 	 */
-	ApiGetResponse saveOrUpdate(String key, String value, int expiredTime) throws CustomException;
+	ApiGetResponse saveOrUpdate(String key, String value, Long expiredTime) throws CustomException;
 
 	/**
 	 * 캐시 삭제
 	 * @param key 삭제할 캐시의 Key
 	 */
-	void deleteCacheById(String key) throws CustomException;
+	Boolean deleteCacheById(String key) throws CustomException;
 
 	/**
 	 * 패턴과 일치하는 캐시 삭제

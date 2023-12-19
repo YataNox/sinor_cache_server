@@ -12,8 +12,7 @@ import reactor.netty.http.client.HttpClient;
 
 @Configuration
 @Slf4j
-/*
-
+/**
  * WebClient 빈 등록
  * WebClient 빈을 등록하면, WebClient.Builder 를 주입받아 사용할 수 있다.
  * 2023.12.7 ddongbu
