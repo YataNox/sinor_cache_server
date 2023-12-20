@@ -1,4 +1,11 @@
 server.port: 8000
+## 시큐리티 로깅
+
+logging:
+  level:
+    org.springframework.security: INFO
+  pattern:
+    console: "%d{dd-MM-yyyy HH:mm:ss} %magenta([%thread]) %highlight(%-5level) %logger.%M - %msg%n"
 
 spring:
   redis:
@@ -6,6 +13,14 @@ spring:
       host: redisHost
       port: 6379
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloakHost:8443/realms/sinor
+          jwk-set-uri: http://keycloakHost:8443/realms/sinor/protocol/openid-connect/certs
+
+  
   jpa:
     hibernate:
       ddl-auto: create
@@ -25,6 +40,9 @@ spring:
       mode: always
       platform: mysql
 
+
+
+
 logging.level:
   org.hibernate.SQL: debug
   org.hibernate.type: trace
@@ -42,3 +60,4 @@ springdoc:
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
   paths-to-match:
+

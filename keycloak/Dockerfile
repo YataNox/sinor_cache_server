@@ -19,10 +19,10 @@ COPY --from=builder /opt/keycloak/ /opt/keycloak/
 ENV KC_DB=mysql
 ENV KC_DB_URL=jdbc:mysql://mysqlHost:3306/user
 ENV KC_DB_USERNAME=root
-ENV KC_DB_PASSWORD=db-q5n2g
+ENV KC_DB_PASSWORD=root-q5n2g
 ENV KC_HOSTNAME=localhost
 
-# 공식문서 최적화 포트
+# 최적화 포트
 ENV KC_HTTP_PORT=8443
 
 # 어드민 계정과 비밀번호
