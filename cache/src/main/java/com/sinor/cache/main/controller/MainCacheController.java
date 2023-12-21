@@ -1,7 +1,6 @@
 package com.sinor.cache.main.controller;
 
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,22 +26,26 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@Override
-	public ResponseEntity<String> getDataReadCache(String path, MultiValueMap<String, String> queryParams) {
+	public ResponseEntity<?> getDataReadCache(String path, MultiValueMap<String, String> queryParams) {
 		CustomResponse pathCache = mainCacheService.getDataInCache(path, queryParams);
+		//ResponseEntity<?> pathCache = mainCacheService.getDataInCache(path, queryParams);
 
-		if (pathCache == null) {
+		if (pathCache == null)
 			pathCache = mainCacheService.postInCache(path, queryParams);
-		}
+
+		/*HttpHeaders headers = new HttpHeaders();
+		pathCache.getHeaders().forEach(headers::set);*/
+		System.out.println(pathCache.getBody());
 
 		HttpHeaders headers = new HttpHeaders();
-		pathCache.getHeaders().forEach(headers::set);
+		for(String key : pathCache.getHeaders().keySet()){
+			if(key.equals("Transfer-Encoding"))
+				continue;
+			System.out.println(key + ":" + pathCache.getHeaders().get(key));
+			headers.add(key, String.valueOf(pathCache.getHeaders().get(key)));
+		}
 
-		System.out.println(pathCache.getBody());
-		System.out.println(pathCache.getBody().toString());
-		return ResponseEntity
-			.status(HttpStatus.valueOf(pathCache.getStatusCodeValue()))
-			.headers(headers)
-			.body(pathCache.getBody().toString()); // 또는 다른 메서드 사용
+		return ResponseEntity.status(pathCache.getStatusCodeValue()).headers(headers).body(pathCache.getBody());
 	}
 
 	/**

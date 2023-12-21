@@ -5,7 +5,6 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.sinor.cache.common.CustomException;
 import com.sinor.cache.common.CustomResponse;
 
@@ -16,7 +15,7 @@ public interface IMainCacheServiceV1 {
 	 * @param path        요청 path
 	 * @param queryString 요청 queryString
 	 */
-	ResponseEntity<JsonNode> getMainPathData(String path, MultiValueMap<String, String> queryString) throws CustomException;
+	ResponseEntity<?> getMainPathData(String path, MultiValueMap<String, String> queryString) throws CustomException;
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드

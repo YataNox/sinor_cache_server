@@ -11,7 +11,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.sinor.cache.admin.api.model.ApiGetResponse;
 import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
 import com.sinor.cache.admin.metadata.service.MetadataService;
@@ -38,16 +37,15 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 * @param path        요청 path
 	 * @param queryString 요청 queryString
 	 */
-	public ResponseEntity<JsonNode> getMainPathData(String path, MultiValueMap<String, String> queryString) throws CustomException {
+	public ResponseEntity<String> getMainPathData(String path, MultiValueMap<String, String> queryString) throws CustomException {
 
 		//테스트 Main uri
 		try {
-			ResponseEntity<JsonNode> response = webClient.get()
+			ResponseEntity<String> response = webClient.get()
 				.uri(uriComponentsBuilder(path, queryString).build().toUri())
 				.retrieve()
-				.toEntity(JsonNode.class)
-				.log()
-				.block();
+				.toEntity(String.class)
+				.log().block();
 
 			System.out.println(response);
 
@@ -135,7 +133,11 @@ public class MainCacheService implements IMainCacheServiceV1 {
 
 		if (!redisUtils.isExist(uri))
 			return null;
-		
+
+		//ResponseEntityWrapper wrapper = ResponseEntityWrapper.fromJson(uri);
+		//byte[] serializedEntity = uri.getBytes();
+		//sResponseEntity<String> responseEntity = (ResponseEntity<String>) SerializationUtils.deserialize(serializedEntity);
+
 		// Redis에서 받은 값 ApiGetResponse로 역직렬화
 		ApiGetResponse cachedData = jsonToStringConverter.jsontoClass(redisUtils.getRedisData(uri), ApiGetResponse.class);
 
@@ -156,7 +158,9 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	public CustomResponse postInCache(String path, MultiValueMap<String, String> queryParams) throws CustomException {
 
 		// Main에서 받은 값 CustomResponse로 Body, Header, Status 분할
-		ResponseEntity<JsonNode> data = getMainPathData(path, queryParams);
+		ResponseEntity<String> data = getMainPathData(path, queryParams);
+		//ResponseEntityWrapper wrapper = new ResponseEntityWrapper(data);
+		//byte[] serializedEntity = SerializationUtils.serialize(data);
 		CustomResponse customResponse = CustomResponse.from(data);
 
 		// 옵션 값 찾기 or 생성
@@ -167,7 +171,10 @@ public class MainCacheService implements IMainCacheServiceV1 {
 		String response = jsonToStringConverter.objectToJson(apiGetResponse);
 
 		// 캐시 저장
-		redisUtils.setRedisData(getUriPathQuery(path, queryParams), response, apiGetResponse.getTtl());
+		/*redisUtils.setRedisData(getUriPathQuery(path, queryParams), new String(Objects.requireNonNull(serializedEntity)),
+			metadata.getMetadataTtlSecond());*/
+
+		redisUtils.setRedisData(getUriPathQuery(path, queryParams), response, metadata.getMetadataTtlSecond());
 
 		// Response만 반환
 		return customResponse;

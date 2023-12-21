@@ -7,7 +7,6 @@ import java.util.Objects;
 import org.springframework.http.ResponseEntity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,10 +22,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CustomResponse {
 	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private JsonNode body;
+	private String body;
 	private Map<String, String> headers;
 	private int statusCodeValue;
-	public static CustomResponse from(ResponseEntity<JsonNode> entity){
+	public static CustomResponse from(ResponseEntity<String> entity){
 		Map<String, String> map = new HashMap<>();
 
 		// 헤더의 대문자 제거 후 적용

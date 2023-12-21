@@ -27,7 +27,7 @@ public interface IMainCacheControllerV1 {
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@GetMapping("/{path}")
-	ResponseEntity<String> getDataReadCache(@PathVariable String path, @RequestParam(required = false) MultiValueMap<String, String> queryParams);
+	ResponseEntity<?> getDataReadCache(@PathVariable String path, @RequestParam(required = false) MultiValueMap<String, String> queryParams);
 
 	/**
 	 * 데이터 조회 또는 생성 및 캐시 조회
