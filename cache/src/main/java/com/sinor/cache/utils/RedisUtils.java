@@ -16,29 +16,27 @@ public class RedisUtils {
 		this.redisTemplate = redisTemplate;
 	}
 
-	public String getRedisData(String key) throws CustomException{
+	public String getRedisData(String key) throws CustomException {
 		try {
-			System.out.println("check : " + redisTemplate.opsForValue().get(key));
 			return redisTemplate.opsForValue().get(key);
-		} catch (NullPointerException e){
+		} catch (NullPointerException e) {
 			throw new CustomException(ResponseStatus.CACHE_NOT_FOUND);
 		}
 	}
 
-	public void setRedisData(String key, String value, Long ttl){
+	public void setRedisData(String key, String value, Long ttl) {
 		redisTemplate.opsForValue().set(key, value, ttl, TimeUnit.SECONDS);
 	}
 
 	public Boolean isExist(String key) throws CustomException {
 		try {
-			System.out.println(redisTemplate.hasKey(key));
 			return redisTemplate.hasKey(key);
-		} catch (NullPointerException e){
+		} catch (NullPointerException e) {
 			throw new CustomException(ResponseStatus.CACHE_NOT_FOUND);
 		}
 	}
 
-	public Cursor<byte[]> searchPatternKeys(String pattern){
+	public Cursor<byte[]> searchPatternKeys(String pattern) {
 
 		return redisTemplate.executeWithStickyConnection(connection -> {
 			ScanOptions options = ScanOptions.scanOptions().match("*" + pattern + "*").build();
@@ -50,7 +48,7 @@ public class RedisUtils {
 		return redisTemplate.delete(key);
 	}
 
-	public void unlinkCache(String key) throws CustomException{
+	public void unlinkCache(String key) throws CustomException {
 		redisTemplate.unlink(key);
 	}
 }

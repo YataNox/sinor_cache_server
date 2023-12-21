@@ -2,11 +2,12 @@ package com.sinor.cache.main.controller;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sinor.cache.common.CustomResponse;
 import com.sinor.cache.main.model.MainCacheRequest;
+import com.sinor.cache.main.model.MainCacheResponse;
 import com.sinor.cache.main.service.MainCacheService;
 
 @RestController
@@ -26,26 +27,21 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@Override
-	public ResponseEntity<?> getDataReadCache(String path, MultiValueMap<String, String> queryParams) {
-		CustomResponse pathCache = mainCacheService.getDataInCache(path, queryParams);
-		//ResponseEntity<?> pathCache = mainCacheService.getDataInCache(path, queryParams);
+	public ResponseEntity<?> getDataReadCache(String path, MultiValueMap<String, String> queryParams,
+		MultiValueMap<String, String> headers) {
+
+		MainCacheResponse pathCache = mainCacheService.getDataInCache(path, queryParams, headers);
 
 		if (pathCache == null)
-			pathCache = mainCacheService.postInCache(path, queryParams);
+			pathCache = mainCacheService.postInCache(path, queryParams, headers);
 
-		/*HttpHeaders headers = new HttpHeaders();
-		pathCache.getHeaders().forEach(headers::set);*/
-		System.out.println(pathCache.getBody());
+		HttpHeaders header = new HttpHeaders();
 
-		HttpHeaders headers = new HttpHeaders();
-		for(String key : pathCache.getHeaders().keySet()){
-			if(key.equals("Transfer-Encoding"))
-				continue;
-			System.out.println(key + ":" + pathCache.getHeaders().get(key));
-			headers.add(key, String.valueOf(pathCache.getHeaders().get(key)));
-		}
+		MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
+		multiValueMap.setAll(pathCache.getHeaders());
+		header.addAll(multiValueMap);
 
-		return ResponseEntity.status(pathCache.getStatusCodeValue()).headers(headers).body(pathCache.getBody());
+		return ResponseEntity.status(pathCache.getStatusCodeValue()).headers(header).body(pathCache.getBody());
 	}
 
 	/**
@@ -57,7 +53,8 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@Override
-	public ResponseEntity<String> postDataReadCache(String path, MultiValueMap<String, String> queryParams, MainCacheRequest body) {
+	public ResponseEntity<String> postDataReadCache(String path, MultiValueMap<String, String> queryParams,
+		MainCacheRequest body) {
 
 		return mainCacheService.postMainPathData(path, queryParams, body.getRequestBody());
 	}
@@ -83,7 +80,8 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@Override
-	public ResponseEntity<String> updateDataRefreshCache(String path, MultiValueMap<String, String> queryParams, MainCacheRequest body) {
+	public ResponseEntity<String> updateDataRefreshCache(String path, MultiValueMap<String, String> queryParams,
+		MainCacheRequest body) {
 		return mainCacheService.updateMainPathData(path, queryParams, body.getRequestBody());
 	}
 }

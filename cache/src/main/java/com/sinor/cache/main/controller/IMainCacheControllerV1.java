@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.sinor.cache.main.model.MainCacheRequest;
@@ -27,7 +28,9 @@ public interface IMainCacheControllerV1 {
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@GetMapping("/{path}")
-	ResponseEntity<?> getDataReadCache(@PathVariable String path, @RequestParam(required = false) MultiValueMap<String, String> queryParams);
+	ResponseEntity<?> getDataReadCache(@PathVariable String path,
+		@RequestParam(required = false) MultiValueMap<String, String> queryParams,
+		@RequestHeader MultiValueMap<String, String> headers);
 
 	/**
 	 * 데이터 조회 또는 생성 및 캐시 조회
@@ -38,8 +41,9 @@ public interface IMainCacheControllerV1 {
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@PostMapping("/{path}")
-	ResponseEntity<String> postDataReadCache(@PathVariable String path, @RequestParam(required = false) MultiValueMap<String, String> queryParams,
-							 MainCacheRequest body);
+	ResponseEntity<String> postDataReadCache(@PathVariable String path,
+		@RequestParam(required = false) MultiValueMap<String, String> queryParams,
+		MainCacheRequest body);
 
 	/**
 	 * 데이터 삭제 및 캐시 갱신
@@ -49,7 +53,8 @@ public interface IMainCacheControllerV1 {
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@DeleteMapping("/{path}")
-	ResponseEntity<String> deleteDataRefreshCache(@PathVariable String path, @RequestParam(required = false) MultiValueMap<String, String> queryParams);
+	ResponseEntity<String> deleteDataRefreshCache(@PathVariable String path,
+		@RequestParam(required = false) MultiValueMap<String, String> queryParams);
 
 	/**
 	 * 데이터 수정 및 캐시 갱신
@@ -60,6 +65,7 @@ public interface IMainCacheControllerV1 {
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@PutMapping("/{path}")
-	ResponseEntity<String> updateDataRefreshCache(@PathVariable String path, @RequestParam(required = false) MultiValueMap<String, String> queryParams,
-								  MainCacheRequest body);
+	ResponseEntity<String> updateDataRefreshCache(@PathVariable String path,
+		@RequestParam(required = false) MultiValueMap<String, String> queryParams,
+		MainCacheRequest body);
 }

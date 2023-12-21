@@ -20,7 +20,6 @@ public class UrlFilter implements Filter {
 
 		HttpServletRequest httpRequest = (HttpServletRequest)request;
 		HttpServletResponse httpResponse = (HttpServletResponse)response;
-		String requestURI = httpRequest.getRequestURI(); // url 추출
 
 		String key = httpRequest.getHeader("Key"); // header에서 키 추출
 		String keyFromDB = "1234"; // DB에서 꺼내기
