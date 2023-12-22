@@ -37,6 +37,10 @@ public class ApiService implements IApiServiceV1 {
 	 */
 	public ApiGetResponse findCacheById(String key) throws CustomException {
 		String value = redisUtils.getRedisData(key);
+
+		if(value.isBlank())
+			throw new CustomException(CACHE_NOT_FOUND);
+
 		return jsonToStringConverter.jsontoClass(value, ApiGetResponse.class);
 	}
 
