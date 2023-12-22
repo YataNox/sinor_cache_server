@@ -21,4 +21,32 @@ public class Metadata {
 
 	@Column(nullable = false)
 	private Long metadataTtlSecond;
+
+	@Column(nullable = false)
+	private int version;
+
+
+	public static Metadata defaultValue(String metadataUrl){
+		return Metadata.builder()
+			.metadataUrl(metadataUrl)
+			.metadataTtlSecond(60 * 10L)
+			.version(0)
+			.build();
+	}
+
+	public static Metadata createValue(String metadataUrl, Long metadataTtlSecond){
+		return Metadata.builder()
+			.metadataUrl(metadataUrl)
+			.metadataTtlSecond(metadataTtlSecond)
+			.version(1)
+			.build();
+	}
+
+	public static Metadata updateValue(Metadata metadata, Long newExpiredTime){
+		return Metadata.builder()
+			.metadataUrl(metadata.getMetadataUrl())
+			.metadataTtlSecond(newExpiredTime)
+			.version(metadata.getVersion() + 1)
+			.build();
+	}
 }

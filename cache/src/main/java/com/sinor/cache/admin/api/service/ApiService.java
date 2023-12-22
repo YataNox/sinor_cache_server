@@ -4,7 +4,6 @@ import static com.sinor.cache.common.ResponseStatus.*;
 import static java.nio.charset.StandardCharsets.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,7 +103,7 @@ public class ApiService implements IApiServiceV1 {
 
 		// unlink로 키 삭제
 		while (cursor.hasNext()) {
-			redisUtils.unlinkCache(Arrays.toString(cursor.next()));
+			redisUtils.unlinkCache(new String(cursor.next(), UTF_8));
 		}
 	}
 

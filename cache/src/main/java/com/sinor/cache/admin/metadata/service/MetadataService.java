@@ -1,6 +1,7 @@
 package com.sinor.cache.admin.metadata.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -32,22 +33,17 @@ public class MetadataService implements IMetadataServiceV1 {
 	 */
 	@Override
 	public MetadataGetResponse findOrCreateMetadataById(String path) throws CustomException {
+		System.out.println(path);
 		// 옵션 조회, 없으면 기본 10분으로 Metadata 생성
-		Metadata metadata = metadataRepository.findById(path)
-			.orElse(
-				metadataRepository.save(
-					Metadata.builder()
-						.metadataUrl(path)
-						.metadataTtlSecond(600L)
-						.build()
-				)
+		Optional<Metadata> metadata = metadataRepository.findById(path);
+
+		if(metadata.isEmpty())
+			return MetadataGetResponse.from(
+				metadataRepository.save(Metadata.defaultValue(path))
 			);
 
 		// response 반환
-		return MetadataGetResponse.builder()
-			.metadataUrl(metadata.getMetadataUrl())
-			.metadataTtlSecond(metadata.getMetadataTtlSecond())
-			.build();
+		return MetadataGetResponse.from(metadata.get());
 	}
 
 	/**
@@ -56,15 +52,14 @@ public class MetadataService implements IMetadataServiceV1 {
 	 */
 	@Override
 	public MetadataGetResponse findMetadataById(String path) throws CustomException {
-		// 옵션 조회, 없으면 기본 10분으로 Metadata 생성
-		Metadata metadata = metadataRepository.findById(path)
-			.orElseThrow(() -> new CustomException(ResponseStatus.METADATA_NOT_FOUND));
+		// 옵션 조회
+		Optional<Metadata> metadata = metadataRepository.findById(path);
+
+		if(metadata.isEmpty())
+			throw new CustomException(ResponseStatus.METADATA_NOT_FOUND);
 
 		// response 반환
-		return MetadataGetResponse.builder()
-			.metadataUrl(metadata.getMetadataUrl())
-			.metadataTtlSecond(metadata.getMetadataTtlSecond())
-			.build();
+		return MetadataGetResponse.from(metadata.get());
 	}
 
 	/**
@@ -74,18 +69,20 @@ public class MetadataService implements IMetadataServiceV1 {
 	 */
 	@Override
 	public MetadataGetResponse updateMetadata(String path, Long newExpiredTime) throws CustomException {
+
 		// 해당 url 유무 파악
-		if(!metadataRepository.existsById(path))
+		Optional<Metadata> metadata = metadataRepository.findById(path);
+
+		if(metadata.isEmpty())
 			throw new CustomException(ResponseStatus.METADATA_NOT_FOUND);
 
 		// 변경 값으로 저장
-		Metadata metadata = metadataRepository.save(new Metadata(path, newExpiredTime));
-
 		// response 반환
-		return MetadataGetResponse.builder()
-			.metadataUrl(metadata.getMetadataUrl())
-			.metadataTtlSecond(metadata.getMetadataTtlSecond())
-			.build();
+		return MetadataGetResponse.from(
+			metadataRepository.save(
+				Metadata.updateValue(metadata.get(), newExpiredTime)
+			)
+		);
 	}
 
 	/**
@@ -97,7 +94,7 @@ public class MetadataService implements IMetadataServiceV1 {
 		// 유무 파악
 		if(!metadataRepository.existsById(path))
 			throw new CustomException(ResponseStatus.METADATA_NOT_FOUND);
-		
+
 		// 캐시 삭제
 		metadataRepository.deleteById(path);
 
@@ -113,20 +110,14 @@ public class MetadataService implements IMetadataServiceV1 {
 		// url 옵션이 이미 있는지 조회
 		if(metadataRepository.existsById(path))
 			throw new RuntimeException("해당 옵션 값이 있습니다..");
-		
+
 		// 옵션 생성
 		Metadata metadata = metadataRepository.save(
-			Metadata.builder()
-				.metadataUrl(path)
-				.metadataTtlSecond(expiredTime)
-				.build()
+			Metadata.createValue(path, expiredTime)
 		);
 
 		// response 반환
-		return MetadataGetResponse.builder()
-			.metadataUrl(metadata.getMetadataUrl())
-			.metadataTtlSecond(metadata.getMetadataTtlSecond())
-			.build();
+		return MetadataGetResponse.from(metadata);
 	}
 
 	/**
@@ -135,10 +126,7 @@ public class MetadataService implements IMetadataServiceV1 {
 	 */
 	@Override
 	public List<MetadataGetResponse> findAll(PageRequest pageRequest) {
-		return metadataRepository.findAll(pageRequest).stream().map(value -> MetadataGetResponse.builder()
-			.metadataUrl(value.getMetadataUrl())
-			.metadataTtlSecond(value.getMetadataTtlSecond())
-			.build()).toList();
+		return metadataRepository.findAll(pageRequest).stream().map(MetadataGetResponse::from).toList();
 	}
 
 	/**
