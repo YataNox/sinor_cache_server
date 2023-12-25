@@ -57,12 +57,10 @@ public class MainCacheService implements IMainCacheServiceV1 {
 			modifiedHeaders.addAll(response.getHeaders());
 			modifiedHeaders.remove(HttpHeaders.TRANSFER_ENCODING);
 
-			ResponseEntity<String> modifiedResponse = ResponseEntity
+            return ResponseEntity
 				.status(response.getStatusCode())
 				.headers(modifiedHeaders)
 				.body(response.getBody());
-
-			return modifiedResponse;
 		} catch (WebClientResponseException e) {
 			throw new CustomException(ResponseStatus.DISPLAY_NOT_FOUND);
 		}
@@ -92,12 +90,10 @@ public class MainCacheService implements IMainCacheServiceV1 {
 			modifiedHeaders.addAll(response.getHeaders());
 			modifiedHeaders.remove(HttpHeaders.TRANSFER_ENCODING);
 
-			ResponseEntity<String> modifiedResponse = ResponseEntity
+            return ResponseEntity
 				.status(response.getStatusCode())
 				.headers(modifiedHeaders)
 				.body(response.getBody());
-
-			return modifiedResponse;
 		} catch (WebClientResponseException e) {
 			throw new CustomException(ResponseStatus.DISPLAY_NOT_FOUND);
 		}
@@ -124,12 +120,10 @@ public class MainCacheService implements IMainCacheServiceV1 {
 			modifiedHeaders.addAll(response.getHeaders());
 			modifiedHeaders.remove(HttpHeaders.TRANSFER_ENCODING);
 
-			ResponseEntity<String> modifiedResponse = ResponseEntity
+            return ResponseEntity
 				.status(response.getStatusCode())
 				.headers(modifiedHeaders)
 				.body(response.getBody());
-
-			return modifiedResponse;
 		} catch (WebClientResponseException e) {
 			throw new CustomException(ResponseStatus.DISPLAY_NOT_FOUND);
 		}
@@ -158,12 +152,10 @@ public class MainCacheService implements IMainCacheServiceV1 {
 			modifiedHeaders.addAll(response.getHeaders());
 			modifiedHeaders.remove(HttpHeaders.TRANSFER_ENCODING);
 
-			ResponseEntity<String> modifiedResponse = ResponseEntity
+            return ResponseEntity
 				.status(response.getStatusCode())
 				.headers(modifiedHeaders)
 				.body(response.getBody());
-
-			return modifiedResponse;
 		} catch (WebClientResponseException e) {
 			throw new CustomException(ResponseStatus.DISPLAY_NOT_FOUND);
 		}
@@ -209,7 +201,8 @@ public class MainCacheService implements IMainCacheServiceV1 {
 		MainCacheResponse mainCacheResponse = MainCacheResponse.from(data);
 
 		// 옵션 값 찾기 or 생성
-		MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
+		MetadataGetResponse metadata = metadataService.getCacheData(path);
+		//MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
 
 		// 캐시 Response 객체를 위에 값을 이용해 생성하고 직렬화
 		ApiGetResponse apiGetResponse = ApiGetResponse.from(metadata, mainCacheResponse);

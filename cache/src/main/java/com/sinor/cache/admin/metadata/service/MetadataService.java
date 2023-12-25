@@ -3,7 +3,10 @@ package com.sinor.cache.admin.metadata.service;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,13 +56,13 @@ public class MetadataService implements IMetadataServiceV1 {
 	@Override
 	public MetadataGetResponse findMetadataById(String path) throws CustomException {
 		// 옵션 조회
-		Optional<Metadata> metadata = metadataRepository.findById(path);
+		/*Optional<Metadata> metadata = metadataRepository.findById(path);
 
 		if(metadata.isEmpty())
-			throw new CustomException(ResponseStatus.METADATA_NOT_FOUND);
+			throw new CustomException(ResponseStatus.METADATA_NOT_FOUND);*/
 
 		// response 반환
-		return MetadataGetResponse.from(metadata.get());
+		return getCacheData(path);
 	}
 
 	/**
@@ -68,6 +71,7 @@ public class MetadataService implements IMetadataServiceV1 {
 	 * @param newExpiredTime 새로 적용할 만료시간
 	 */
 	@Override
+	@CachePut(cacheNames = "MetadataCache", key = "#path")
 	public MetadataGetResponse updateMetadata(String path, Long newExpiredTime) throws CustomException {
 
 		// 해당 url 유무 파악
@@ -136,5 +140,26 @@ public class MetadataService implements IMetadataServiceV1 {
 	@Override
 	public Boolean isExistById(String path) {
 		return metadataRepository.existsById(path);
+	}
+
+	@PostConstruct
+	public void loadMetadataToCache(){
+		// Mysql에 저장된 Metadata 조회
+		List<Metadata> metadataList = metadataRepository.findAll();
+
+		for(Metadata metadata : metadataList){
+			MetadataGetResponse response = getCacheData(metadata.getMetadataUrl());
+			log.info(response.getMetadataUrl() + " Cache Create.");
+		}
+	}
+
+	@Cacheable(cacheNames = "MetadataCache", key = "#path")
+	public MetadataGetResponse getCacheData(String path){
+		Optional<Metadata> metadata = metadataRepository.findById(path);
+
+		if(metadata.isEmpty())
+			throw new CustomException(ResponseStatus.METADATA_NOT_FOUND);
+
+		return MetadataGetResponse.from(metadata.get());
 	}
 }
