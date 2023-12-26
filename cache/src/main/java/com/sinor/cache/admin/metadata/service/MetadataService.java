@@ -3,7 +3,6 @@ package com.sinor.cache.admin.metadata.service;
 import java.util.List;
 import java.util.Optional;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -62,7 +61,7 @@ public class MetadataService implements IMetadataServiceV1 {
 			throw new CustomException(ResponseStatus.METADATA_NOT_FOUND);*/
 
 		// response 반환
-		return getCacheData(path);
+		return getMetadataCache(path);
 	}
 
 	/**
@@ -129,8 +128,16 @@ public class MetadataService implements IMetadataServiceV1 {
 	 * @param pageRequest 조회할 목록의 size, page 번호가 들어 있는 Paging 클래스
 	 */
 	@Override
-	public List<MetadataGetResponse> findAll(PageRequest pageRequest) {
+	public List<MetadataGetResponse> findAllByPage(PageRequest pageRequest) {
 		return metadataRepository.findAll(pageRequest).stream().map(MetadataGetResponse::from).toList();
+	}
+
+	/**
+	 * page 상관없이 Metadata 전체를 조회하는 메소드
+	 * 초기 세팅 이외의 사용 비권장
+	 */
+	public List<Metadata> findAll(){
+		return metadataRepository.findAll();
 	}
 
 	/**
@@ -142,19 +149,9 @@ public class MetadataService implements IMetadataServiceV1 {
 		return metadataRepository.existsById(path);
 	}
 
-	@PostConstruct
-	public void loadMetadataToCache(){
-		// Mysql에 저장된 Metadata 조회
-		List<Metadata> metadataList = metadataRepository.findAll();
-
-		for(Metadata metadata : metadataList){
-			MetadataGetResponse response = getCacheData(metadata.getMetadataUrl());
-			log.info(response.getMetadataUrl() + " Cache Create.");
-		}
-	}
-
-	@Cacheable(cacheNames = "MetadataCache", key = "#path")
-	public MetadataGetResponse getCacheData(String path){
+	@Cacheable(value = "MetadataCache", key = "#path")
+	public MetadataGetResponse getMetadataCache(String path){
+		log.info("캐시 없음. 메소드 동작");
 		Optional<Metadata> metadata = metadataRepository.findById(path);
 
 		if(metadata.isEmpty())

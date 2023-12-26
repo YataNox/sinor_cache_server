@@ -45,7 +45,7 @@ public interface IMetadataServiceV1 {
 	 * 옵션들의 목록을 조회한다. (10개씩 페이징)
 	 * @param pageRequest 조회할 목록의 size, page 번호가 들어 있는 Paging 클래스
 	 */
-	List<MetadataGetResponse> findAll(PageRequest pageRequest);
+	List<MetadataGetResponse> findAllByPage(PageRequest pageRequest);
 
 	/**
 	 * 옵션이 있는 지 확인

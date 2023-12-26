@@ -201,7 +201,7 @@ public class MainCacheService implements IMainCacheServiceV1 {
 		MainCacheResponse mainCacheResponse = MainCacheResponse.from(data);
 
 		// 옵션 값 찾기 or 생성
-		MetadataGetResponse metadata = metadataService.getCacheData(path);
+		MetadataGetResponse metadata = metadataService.getMetadataCache(path);
 		//MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
 
 		// 캐시 Response 객체를 위에 값을 이용해 생성하고 직렬화

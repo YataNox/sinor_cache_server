@@ -13,6 +13,12 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        show_sql: true
+        use_sql_comments: true
+
+  cache:
+    jcache:
+      config: classpath:Ehcache.xml
 
   datasource:
     url: jdbc:mysql://mysqlHost:3306/user?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&serverTimezone=Asia/Seoul

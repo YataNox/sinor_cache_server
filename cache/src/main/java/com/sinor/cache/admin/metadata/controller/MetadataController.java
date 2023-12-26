@@ -41,7 +41,7 @@ public class MetadataController implements IMetadataControllerV1{
 	public ResponseEntity<AdminSuccessResponse<?>> getMetadataAll(int page) {
 		// 조회할 Metadata Page 설정 1 Page 당 데이터 10개
 		PageRequest pageRequest = PageRequest.of(page, 10);
-		AdminSuccessResponse<?> adminResponse = AdminSuccessResponse.from(ResponseStatus.SUCCESS, metadataService.findAll(pageRequest));
+		AdminSuccessResponse<?> adminResponse = AdminSuccessResponse.from(ResponseStatus.SUCCESS, metadataService.findAllByPage(pageRequest));
 		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(adminResponse);
 	}
 
