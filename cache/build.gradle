@@ -29,7 +29,6 @@ dependencies {
 
     //
     implementation('org.springframework:spring-webflux')
-
     implementation 'io.projectreactor.netty:reactor-netty'
 
 
@@ -47,11 +46,13 @@ dependencies {
     // Web
     implementation('org.springframework.boot:spring-boot-starter-web')
     implementation('org.springframework.boot:spring-boot-starter')
-    implementation('org.springframework.boot:spring-boot-starter-web')
 
     //시큐리티
-//    implementation('org.springframework.boot:spring-boot-starter-oauth2-client') // 스프링 시큐리티
-//    implementation('org.springframework.boot:spring-boot-starter-security')
+    implementation('org.springframework.boot:spring-boot-starter-oauth2-client')
+    implementation('org.springframework.boot:spring-boot-starter-security')
+    implementation('org.springframework.boot:spring-boot-starter-oauth2-resource-server')
+    implementation 'org.keycloak:keycloak-admin-client:23.0.3'
+
 
     //스웨거
     implementation('org.springdoc:springdoc-openapi-ui:1.6.9')

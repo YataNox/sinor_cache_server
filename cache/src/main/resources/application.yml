@@ -1,10 +1,27 @@
 server.port: 8000
+## 시큐리티 로깅
+
+logging:
+  level:
+    org.springframework.security: INFO
+    org.hibernate.SQL: debug
+    org.hibernate.type: trace
+  pattern:
+    console: "%d{dd-MM-yyyy HH:mm:ss} %magenta([%thread]) %highlight(%-5level) %logger.%M - %msg%n"
 
 spring:
   redis:
     data:
       host: redisHost
       port: 6379
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloakHost:8443/realms/sinor
+          jwk-set-uri: http://keycloakHost:8443/realms/sinor/protocol/openid-connect/certs
+
 
   jpa:
     hibernate:
@@ -24,10 +41,6 @@ spring:
     init:
       mode: always
       platform: mysql
-
-logging.level:
-  org.hibernate.SQL: debug
-  org.hibernate.type: trace
 
 springdoc:
   swagger-ui:
