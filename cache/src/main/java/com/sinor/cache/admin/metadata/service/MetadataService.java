@@ -55,13 +55,17 @@ public class MetadataService implements IMetadataServiceV1 {
 	@Override
 	public MetadataGetResponse findMetadataById(String path) throws CustomException {
 		// 옵션 조회
-		/*Optional<Metadata> metadata = metadataRepository.findById(path);
+		long startTime = System.currentTimeMillis();
+		System.out.println("조회 시작");
+		Optional<Metadata> metadata = metadataRepository.findById(path);
+		long endTime = System.currentTimeMillis();
+		System.out.println("조회 종료 : " + (endTime - startTime) + "밀리초");
 
 		if(metadata.isEmpty())
-			throw new CustomException(ResponseStatus.METADATA_NOT_FOUND);*/
+			throw new CustomException(ResponseStatus.METADATA_NOT_FOUND);
 
 		// response 반환
-		return getMetadataCache(path);
+		return MetadataGetResponse.from(metadata.get());
 	}
 
 	/**
@@ -74,7 +78,10 @@ public class MetadataService implements IMetadataServiceV1 {
 	public MetadataGetResponse updateMetadata(String path, Long newExpiredTime) throws CustomException {
 
 		// 해당 url 유무 파악
+		long startTime = System.currentTimeMillis();
 		Optional<Metadata> metadata = metadataRepository.findById(path);
+		long endTime = System.currentTimeMillis();
+		System.out.println("조회 종료 : " + (endTime - startTime) + "밀리초");
 
 		if(metadata.isEmpty())
 			throw new CustomException(ResponseStatus.METADATA_NOT_FOUND);
@@ -83,7 +90,7 @@ public class MetadataService implements IMetadataServiceV1 {
 		// response 반환
 		return MetadataGetResponse.from(
 			metadataRepository.save(
-				Metadata.updateValue(metadata.get(), newExpiredTime)
+				Metadata.updateValue(metadata.get().getMetadataUrl(), newExpiredTime, metadata.get().getVersion())
 			)
 		);
 	}
@@ -149,7 +156,7 @@ public class MetadataService implements IMetadataServiceV1 {
 		return metadataRepository.existsById(path);
 	}
 
-	@Cacheable(value = "MetadataCache", key = "#path")
+	@Cacheable(value = "metadataCacheInfo", key = "#path")
 	public MetadataGetResponse getMetadataCache(String path){
 		log.info("캐시 없음. 메소드 동작");
 		Optional<Metadata> metadata = metadataRepository.findById(path);

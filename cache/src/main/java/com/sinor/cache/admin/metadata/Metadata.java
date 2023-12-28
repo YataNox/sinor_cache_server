@@ -44,11 +44,11 @@ public class Metadata {
 			.build();
 	}
 
-	public static Metadata updateValue(Metadata metadata, Long newExpiredTime){
+	public static Metadata updateValue(String metadataUrl, Long metadataTtlSecond, int version){
 		return Metadata.builder()
-			.metadataUrl(metadata.getMetadataUrl())
-			.metadataTtlSecond(newExpiredTime)
-			.version(metadata.getVersion() + 1)
+			.metadataUrl(metadataUrl)
+			.metadataTtlSecond(metadataTtlSecond)
+			.version(version + 1)
 			.build();
 	}
 }
