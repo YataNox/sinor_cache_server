@@ -8,19 +8,16 @@ logging:
     console: "%d{dd-MM-yyyy HH:mm:ss} %magenta([%thread]) %highlight(%-5level) %logger.%M - %msg%n"
 
 spring:
-  redis:
-    data:
-      host: redisHost
-      port: 6379
-
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://keycloakHost:8443/realms/sinor
-          jwk-set-uri: http://keycloakHost:8443/realms/sinor/protocol/openid-connect/certs
-
-  
+          public-key-location: classpath:publicKey.txt
+          jws-algorithms: RS256
+  redis:
+    data:
+      host: redisHost
+      port: 6379
   jpa:
     hibernate:
       ddl-auto: create
@@ -39,8 +36,6 @@ spring:
     init:
       mode: always
       platform: mysql
-
-
 
 
 logging.level:

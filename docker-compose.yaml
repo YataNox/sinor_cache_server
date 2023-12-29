@@ -30,6 +30,8 @@ services:
         condition: service_started
       main_server:
         condition: service_started
+      auth_server:
+        condition: service_started
     volumes:
       - ./proxy/nginx.conf:/etc/nginx/nginx.conf
 
@@ -86,7 +88,7 @@ services:
     hostname: mainHost
     build: ./main
     ports:
-      - "8080:8080"
+      - "8081:8081"
     restart: no
     depends_on:
       main_db:
@@ -112,25 +114,14 @@ services:
     volumes:
       - main-mysql_db-data:/var/lib/mysql
 
-  keycloak:
-    hostname: keycloakHost
-    image: quay.io/keycloak/keycloak:latest
-    environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
-      - KC_HTTP_PORT=8443
-      - DB_VENDOR=mysql
-      - DB_ADDR=main_db
-      - DB_PORT=3306
-      - DB_DATABASE=user
-      - DB_USER=root
-      - DB_PASSWORD_FILE=/run/secrets/keycloak_db-password
-    depends_on:
-      - main_db
-    command: [ "start-dev","--http-port=8443" ]
+
+  auth_server:
+    hostname: authHost
+    build: ./auth
     ports:
-      - "8443:8443"
-    secrets:
-      - keycloak_db-password
+      - "9000:9000"
+    restart: no
+
+
 
 
