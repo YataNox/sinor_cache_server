@@ -38,9 +38,9 @@ public class SecurityConfig {
 		return http
 			.authorizeHttpRequests(authorize -> {
 				authorize.requestMatchers("/api/v**/authentication").permitAll();
+				authorize.requestMatchers("/api/v**/refresh").permitAll();
 				authorize.anyRequest().authenticated();
 			})
-
 			.sessionManagement(session -> {
 				session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 			})
@@ -60,7 +60,7 @@ public class SecurityConfig {
 			.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
 			.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
 			.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-			// .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+			.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
 			.clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
 			.tokenSettings(TokenSettings.builder().accessTokenTimeToLive(Duration.ofSeconds(60)).build())
 			.build();

@@ -114,7 +114,6 @@ services:
     volumes:
       - main-mysql_db-data:/var/lib/mysql
 
-
   auth_server:
     hostname: authHost
     build: ./auth

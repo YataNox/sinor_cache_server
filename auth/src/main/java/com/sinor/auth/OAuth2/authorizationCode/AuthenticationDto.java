@@ -15,7 +15,7 @@ public class AuthenticationDto {
 	@Getter
 	@Builder
 	public static class Res {
-		private final String token;
+		private final String accessToken;
 		private final String refreshToken;
 	}
 }

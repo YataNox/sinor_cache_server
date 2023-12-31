@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 @Builder
 @RequiredArgsConstructor
 public class UserToken {
+	private final String subject;
 	private final String username;
 	private final Date expiration;
 	private final String[] roles;
