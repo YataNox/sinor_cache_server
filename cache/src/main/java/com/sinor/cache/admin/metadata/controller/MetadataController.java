@@ -10,17 +10,21 @@ import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
 import com.sinor.cache.admin.metadata.service.IMetadataServiceV1;
 import com.sinor.cache.common.AdminSuccessResponse;
 import com.sinor.cache.common.ResponseStatus;
+import com.sinor.cache.utils.JsonToStringConverter;
 
 @RestController
 public class MetadataController implements IMetadataControllerV1{
 
 	private final IMetadataServiceV1 metadataService;
 	private final IApiServiceV1 apiService;
+	private final JsonToStringConverter jsonToStringConverter;
 
 	@Autowired
-	public MetadataController(IMetadataServiceV1 metadataService, IApiServiceV1 apiService) {
+	public MetadataController(IMetadataServiceV1 metadataService, IApiServiceV1 apiService,
+		JsonToStringConverter jsonToStringConverter) {
 		this.metadataService = metadataService;
 		this.apiService = apiService;
+		this.jsonToStringConverter = jsonToStringConverter;
 	}
 
 	/**
@@ -28,7 +32,8 @@ public class MetadataController implements IMetadataControllerV1{
 	 */
 	@Override
 	public ResponseEntity<AdminSuccessResponse<?>> getMetadata(String path) {
-		AdminSuccessResponse<?> adminResponse = AdminSuccessResponse.from(ResponseStatus.SUCCESS, metadataService.findMetadataById(path));
+		MetadataGetResponse metadata = metadataService.findMetadataById(path);
+		AdminSuccessResponse<?> adminResponse = AdminSuccessResponse.from(ResponseStatus.SUCCESS, metadata);
 		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(adminResponse);
 	}
 

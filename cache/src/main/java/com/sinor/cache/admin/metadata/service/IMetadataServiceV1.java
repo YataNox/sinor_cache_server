@@ -41,6 +41,8 @@ public interface IMetadataServiceV1 {
 	 */
 	MetadataGetResponse	createMetadata(String path, Long expiredTime) throws CustomException;
 
+	MetadataGetResponse createMetadata(String path) throws CustomException;
+
 	/**
 	 * 옵션들의 목록을 조회한다. (10개씩 페이징)
 	 * @param pageRequest 조회할 목록의 size, page 번호가 들어 있는 Paging 클래스

@@ -13,8 +13,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        show_sql: true
-        use_sql_comments: true
 
   datasource:
     url: jdbc:mysql://mysqlHost:3306/user?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&serverTimezone=Asia/Seoul
@@ -28,6 +26,7 @@ spring:
       platform: mysql
 
 logging.level:
+  root: INFO #로깅을 위해 추가
   org.hibernate.SQL: debug
   org.hibernate.type: trace
 

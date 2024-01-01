@@ -21,16 +21,23 @@ import com.sinor.cache.main.model.MainCacheResponse;
 import com.sinor.cache.utils.JsonToStringConverter;
 import com.sinor.cache.utils.RedisUtils;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
 @Service
 @Transactional
 public class MainCacheService implements IMainCacheServiceV1 {
-	private WebClient webClient;
+	private final WebClient webClient;
 	private final MetadataService metadataService;
 	private final JsonToStringConverter jsonToStringConverter;
-	private final RedisUtils redisUtils;
+
+	private final RedisUtils responseRedisUtils;
+
+	public MainCacheService(WebClient webClient, MetadataService metadataService,
+		JsonToStringConverter jsonToStringConverter,
+		RedisUtils responseRedisUtils) {
+		this.webClient = webClient;
+		this.metadataService = metadataService;
+		this.jsonToStringConverter = jsonToStringConverter;
+		this.responseRedisUtils = responseRedisUtils;
+	}
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드
@@ -171,15 +178,18 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	public MainCacheResponse getDataInCache(String path, MultiValueMap<String, String> queryParams,
 		MultiValueMap<String, String> headers) throws
 		CustomException {
-		// URI 조합
-		String uri = getUriPathQuery(path, queryParams);
 
-		if (!redisUtils.isExist(uri))
+		MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
+
+		// URI 조합
+		String key = getUriPathQuery(path, queryParams) + "V" + metadata.getVersion();
+
+		if (!responseRedisUtils.isExist(key))
 			return null;
 
 		// redis에 값이 있다면
 		// Redis에서 받은 값 ApiGetResponse로 역직렬화
-		ApiGetResponse cachedData = jsonToStringConverter.jsontoClass(redisUtils.getRedisData(uri),
+		ApiGetResponse cachedData = jsonToStringConverter.jsontoClass(responseRedisUtils.getRedisData(key),
 			ApiGetResponse.class);
 
 		return cachedData.getResponse();
@@ -201,15 +211,16 @@ public class MainCacheService implements IMainCacheServiceV1 {
 		MainCacheResponse mainCacheResponse = MainCacheResponse.from(data);
 
 		// 옵션 값 찾기 or 생성
-		MetadataGetResponse metadata = metadataService.getMetadataCache(path);
-		//MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
+		MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
 
 		// 캐시 Response 객체를 위에 값을 이용해 생성하고 직렬화
 		ApiGetResponse apiGetResponse = ApiGetResponse.from(metadata, mainCacheResponse);
 		String response = jsonToStringConverter.objectToJson(apiGetResponse);
 
+		// path + queryString + metadata version 형태의 Key 이름 생성
+		String cacheKeyName = getUriPathQuery(path, queryParams) + "V" + metadata.getVersion();
 		// 캐시 저장
-		redisUtils.setRedisData(getUriPathQuery(path, queryParams), response, metadata.getMetadataTtlSecond());
+		responseRedisUtils.setRedisData(cacheKeyName, response, metadata.getMetadataTtlSecond());
 
 		// Response만 반환
 		return mainCacheResponse;
