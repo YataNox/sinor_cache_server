@@ -1,13 +1,7 @@
 package com.sinor.cache.config;
 
-import java.time.Duration;
-import java.util.Objects;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.cache.CacheKeyPrefix;
-import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
@@ -15,8 +9,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,7 +16,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sinor.cache.utils.JsonToStringConverter;
 import com.sinor.cache.utils.RedisUtils;
-import com.sinor.cache.utils.RedisUtils2;
 
 @Configuration
 public class RedisConfig {
@@ -105,37 +96,6 @@ public class RedisConfig {
 	}
 
 	/**
-	 * Redis Cache 매니저 구현체
-	 */
-	@Bean(name = "cacheManager")
-	public RedisCacheManager responseRedisCacheManager() {
-		RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
-			.serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
-			.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer(objectMapper())))   // json 형식으로 value 저장
-			.computePrefixWith(CacheKeyPrefix.simple())
-			.entryTtl(Duration.ofMinutes(10))
-			.disableCachingNullValues();
-
-		return RedisCacheManager.builder(Objects.requireNonNull(responseRedisTemplate().getConnectionFactory()))
-			.cacheDefaults(cacheConfig)
-			.build();
-	}
-
-	@Bean
-	public RedisCacheManager metadataRedisCacheManager() {
-		RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
-			.serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
-			.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer(objectMapper())))   // json 형식으로 value 저장
-			.computePrefixWith(CacheKeyPrefix.simple())
-			.entryTtl(Duration.ofMinutes(10))
-			.disableCachingNullValues();
-
-		return RedisCacheManager.builder(Objects.requireNonNull(metadataRedisTemplate().getConnectionFactory()))
-			.cacheDefaults(cacheConfig)
-			.build();
-	}
-
-	/**
 	 * 객체들의 직렬화와 역직렬화를 담당할 ObjectMapper 클래스
 	 */
 	@Bean
@@ -159,7 +119,7 @@ public class RedisConfig {
 	 * Redis에 대한 예외처리 등이 처리되어 있으며 Redis 0번 데이터베이스에 접근하여
 	 * Response에 대한 접근을 담당한다.
 	 */
-	@Bean
+	@Bean(name = "responseRedisUtils")
 	public RedisUtils responseRedisUtils(){
 		return new RedisUtils(responseRedisTemplate());
 	}
@@ -169,8 +129,8 @@ public class RedisConfig {
 	 * Redis에 대한 예외처리 등이 처리되어 있으며 Redis 1번 데이터베이스에 접근하여
 	 * Metadata에 대한 접근을 담당한다.
 	 */
-	@Bean
-	public RedisUtils2 metadataRedisUtils(){
-		return new RedisUtils2(metadataRedisTemplate());
+	@Bean(name = "metadataRedisUtils")
+	public RedisUtils metadataRedisUtils(){
+		return new RedisUtils(metadataRedisTemplate());
 	}
 }

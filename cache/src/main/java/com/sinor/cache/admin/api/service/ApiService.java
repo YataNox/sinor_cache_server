@@ -15,7 +15,6 @@ import com.sinor.cache.admin.api.model.ApiGetResponse;
 import com.sinor.cache.common.CustomException;
 import com.sinor.cache.utils.JsonToStringConverter;
 import com.sinor.cache.utils.RedisUtils;
-import com.sinor.cache.utils.RedisUtils2;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,12 +23,12 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional(readOnly = true)
 public class ApiService implements IApiServiceV1 {
 	private final JsonToStringConverter jsonToStringConverter;
-	private final RedisUtils2 metadataRedisUtils;
+	private final RedisUtils metadataRedisUtils;
 
 	private final RedisUtils responseRedisUtils;
 
 	@Autowired
-	public ApiService(JsonToStringConverter jsonToStringConverter, RedisUtils2 metadataRedisUtils,
+	public ApiService(JsonToStringConverter jsonToStringConverter, RedisUtils metadataRedisUtils,
 		RedisUtils responseRedisUtils) {
 		this.metadataRedisUtils = metadataRedisUtils;
 		this.jsonToStringConverter = jsonToStringConverter;

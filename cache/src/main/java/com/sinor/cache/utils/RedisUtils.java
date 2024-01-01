@@ -10,10 +10,10 @@ import com.sinor.cache.common.CustomException;
 import com.sinor.cache.common.ResponseStatus;
 
 public class RedisUtils {
-	private final RedisTemplate<String, String> responseRedisUtils;
+	private final RedisTemplate<String, String> redisTemplate;
 
-	public RedisUtils(RedisTemplate<String, String> responseRedisTemplate) {
-		this.responseRedisUtils = responseRedisTemplate;
+	public RedisUtils(RedisTemplate<String, String> redisTemplate) {
+		this.redisTemplate = redisTemplate;
 	}
 
 	/**
@@ -24,7 +24,7 @@ public class RedisUtils {
 	 */
 	public String getRedisData(String key) throws CustomException {
 		try {
-			return responseRedisUtils.opsForValue().get(key);
+			return redisTemplate.opsForValue().get(key);
 		} catch (NullPointerException e) {
 			throw new CustomException(ResponseStatus.CACHE_NOT_FOUND);
 		}
@@ -37,7 +37,7 @@ public class RedisUtils {
 	 * @param ttl 생성할 캐시의 만료 시간 (Second)
 	 */
 	public void setRedisData(String key, String value, Long ttl) {
-		responseRedisUtils.opsForValue().set(key, value, ttl, TimeUnit.SECONDS);
+		redisTemplate.opsForValue().set(key, value, ttl, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -46,7 +46,7 @@ public class RedisUtils {
 	 * @param value
 	 */
 	public void setRedisData(String key, String value){
-		responseRedisUtils.opsForValue().set(key, value);
+		redisTemplate.opsForValue().set(key, value);
 	}
 
 	/**
@@ -56,7 +56,7 @@ public class RedisUtils {
 	 */
 	public Boolean isExist(String key) throws CustomException {
 		try {
-			return responseRedisUtils.hasKey(key);
+			return redisTemplate.hasKey(key);
 		} catch (NullPointerException e) {
 			throw new CustomException(ResponseStatus.CACHE_NOT_FOUND);
 		}
@@ -70,17 +70,17 @@ public class RedisUtils {
 	 */
 	public Cursor<byte[]> searchPatternKeys(String pattern) {
 
-		return responseRedisUtils.executeWithStickyConnection(connection -> {
+		return redisTemplate.executeWithStickyConnection(connection -> {
 			ScanOptions options = ScanOptions.scanOptions().match("*" + pattern + "*").build();
 			return connection.scan(options);
 		});
 	}
 
 	public Boolean deleteCache(String key) throws CustomException {
-		return responseRedisUtils.delete(key);
+		return redisTemplate.delete(key);
 	}
 
 	public void unlinkCache(String key) throws CustomException {
-		responseRedisUtils.unlink(key);
+		redisTemplate.unlink(key);
 	}
 }

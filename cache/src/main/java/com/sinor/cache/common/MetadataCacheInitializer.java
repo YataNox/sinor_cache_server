@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import com.sinor.cache.admin.metadata.Metadata;
 import com.sinor.cache.admin.metadata.service.MetadataService;
 import com.sinor.cache.utils.JsonToStringConverter;
-import com.sinor.cache.utils.RedisUtils2;
+import com.sinor.cache.utils.RedisUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,8 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 public class MetadataCacheInitializer implements ApplicationRunner {
 	private final MetadataService metadataService;
 	private final JsonToStringConverter jsonToStringConverter;
-	private final RedisUtils2 metadataRedisUtils;
-	public MetadataCacheInitializer(MetadataService metadataService, JsonToStringConverter jsonToStringConverter, RedisUtils2 metadataRedisUtils) {
+	private final RedisUtils metadataRedisUtils;
+	public MetadataCacheInitializer(MetadataService metadataService, JsonToStringConverter jsonToStringConverter, RedisUtils metadataRedisUtils) {
 		this.metadataService = metadataService;
 		this.jsonToStringConverter = jsonToStringConverter;
 		this.metadataRedisUtils = metadataRedisUtils;

@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +16,7 @@ import com.sinor.cache.admin.metadata.repository.MetadataRepository;
 import com.sinor.cache.common.CustomException;
 import com.sinor.cache.common.ResponseStatus;
 import com.sinor.cache.utils.JsonToStringConverter;
-import com.sinor.cache.utils.RedisUtils2;
+import com.sinor.cache.utils.RedisUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,11 +27,11 @@ public class MetadataService implements IMetadataServiceV1 {
 	private final MetadataRepository metadataRepository;
 	private final JsonToStringConverter jsonToStringConverter;
 
-	private final RedisUtils2 metadataRedisUtils;
+	private final RedisUtils metadataRedisUtils;
 
 	@Autowired
 	public MetadataService(MetadataRepository optionRepository, JsonToStringConverter jsonToStringConverter,
-		RedisUtils2 metadataRedisUtils) {
+		RedisUtils metadataRedisUtils) {
 		this.metadataRepository = optionRepository;
 		this.jsonToStringConverter = jsonToStringConverter;
 		this.metadataRedisUtils = metadataRedisUtils;
@@ -202,7 +201,7 @@ public class MetadataService implements IMetadataServiceV1 {
 		return metadataRepository.existsById(path);
 	}
 
-	@Cacheable(value = "metadataCacheInfo", key = "#path")
+	/*@Cacheable(value = "metadataCacheInfo", key = "#path")
 	public String getMetadataCache(String path){
 		log.info("캐시 없음. 메소드 동작");
 		long startTime = System.currentTimeMillis();
@@ -213,5 +212,5 @@ public class MetadataService implements IMetadataServiceV1 {
 		if(metadata.isEmpty())
 			throw new CustomException(ResponseStatus.METADATA_NOT_FOUND);
 		return jsonToStringConverter.objectToJson(MetadataGetResponse.from(metadata.get()));
-	}
+	}*/
 }
