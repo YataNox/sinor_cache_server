@@ -33,7 +33,9 @@ public class AuthenticationController {
 		String refreshToken = null;
 		try {
 			accessToken = jwtTokenService.createAccessToken(userToken);
-			refreshToken = jwtTokenService.createRefreshToken();
+			refreshToken = jwtTokenService.createRefreshToken(RefreshTokenDto.Req.builder()
+				.username(request.getUsername())
+				.build());
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
 			throw new RuntimeException(e);
 		}

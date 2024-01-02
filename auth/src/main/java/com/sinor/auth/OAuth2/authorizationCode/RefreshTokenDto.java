@@ -7,7 +7,7 @@ public class RefreshTokenDto {
 	@Getter
 	@Builder
 	public static class Req {
-		
+		private String username;
 		private String refreshToken;
 
 	}

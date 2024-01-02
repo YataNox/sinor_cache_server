@@ -44,7 +44,9 @@ public class JwtTokenService {
 			.compact();
 	}
 
-	public String createRefreshToken() throws NoSuchAlgorithmException, InvalidKeySpecException {
+	public String createRefreshToken(RefreshTokenDto.Req build) throws
+		NoSuchAlgorithmException,
+		InvalidKeySpecException {
 		return Jwts.builder()
 			.setSubject("RefreshToken")
 			.setIssuedAt(new Date())

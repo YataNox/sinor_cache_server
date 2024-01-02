@@ -25,6 +25,7 @@ public class SecurityConfig {
 			.cors(AbstractHttpConfigurer::disable)
 			.authorizeHttpRequests(registry -> registry
 				.requestMatchers("/admin/**").hasRole("ADMIN")
+				.requestMatchers("/api/v**/authentication").permitAll()
 				.anyRequest().authenticated())
 			.oauth2ResourceServer(oauth2ResourceServer ->
 				oauth2ResourceServer.jwt(jwt ->

@@ -43,6 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 					e.printStackTrace();
 					return null;
 				}
+				
 			})
 			.filter(it -> !it.isExpired())
 			.filter(it -> it.getUsername() != null)
