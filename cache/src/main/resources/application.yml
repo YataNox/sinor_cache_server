@@ -9,8 +9,18 @@ logging:
     root: info
   pattern:
     console: "%d{dd-MM-yyyy HH:mm:ss} %magenta([%thread]) %highlight(%-5level) %logger.%M - %msg%n"
+jwt:
+  authorization: c2lub3I6c2lub3ItcTVuMmc=
+  username: sinor
+  password: sinor-q5n2g
 
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          public-key-location: classpath:publicKey.txt
+          jws-algorithms: RS256
   redis:
     data:
       host: redisHost
@@ -48,3 +58,4 @@ springdoc:
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
   paths-to-match:
+
