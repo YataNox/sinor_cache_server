@@ -15,6 +15,13 @@ public interface IMetadataServiceV1 {
 	MetadataGetResponse findOrCreateMetadataById(String path) throws AdminException;
 
 	/**
+	 * 캐시에 저장된 옵션 조회
+	 * @param path 조회할 캐시의 path
+	 * @return MetadataGetResponse By path Or null
+	 */
+	public MetadataGetResponse findMetadataCacheById(String path) throws CustomException;
+
+	/**
 	 * 옵션 조회 없으면 예외 발생
 	 * @param path 조회할 옵션의 path
 	 */

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RequiredArgsConstructor
 @Service
 @Transactional
 public class MainCacheService implements IMainCacheServiceV1 {
@@ -41,6 +41,16 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	private final MetadataService metadataService;
 	private final JsonToStringConverter jsonToStringConverter;
 	private final RedisUtils responseRedisUtils;
+
+	@Autowired
+	public MainCacheService(WebClient webClient, MetadataService metadataService,
+		JsonToStringConverter jsonToStringConverter,
+		RedisUtils responseRedisUtils) {
+		this.webClient = webClient;
+		this.metadataService = metadataService;
+		this.jsonToStringConverter = jsonToStringConverter;
+		this.responseRedisUtils = responseRedisUtils;
+	}
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드
@@ -196,17 +206,23 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	public MainCacheResponse getDataInCache(String path, MultiValueMap<String, String> queryParams,
 		MultiValueMap<String, String> headers) throws AdminException {
 
-		MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
+		// metadata 확인
+		// Metadata 조회
+		MetadataGetResponse metadata = metadataService.findMetadataCacheById(path);
+
+		if(metadata == null)
+			return null;
+
 		// URI 조합
 		String key = getUriPathQuery(path, queryParams) + "V" + metadata.getVersion();
 
 		System.out.println("전체 uri : " + key);
 
+		// response 확인
 		if (!responseRedisUtils.isExist(key))
 			return null;
 
-		// redis에 값이 있다면
-		// Redis에서 받은 값 ApiGetResponse로 역직렬화
+		// response 조회
 		ApiGetResponse cachedData = jsonToStringConverter.jsontoClass(responseRedisUtils.getRedisData(key),
 			ApiGetResponse.class);
 
@@ -250,16 +266,14 @@ public class MainCacheService implements IMainCacheServiceV1 {
 		if (queryParams != null)
 			builder.queryParams(queryParams);
 
+		System.out.println("builder : " + builder.toUriString());
 		return builder;
 	}
 
 	private String getUriPathQuery(String path, MultiValueMap<String, String> queryParams) {
 		UriComponents uriComponents = uriComponentsBuilder(path, queryParams).build();
-
-		if (uriComponents.getQuery() == null)
-			return uriComponents.getPath();
-
-		return uriComponents.getPath() + "?" + uriComponents.getQuery();
+		System.out.println(uriComponents.toUriString());
+		return uriComponents.toUriString();
 	}
 
 	/**

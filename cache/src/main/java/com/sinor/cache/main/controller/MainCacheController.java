@@ -37,13 +37,14 @@ public class MainCacheController implements IMainCacheControllerV1 {
 
 		MainCacheResponse pathCache = mainCacheService.getDataInCache(path, encodedQueryParams, headers);
 
+		// 메인 요청 및 캐시 생성
 		if (pathCache == null)
 			pathCache = mainCacheService.postInCache(path, encodedQueryParams, headers);
 
 		log.info("check body : {}", pathCache.getBody());
 
+		// 헤더 재조립
 		HttpHeaders header = new HttpHeaders();
-
 		MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
 		multiValueMap.setAll(pathCache.getHeaders());
 		header.addAll(multiValueMap);
