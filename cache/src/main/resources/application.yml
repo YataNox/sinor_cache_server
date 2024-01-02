@@ -45,6 +45,11 @@ spring:
       mode: always
       platform: mysql
 
+logging.level:
+  #root: INFO #로깅을 위해 추가
+  org.hibernate.SQL: debug
+  org.hibernate.type: trace
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -58,4 +63,3 @@ springdoc:
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
   paths-to-match:
-

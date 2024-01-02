@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sinor.cache.admin.api.model.ApIGetRequest;
+import com.sinor.cache.admin.api.model.ApiGetResponse;
 import com.sinor.cache.admin.api.service.IApiServiceV1;
-import com.sinor.cache.common.AdminSuccessResponse;
 import com.sinor.cache.common.ResponseStatus;
+import com.sinor.cache.common.SuccessResponse;
 
 @RestController
 public class ApiController implements IApiControllerV1 {
@@ -18,6 +20,14 @@ public class ApiController implements IApiControllerV1 {
 		this.apiService = apiService;
 	}
 
+	public class KeyDto {
+		private String key;
+
+		public String getKey() {
+			return key;
+		}
+	}
+
 	/**
 	 * 단일 캐시 조회
 	 *
@@ -25,11 +35,11 @@ public class ApiController implements IApiControllerV1 {
 	 */
 
 	@Override
-	public ResponseEntity<AdminSuccessResponse<?>> getCache(String key) {
-		AdminSuccessResponse<?> adminResponse = AdminSuccessResponse.from(ResponseStatus.SUCCESS,
-			apiService.findCacheById(key));
+	public ResponseEntity<SuccessResponse<?>> getCache(ApIGetRequest key) {
+		System.out.println(key.getKey());
+		SuccessResponse<?> adminResponse = SuccessResponse.from(ResponseStatus.SUCCESS,
+			apiService.findCacheById(key.getKey()));
 		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(adminResponse);
-
 	}
 
 	/**
@@ -38,19 +48,10 @@ public class ApiController implements IApiControllerV1 {
 	 */
 
 	@Override
-	public ResponseEntity<AdminSuccessResponse<?>> getCacheListByKeyParams(String url) {
-		AdminSuccessResponse<?> adminResponse = AdminSuccessResponse.from(ResponseStatus.SUCCESS,
+	public ResponseEntity<SuccessResponse<?>> getCacheListByKeyParams(String url) {
+		SuccessResponse<?> adminResponse = SuccessResponse.from(ResponseStatus.SUCCESS,
 			apiService.findCacheList(url));
 		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(adminResponse);
-	}
-
-	/**
-	 * 전체 캐시 목록 조회
-	 */
-
-	@Override
-	public ResponseEntity<AdminSuccessResponse<?>> getCacheListAll() {
-		return null;
 	}
 
 	/**
@@ -58,8 +59,22 @@ public class ApiController implements IApiControllerV1 {
 	 * @param key 삭제할 캐시의 key 값
 	 */
 	@Override
-	public ResponseEntity<?> deletecache(String key) {
-		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(apiService.deleteCacheById(key));
+	public ResponseEntity<?> deletecache(ApIGetRequest key) {
+
+		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(apiService.deleteCacheById(key.getKey()));
+	}
+
+	@Override
+	public ResponseEntity<?> deletecaches(String url) {
+		apiService.deleteCacheList(url);
+		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body("삭제 성공");
+	}
+
+	@Override
+	public ResponseEntity<?> updateCache(ApIGetRequest request) {
+		ApiGetResponse adminResponse = apiService.updateCacheById(request.getKey(), request.getResponse());
+
+		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(adminResponse);
 	}
 }
 

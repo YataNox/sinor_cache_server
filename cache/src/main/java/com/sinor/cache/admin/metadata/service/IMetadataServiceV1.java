@@ -5,43 +5,43 @@ import java.util.List;
 import org.springframework.data.domain.PageRequest;
 
 import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
-import com.sinor.cache.common.CustomException;
+import com.sinor.cache.common.admin.AdminException;
 
 public interface IMetadataServiceV1 {
 	/**
 	 * 옵션 조회 없으면 기본 10분 생성 후 반환
 	 * @param path 조회할 옵션의 path
 	 */
-	MetadataGetResponse findOrCreateMetadataById(String path) throws CustomException;
+	MetadataGetResponse findOrCreateMetadataById(String path) throws AdminException;
 
 	/**
 	 * 옵션 조회 없으면 예외 발생
 	 * @param path 조회할 옵션의 path
 	 */
-	MetadataGetResponse findMetadataById(String path) throws CustomException;
+	MetadataGetResponse findMetadataById(String path) throws AdminException;
 
 	/**
 	 * 옵션 수정
 	 * @param path 옵션 변경할 path 값
 	 * @param newExpiredTime 새로 적용할 만료시간
 	 */
-	MetadataGetResponse updateMetadata(String path, Long newExpiredTime) throws CustomException;
+	MetadataGetResponse updateMetadata(String path, Long newExpiredTime) throws AdminException;
 
 	/**
 	 * 옵션 삭제
 	 *
 	 * @param path 삭제할 path
 	 */
-	void deleteMetadataById(String path) throws CustomException;
+	void deleteMetadataById(String path) throws AdminException;
 
 	/**
 	 * 옵션 생성
 	 * @param path 생성할 path 값
 	 * @param expiredTime 적용할 만료시간
 	 */
-	MetadataGetResponse	createMetadata(String path, Long expiredTime) throws CustomException;
+	MetadataGetResponse createMetadata(String path, Long expiredTime) throws AdminException;
 
-	MetadataGetResponse createMetadata(String path) throws CustomException;
+	MetadataGetResponse createMetadata(String path) throws AdminException;
 
 	/**
 	 * 옵션들의 목록을 조회한다. (10개씩 페이징)

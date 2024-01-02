@@ -6,19 +6,34 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.sinor.cache.common.admin.AdminException;
+import com.sinor.cache.common.main.MainException;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 	/**
-	 * CustomException Handler
+	 * AdminException Handler
 	 */
-	@ExceptionHandler(CustomException.class)
-	public ResponseEntity<?> customException(CustomException e){
+	@ExceptionHandler(AdminException.class)
+	public ResponseEntity<?> adminException(AdminException e) {
 		log.error("Custom Exception Occurred : " + e.getStatus().getCode(), e);
 
-		AdminFailureResponse responseBody = AdminFailureResponse.from(e.getStatus());
+		FailureResponse responseBody = FailureResponse.fromByAdmin(e.getStatus());
+
+		return ResponseEntity.status((e).getStatus().getCode()).body(responseBody);
+	}
+
+	/**
+	 * mainException Handler
+	 */
+	@ExceptionHandler(MainException.class)
+	public ResponseEntity<?> mainException(MainException e) {
+		log.error("Custom Exception Occurred : " + e.getStatus().getCode(), e);
+
+		FailureResponse responseBody = FailureResponse.fromByMain(e.getStatus());
 
 		return ResponseEntity.status((e).getStatus().getCode()).body(responseBody);
 	}
@@ -28,10 +43,11 @@ public class GlobalExceptionHandler {
 	 */
 	@ExceptionHandler(Exception.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	public ResponseEntity<?> Exception(Exception e){
+	public ResponseEntity<?> Exception(Exception e) {
 		log.error("Internal Server Error occurred : " + HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
 
-		AdminFailureResponse responseBody = AdminFailureResponse.from(com.sinor.cache.common.ResponseStatus.INTERNAL_SERVER_ERROR);
+		FailureResponse responseBody = FailureResponse.from(
+			com.sinor.cache.common.ResponseStatus.INTERNAL_SERVER_ERROR);
 
 		return ResponseEntity.internalServerError().body(responseBody);
 	}

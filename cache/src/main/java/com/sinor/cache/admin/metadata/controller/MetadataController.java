@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sinor.cache.admin.api.service.IApiServiceV1;
 import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
 import com.sinor.cache.admin.metadata.service.IMetadataServiceV1;
-import com.sinor.cache.common.AdminSuccessResponse;
 import com.sinor.cache.common.ResponseStatus;
+import com.sinor.cache.common.SuccessResponse;
 import com.sinor.cache.utils.JsonToStringConverter;
 
 @RestController
-public class MetadataController implements IMetadataControllerV1{
+public class MetadataController implements IMetadataControllerV1 {
 
 	private final IMetadataServiceV1 metadataService;
 	private final IApiServiceV1 apiService;
@@ -31,9 +31,9 @@ public class MetadataController implements IMetadataControllerV1{
 	 * @param path 조회할 옵션의 path
 	 */
 	@Override
-	public ResponseEntity<AdminSuccessResponse<?>> getMetadata(String path) {
-		MetadataGetResponse metadata = metadataService.findMetadataById(path);
-		AdminSuccessResponse<?> adminResponse = AdminSuccessResponse.from(ResponseStatus.SUCCESS, metadata);
+	public ResponseEntity<SuccessResponse<?>> getMetadata(String path) {
+		SuccessResponse<?> adminResponse = SuccessResponse.from(ResponseStatus.SUCCESS,
+			metadataService.findMetadataById(path));
 		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(adminResponse);
 	}
 
@@ -43,10 +43,11 @@ public class MetadataController implements IMetadataControllerV1{
 	 * @param page 목록의 Page 번호
 	 */
 	@Override
-	public ResponseEntity<AdminSuccessResponse<?>> getMetadataAll(int page) {
+	public ResponseEntity<SuccessResponse<?>> getMetadataAll(int page) {
 		// 조회할 Metadata Page 설정 1 Page 당 데이터 10개
 		PageRequest pageRequest = PageRequest.of(page, 10);
-		AdminSuccessResponse<?> adminResponse = AdminSuccessResponse.from(ResponseStatus.SUCCESS, metadataService.findAllByPage(pageRequest));
+		SuccessResponse<?> adminResponse = SuccessResponse.from(ResponseStatus.SUCCESS,
+			metadataService.findAllByPage(pageRequest));
 		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(adminResponse);
 	}
 
@@ -54,8 +55,9 @@ public class MetadataController implements IMetadataControllerV1{
 	 * @param path 생성할 옵션의 path
 	 */
 	@Override
-	public ResponseEntity<AdminSuccessResponse<?>> createMetadata(String path) {
-		AdminSuccessResponse<?> adminResponse = AdminSuccessResponse.from(ResponseStatus.SUCCESS, metadataService.createMetadata(path, 60*10L));
+	public ResponseEntity<SuccessResponse<?>> createMetadata(String path) {
+		SuccessResponse<?> adminResponse = SuccessResponse.from(ResponseStatus.SUCCESS,
+			metadataService.createMetadata(path, 60 * 10L));
 		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(adminResponse);
 	}
 
@@ -63,10 +65,10 @@ public class MetadataController implements IMetadataControllerV1{
 	 * @param path 수정할 옵션의 path
 	 */
 	@Override
-	public ResponseEntity<AdminSuccessResponse<?>> updateMetadata(String path, Long newExpiredTime) {
+	public ResponseEntity<SuccessResponse<?>> updateMetadata(String path, Long newExpiredTime) {
 		// 캐시 수정
 		MetadataGetResponse updatedMetadata = metadataService.updateMetadata(path, newExpiredTime);
-		AdminSuccessResponse<?> adminResponse = AdminSuccessResponse.from(ResponseStatus.SUCCESS, updatedMetadata);
+		SuccessResponse<?> adminResponse = SuccessResponse.from(ResponseStatus.SUCCESS, updatedMetadata);
 		// 수정된 Path URL 캐시 목록 삭제
 		apiService.deleteCacheList(updatedMetadata.getMetadataUrl());
 
@@ -77,9 +79,9 @@ public class MetadataController implements IMetadataControllerV1{
 	 * @param path 삭제할 옵션의 path
 	 */
 	@Override
-	public ResponseEntity<AdminSuccessResponse<?>> deleteMetadata(String path) {
+	public ResponseEntity<SuccessResponse<?>> deleteMetadata(String path) {
 		metadataService.deleteMetadataById(path);
-		AdminSuccessResponse<?> adminResponse = AdminSuccessResponse.fromNoData(ResponseStatus.SUCCESS);
+		SuccessResponse<?> adminResponse = SuccessResponse.fromNoData(ResponseStatus.SUCCESS);
 		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(adminResponse);
 	}
 
@@ -89,8 +91,9 @@ public class MetadataController implements IMetadataControllerV1{
 	 * @param path 유무를 파악할 path 값
 	 */
 	@Override
-	public ResponseEntity<AdminSuccessResponse<?>> isExistMetadata(String path) {
-		AdminSuccessResponse<?> adminResponse = AdminSuccessResponse.from(ResponseStatus.SUCCESS, metadataService.isExistById(path));
+	public ResponseEntity<SuccessResponse<?>> isExistMetadata(String path) {
+		SuccessResponse<?> adminResponse = SuccessResponse.from(ResponseStatus.SUCCESS,
+			metadataService.isExistById(path));
 		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(adminResponse);
 	}
 }

@@ -19,13 +19,14 @@ import reactor.netty.http.client.HttpClient;
  */
 public class WebClientConfig {
 
-	DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory();
-
-	HttpClient httpClient = HttpClient.create()
-		.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000); // 10초
-
 	@Bean
 	public WebClient webClient() {
+		DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory();
+		//factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY);
+
+		HttpClient httpClient = HttpClient.create()
+			.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000); // 10초
+
 		return WebClient.builder()
 			.uriBuilderFactory(factory)
 			.baseUrl("http://mainHost:8080")

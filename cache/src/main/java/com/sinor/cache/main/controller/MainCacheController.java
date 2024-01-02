@@ -10,6 +10,9 @@ import com.sinor.cache.main.model.MainCacheRequest;
 import com.sinor.cache.main.model.MainCacheResponse;
 import com.sinor.cache.main.service.MainCacheService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 public class MainCacheController implements IMainCacheControllerV1 {
 
@@ -30,10 +33,14 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	public ResponseEntity<?> getDataReadCache(String path, MultiValueMap<String, String> queryParams,
 		MultiValueMap<String, String> headers) {
 
-		MainCacheResponse pathCache = mainCacheService.getDataInCache(path, queryParams, headers);
+		MultiValueMap<String, String> encodedQueryParams = mainCacheService.encodingUrl(queryParams);
+
+		MainCacheResponse pathCache = mainCacheService.getDataInCache(path, encodedQueryParams, headers);
 
 		if (pathCache == null)
-			pathCache = mainCacheService.postInCache(path, queryParams, headers);
+			pathCache = mainCacheService.postInCache(path, encodedQueryParams, headers);
+
+		log.info("check body : {}", pathCache.getBody());
 
 		HttpHeaders header = new HttpHeaders();
 

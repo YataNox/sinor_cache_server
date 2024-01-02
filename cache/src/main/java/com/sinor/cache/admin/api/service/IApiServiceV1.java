@@ -3,7 +3,7 @@ package com.sinor.cache.admin.api.service;
 import java.util.List;
 
 import com.sinor.cache.admin.api.model.ApiGetResponse;
-import com.sinor.cache.common.CustomException;
+import com.sinor.cache.common.admin.AdminException;
 
 public interface IApiServiceV1 {
 
@@ -11,13 +11,13 @@ public interface IApiServiceV1 {
 	 * 캐시 조회
 	 * @param key 조회할 캐시의 Key 값
 	 */
-	ApiGetResponse findCacheById(String key) throws CustomException;
+	ApiGetResponse findCacheById(String key) throws AdminException;
 
 	/**
 	 * 패턴과 일치하는 캐시 조회
 	 * @param pattern 조회할 캐시들의 공통 패턴
 	 */
-	List<ApiGetResponse> findCacheList(String pattern) throws CustomException;
+	List<ApiGetResponse> findCacheList(String pattern) throws AdminException;
 
 	/**
 	 * 전체 캐시 조회
@@ -30,17 +30,19 @@ public interface IApiServiceV1 {
 	 * @param value 생성할 캐시의 Value
 	 * @param expiredTime 생성할 캐시의 만료시간
 	 */
-	ApiGetResponse saveOrUpdate(String key, String value, Long expiredTime) throws CustomException;
+	ApiGetResponse saveOrUpdate(String key, String value, Long expiredTime) throws AdminException;
 
 	/**
 	 * 캐시 삭제
 	 * @param key 삭제할 캐시의 Key
 	 */
-	Boolean deleteCacheById(String key) throws CustomException;
+	Boolean deleteCacheById(String key) throws AdminException;
 
 	/**
 	 * 패턴과 일치하는 캐시 삭제
 	 * @param pattern 삭제할 캐시들의 공통 패턴
 	 */
-	void deleteCacheList(String pattern) throws CustomException;
+	void deleteCacheList(String pattern) throws AdminException;
+
+	ApiGetResponse updateCacheById(String key, String response);
 }

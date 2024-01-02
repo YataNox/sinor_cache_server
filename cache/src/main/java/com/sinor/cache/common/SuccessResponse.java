@@ -10,7 +10,7 @@ import lombok.Getter;
 
 @Getter
 @JsonPropertyOrder({"timestamp", "isSuccess", "code", "message", "data"})
-public class AdminSuccessResponse<T> {
+public class SuccessResponse<T> {
 	private final LocalDateTime timestamp;
 	@JsonProperty("isSuccess")
 	private final Boolean isSuccess;
@@ -20,7 +20,7 @@ public class AdminSuccessResponse<T> {
 	private final T data;
 
 	// 요청에 성공한 경우
-	private AdminSuccessResponse(ResponseStatus status, T data) {
+	private SuccessResponse(ResponseStatus status, T data) {
 		this.timestamp = LocalDateTime.now();
 		this.isSuccess = status.isSuccess();
 		this.message = status.getMessage();
@@ -28,7 +28,7 @@ public class AdminSuccessResponse<T> {
 		this.data = data;
 	}
 
-	private AdminSuccessResponse(ResponseStatus status) {
+	private SuccessResponse(ResponseStatus status) {
 		this.timestamp = LocalDateTime.now();
 		this.isSuccess = status.isSuccess();
 		this.message = status.getMessage();
@@ -36,12 +36,12 @@ public class AdminSuccessResponse<T> {
 		this.data = null;
 	}
 
-	public static AdminSuccessResponse<?> fromNoData(ResponseStatus status){
-		return new AdminSuccessResponse<>(status);
+	public static SuccessResponse<?> fromNoData(ResponseStatus status) {
+		return new SuccessResponse<>(status);
 	}
 
-	public static <T> AdminSuccessResponse<?> from(ResponseStatus status, T data){
-		return new AdminSuccessResponse<>(status, data);
+	public static <T> SuccessResponse<?> from(ResponseStatus status, T data) {
+		return new SuccessResponse<>(status, data);
 	}
 }
 

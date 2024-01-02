@@ -1,11 +1,17 @@
 package com.sinor.cache.main.service;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -15,29 +21,26 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.sinor.cache.admin.api.model.ApiGetResponse;
 import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
 import com.sinor.cache.admin.metadata.service.MetadataService;
-import com.sinor.cache.common.CustomException;
-import com.sinor.cache.common.ResponseStatus;
+import com.sinor.cache.common.admin.AdminException;
+import com.sinor.cache.common.main.MainException;
+import com.sinor.cache.common.main.MainResponseStatus;
 import com.sinor.cache.main.model.MainCacheResponse;
 import com.sinor.cache.utils.JsonToStringConverter;
 import com.sinor.cache.utils.RedisUtils;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class MainCacheService implements IMainCacheServiceV1 {
+
 	private final WebClient webClient;
 	private final MetadataService metadataService;
 	private final JsonToStringConverter jsonToStringConverter;
-
 	private final RedisUtils responseRedisUtils;
-
-	public MainCacheService(WebClient webClient, MetadataService metadataService,
-		JsonToStringConverter jsonToStringConverter,
-		RedisUtils responseRedisUtils) {
-		this.webClient = webClient;
-		this.metadataService = metadataService;
-		this.jsonToStringConverter = jsonToStringConverter;
-		this.responseRedisUtils = responseRedisUtils;
-	}
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드
@@ -46,8 +49,7 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 * @param queryString 요청 queryString
 	 */
 	public ResponseEntity<String> getMainPathData(String path, MultiValueMap<String, String> queryString,
-		MultiValueMap<String, String> headers) throws
-		CustomException {
+		MultiValueMap<String, String> headers) {
 
 		//테스트 Main uri
 		try {
@@ -64,12 +66,16 @@ public class MainCacheService implements IMainCacheServiceV1 {
 			modifiedHeaders.addAll(response.getHeaders());
 			modifiedHeaders.remove(HttpHeaders.TRANSFER_ENCODING);
 
-            return ResponseEntity
+			ResponseEntity<String> modifiedResponse = ResponseEntity
 				.status(response.getStatusCode())
 				.headers(modifiedHeaders)
 				.body(response.getBody());
+
+			log.info("Successfully retrieved data for path: {}", path);
+
+			return modifiedResponse;
 		} catch (WebClientResponseException e) {
-			throw new CustomException(ResponseStatus.DISPLAY_NOT_FOUND);
+			throw new MainException(MainResponseStatus.CONNECTION_FAILED);
 		}
 	}
 
@@ -97,12 +103,16 @@ public class MainCacheService implements IMainCacheServiceV1 {
 			modifiedHeaders.addAll(response.getHeaders());
 			modifiedHeaders.remove(HttpHeaders.TRANSFER_ENCODING);
 
-            return ResponseEntity
+			ResponseEntity<String> modifiedResponse = ResponseEntity
 				.status(response.getStatusCode())
 				.headers(modifiedHeaders)
 				.body(response.getBody());
+
+			log.info("Successfully retrieved data for path: {}", path);
+
+			return modifiedResponse;
 		} catch (WebClientResponseException e) {
-			throw new CustomException(ResponseStatus.DISPLAY_NOT_FOUND);
+			throw new MainException(MainResponseStatus.CONNECTION_FAILED);
 		}
 	}
 
@@ -127,12 +137,16 @@ public class MainCacheService implements IMainCacheServiceV1 {
 			modifiedHeaders.addAll(response.getHeaders());
 			modifiedHeaders.remove(HttpHeaders.TRANSFER_ENCODING);
 
-            return ResponseEntity
+			ResponseEntity<String> modifiedResponse = ResponseEntity
 				.status(response.getStatusCode())
 				.headers(modifiedHeaders)
 				.body(response.getBody());
+
+			log.info("Successfully retrieved data for path: {}", path);
+
+			return modifiedResponse;
 		} catch (WebClientResponseException e) {
-			throw new CustomException(ResponseStatus.DISPLAY_NOT_FOUND);
+			throw new MainException(MainResponseStatus.CONNECTION_FAILED);
 		}
 	}
 
@@ -159,12 +173,16 @@ public class MainCacheService implements IMainCacheServiceV1 {
 			modifiedHeaders.addAll(response.getHeaders());
 			modifiedHeaders.remove(HttpHeaders.TRANSFER_ENCODING);
 
-            return ResponseEntity
+			ResponseEntity<String> modifiedResponse = ResponseEntity
 				.status(response.getStatusCode())
 				.headers(modifiedHeaders)
 				.body(response.getBody());
+
+			log.info("Successfully retrieved data for path: {}", path);
+
+			return modifiedResponse;
 		} catch (WebClientResponseException e) {
-			throw new CustomException(ResponseStatus.DISPLAY_NOT_FOUND);
+			throw new MainException(MainResponseStatus.CONNECTION_FAILED);
 		}
 	}
 
@@ -176,13 +194,13 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 * @return 값이 있다면 value, 없다면 null
 	 */
 	public MainCacheResponse getDataInCache(String path, MultiValueMap<String, String> queryParams,
-		MultiValueMap<String, String> headers) throws
-		CustomException {
+		MultiValueMap<String, String> headers) throws AdminException {
 
 		MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
-
 		// URI 조합
 		String key = getUriPathQuery(path, queryParams) + "V" + metadata.getVersion();
+
+		System.out.println("전체 uri : " + key);
 
 		if (!responseRedisUtils.isExist(key))
 			return null;
@@ -202,8 +220,7 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 * @param queryParams 각 캐시의 구별을 위한 QueryString
 	 */
 	public MainCacheResponse postInCache(String path, MultiValueMap<String, String> queryParams,
-		MultiValueMap<String, String> headers) throws
-		CustomException {
+		MultiValueMap<String, String> headers) {
 
 		// Main에서 받은 값 CustomResponse로 Body, Header, Status 분할
 		ResponseEntity<String> data = getMainPathData(path, queryParams, headers);
@@ -245,4 +262,28 @@ public class MainCacheService implements IMainCacheServiceV1 {
 		return uriComponents.getPath() + "?" + uriComponents.getQuery();
 	}
 
+	/**
+	 * url에 포함되어있는 한글 등을 인코딩
+	 * @param queryParams 요청에 전달될 값
+	 * @return 인코딩되 결과값
+	 */
+	public MultiValueMap<String, String> encodingUrl(MultiValueMap<String, String> queryParams) {
+
+		MultiValueMap<String, String> encodedQueryParams = new LinkedMultiValueMap<>();
+
+		for (String key : queryParams.keySet()) {
+			List<String> encodedValues = queryParams.get(key).stream()
+				.map(value -> {
+					try {
+						return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
+					} catch (UnsupportedEncodingException e) {
+						throw new RuntimeException(e);
+					}
+				})
+				.collect(Collectors.toList());
+			encodedQueryParams.put(key, encodedValues);
+		}
+
+		return encodedQueryParams;
+	}
 }

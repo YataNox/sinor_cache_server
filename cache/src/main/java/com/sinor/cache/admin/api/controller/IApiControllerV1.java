@@ -3,9 +3,11 @@ package com.sinor.cache.admin.api.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
-import com.sinor.cache.common.AdminSuccessResponse;
+import com.sinor.cache.admin.api.model.ApIGetRequest;
+import com.sinor.cache.common.SuccessResponse;
 
 public interface IApiControllerV1 {
 	/**
@@ -13,25 +15,30 @@ public interface IApiControllerV1 {
 	 * @param key 조회할 캐시의 Key 값
 	 */
 	@GetMapping("/admin/cache")
-	ResponseEntity<AdminSuccessResponse<?>> getCache(@RequestParam String key);
+	ResponseEntity<SuccessResponse<?>> getCache(@RequestBody ApIGetRequest key);
 
 	/**
 	 * URL 별 캐시 목록 조회
 	 * @param url 조회할 캐시들의 공통 url 값
 	 */
 	@GetMapping("/admin/cache/list")
-	ResponseEntity<AdminSuccessResponse<?>> getCacheListByKeyParams(@RequestParam String url);
-
-	/**
-	 * 전체 캐시 목록 조회
-	 */
-	@GetMapping("/admin/cache/list/all")
-	ResponseEntity<AdminSuccessResponse<?>> getCacheListAll();
+	ResponseEntity<SuccessResponse<?>> getCacheListByKeyParams(@RequestBody String url);
 
 	/**
 	 * 단일 캐시 삭제
 	 * @param key 삭제할 캐시의 key 값
 	 */
 	@DeleteMapping("/admin/cache")
-	ResponseEntity<?> deletecache(@RequestParam String key);
+	ResponseEntity<?> deletecache(@RequestBody ApIGetRequest key);
+
+	@DeleteMapping("/admin/caches")
+	ResponseEntity<?> deletecaches(@RequestBody String url);
+
+	/**
+	 *
+	 * @param request
+	 * @return
+	 */
+	@PutMapping("/admin/cache")
+	ResponseEntity<?> updateCache(@RequestBody ApIGetRequest request);
 }

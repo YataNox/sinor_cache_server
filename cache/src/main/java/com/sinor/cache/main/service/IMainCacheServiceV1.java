@@ -5,7 +5,7 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 
-import com.sinor.cache.common.CustomException;
+import com.sinor.cache.common.main.MainException;
 import com.sinor.cache.main.model.MainCacheResponse;
 
 public interface IMainCacheServiceV1 {
@@ -16,7 +16,7 @@ public interface IMainCacheServiceV1 {
 	 * @param queryString 요청 queryString
 	 */
 	ResponseEntity<?> getMainPathData(String path, MultiValueMap<String, String> queryString,
-		MultiValueMap<String, String> headers) throws CustomException;
+		MultiValueMap<String, String> headers) throws MainException;
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드
@@ -26,7 +26,7 @@ public interface IMainCacheServiceV1 {
 	 * @param body        Requestbody
 	 */
 	ResponseEntity<String> postMainPathData(String path, MultiValueMap<String, String> queryString,
-		Map<String, String> body) throws CustomException;
+		Map<String, String> body) throws MainException;
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드
@@ -35,7 +35,7 @@ public interface IMainCacheServiceV1 {
 	 * @param queryString 요청 queryString
 	 */
 	ResponseEntity<String> deleteMainPathData(String path, MultiValueMap<String, String> queryString) throws
-		CustomException;
+		MainException;
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드
@@ -45,7 +45,7 @@ public interface IMainCacheServiceV1 {
 	 * @param body        Requestbody
 	 */
 	ResponseEntity<String> updateMainPathData(String path, MultiValueMap<String, String> queryString,
-		Map<String, String> body) throws CustomException;
+		Map<String, String> body) throws MainException;
 
 	/**
 	 * 캐시에 데이터가 있는지 확인하고 없으면 데이터를 조회해서 있으면 데이터를 조회해서 반환해주는 메소드
@@ -55,7 +55,7 @@ public interface IMainCacheServiceV1 {
 	 * @return 값이 있다면 value, 없다면 null
 	 */
 	MainCacheResponse getDataInCache(String path, MultiValueMap<String, String> queryParams,
-		MultiValueMap<String, String> headers) throws CustomException;
+		MultiValueMap<String, String> headers) throws MainException;
 
 	/**
 	 * 캐시에 데이터가 없으면 메인 데이터를 조회해서 캐시에 저장하고 반환해주는 메소드
@@ -64,6 +64,12 @@ public interface IMainCacheServiceV1 {
 	 * @param queryString 각 캐시의 구별을 위한 QueryString
 	 */
 	MainCacheResponse postInCache(String path, MultiValueMap<String, String> queryString,
-		MultiValueMap<String, String> headers) throws CustomException;
+		MultiValueMap<String, String> headers) throws MainException;
 
+	/**
+	 * url에 포함되어있는 한글 등을 인코딩
+	 * @param queryParams 요청에 전달될 값
+	 * @return 인코딩되 결과값
+	 */
+	MultiValueMap<String, String> encodingUrl(MultiValueMap<String, String> queryParams) throws MainException;
 }

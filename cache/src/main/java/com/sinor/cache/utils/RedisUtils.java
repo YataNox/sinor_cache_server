@@ -1,13 +1,14 @@
 package com.sinor.cache.utils;
 
+import static com.sinor.cache.common.admin.AdminResponseStatus.*;
+
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 
-import com.sinor.cache.common.CustomException;
-import com.sinor.cache.common.ResponseStatus;
+import com.sinor.cache.common.admin.AdminException;
 
 public class RedisUtils {
 	private final RedisTemplate<String, String> redisTemplate;
@@ -20,13 +21,13 @@ public class RedisUtils {
 	 * redistemplate 안의 값을 호출
 	 * @param key 호출할 캐시의 key 값
 	 * @return 해당 key 값의 value (String 형태)
-	 * @throws CustomException 역 직렬화 실패 시 발생 오류
+	 * @throws AdminException 역 직렬화 실패 시 발생 오류
 	 */
-	public String getRedisData(String key) throws CustomException {
+	public String getRedisData(String key) throws AdminException {
 		try {
 			return redisTemplate.opsForValue().get(key);
 		} catch (NullPointerException e) {
-			throw new CustomException(ResponseStatus.CACHE_NOT_FOUND);
+			throw new AdminException(CACHE_NOT_FOUND);
 		}
 	}
 
@@ -45,7 +46,7 @@ public class RedisUtils {
 	 * @param key
 	 * @param value
 	 */
-	public void setRedisData(String key, String value){
+	public void setRedisData(String key, String value) {
 		redisTemplate.opsForValue().set(key, value);
 	}
 
@@ -54,11 +55,11 @@ public class RedisUtils {
 	 * @param key 캐시 유무를 확인 할 캐시의 key
 	 * @return 있으면 true 없으면 false
 	 */
-	public Boolean isExist(String key) throws CustomException {
+	public Boolean isExist(String key) throws AdminException {
 		try {
 			return redisTemplate.hasKey(key);
 		} catch (NullPointerException e) {
-			throw new CustomException(ResponseStatus.CACHE_NOT_FOUND);
+			throw new AdminException(CACHE_NOT_FOUND);
 		}
 	}
 
@@ -68,6 +69,7 @@ public class RedisUtils {
 	 * @param pattern 찾으려는 key의 일부
 	 * @return 찾은 key들의 Cursor
 	 */
+	//TODO ScanOptions의 deprecated로 인해 Redis KeyCommands으로 리팩토링 필요
 	public Cursor<byte[]> searchPatternKeys(String pattern) {
 
 		return redisTemplate.executeWithStickyConnection(connection -> {
@@ -76,11 +78,21 @@ public class RedisUtils {
 		});
 	}
 
-	public Boolean deleteCache(String key) throws CustomException {
+	public String disuniteKey(String key) {
+
+		if (key.contains("?")) {
+			return key.substring(0, key.indexOf("?"));
+		} else {
+			return key;
+		}
+
+	}
+
+	public Boolean deleteCache(String key) throws AdminException {
 		return redisTemplate.delete(key);
 	}
 
-	public void unlinkCache(String key) throws CustomException {
+	public void unlinkCache(String key) throws AdminException {
 		redisTemplate.unlink(key);
 	}
 }

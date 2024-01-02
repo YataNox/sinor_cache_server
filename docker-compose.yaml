@@ -46,6 +46,8 @@ services:
         condition: service_healthy
       cache_mysql_db:
         condition: service_healthy
+    environment:
+      - TZ=Asia/Seoul
 
   cache_redis_db:
     hostname: redisHost
