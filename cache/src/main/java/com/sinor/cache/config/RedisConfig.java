@@ -1,13 +1,9 @@
 package com.sinor.cache.config;
 
-import java.time.Duration;
-import java.util.Objects;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
@@ -24,24 +20,63 @@ import com.sinor.cache.utils.RedisUtils;
 @Configuration
 public class RedisConfig {
 
+	/**
+	 * Response 저장을 위한 Redis 0번 데이터베이스
+	 * 사용 시 Redis-cli 내부에서 SELECT 0 접속
+ 	 */
 	@Bean
-	public RedisConnectionFactory redisConnectionFactory() {
-		return new LettuceConnectionFactory("redisHost", 6379); // 여러 다른 Redis 연결 방법이 있을 수 있습니다.
+	public RedisConnectionFactory responseRedisConnectionFactory() {
+		RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
+		redisStandaloneConfiguration.setHostName("redisHost");
+		redisStandaloneConfiguration.setPort(6379);
+		redisStandaloneConfiguration.setDatabase(0);
+
+		return new LettuceConnectionFactory(redisStandaloneConfiguration); // 여러 다른 Redis 연결 방법이 있을 수 있습니다.
 	}
 
+	/**
+	 * Metadata 저장을 위한 Redis 1번 데이터베이스
+	 * 사용 시 Redis-cli 내부에서 SELECT 1 접속
+	 */
 	@Bean
-	public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+	public RedisConnectionFactory metadataRedisConnectionFactory() {
+		RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
+		redisStandaloneConfiguration.setHostName("redisHost");
+		redisStandaloneConfiguration.setPort(6379);
+		redisStandaloneConfiguration.setDatabase(1);
+
+		return new LettuceConnectionFactory(redisStandaloneConfiguration); // 여러 다른 Redis 연결 방법이 있을 수 있습니다.
+	}
+
+	/**
+	 * 스프링에서 Redis에 접근하기 위한 Template 객체
+	 */
+	@Bean(name = "redisTemplate")
+	public RedisTemplate<String, String> responseRedisTemplate() {
 		RedisTemplate<String, String> template = new RedisTemplate<>();
-		template.setConnectionFactory(redisConnectionFactory);
+		template.setConnectionFactory(responseRedisConnectionFactory());
 		template.setKeySerializer(new StringRedisSerializer());
 		template.setValueSerializer(new StringRedisSerializer());
 		return template;
 	}
 
+	@Bean(name = "metadataRedisTemplate")
+	public RedisTemplate<String, String> metadataRedisTemplate() {
+		RedisTemplate<String, String> template = new RedisTemplate<>();
+		template.setConnectionFactory(metadataRedisConnectionFactory());
+		template.setKeySerializer(new StringRedisSerializer());
+		template.setValueSerializer(new StringRedisSerializer());
+		return template;
+	}
+
+	/**
+	 * redis에서 캐시 만료에 대한 메시지를 전달받을 Listener
+	 * Response 캐시에 대한 만료를 감지 한다.
+	 */
 	@Bean
-	public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory) {
+	public RedisMessageListenerContainer redisMessageListenerContainer() {
 		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-		container.setConnectionFactory(connectionFactory);
+		container.setConnectionFactory(responseRedisConnectionFactory());
 
 		MessageListenerAdapter listenerAdapter = new MessageListenerAdapter(new CacheMessageListener());
 		container.addMessageListener(listenerAdapter, new ChannelTopic("__keyevent@0__:expired"));
@@ -49,6 +84,9 @@ public class RedisConfig {
 		return container;
 	}
 
+	/**
+	 * Redis 메시지가 감지 됬을 때 이벤트를 처리할 메소드
+	 */
 	public static class CacheMessageListener {
 
 		public void handleMessage(String message) {
@@ -57,17 +95,9 @@ public class RedisConfig {
 		}
 	}
 
-	@Bean
-	public RedisCacheManager redisCacheManager(RedisTemplate<String, String> redisTemplate) {
-		RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
-			.entryTtl(Duration.ofMinutes(10))
-			.disableCachingNullValues();
-
-		return RedisCacheManager.builder(Objects.requireNonNull(redisTemplate.getConnectionFactory()))
-			.cacheDefaults(cacheConfig)
-			.build();
-	}
-
+	/**
+	 * 객체들의 직렬화와 역직렬화를 담당할 ObjectMapper 클래스
+	 */
 	@Bean
 	public ObjectMapper objectMapper() {
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -76,13 +106,31 @@ public class RedisConfig {
 		return objectMapper;
 	}
 
+	/**
+	 * ObjectMapper를 실질적으로 사용할 객체 변환기 클래스
+	 */
 	@Bean
 	public JsonToStringConverter jsonToStringConverter(){
 		return new JsonToStringConverter(objectMapper());
 	}
 
-	@Bean
-	public RedisUtils redisUtils(){
-		return new RedisUtils(redisTemplate(redisConnectionFactory()));
+	/**
+	 * RedisTemplate를 사용하기 위한 클래스
+	 * Redis에 대한 예외처리 등이 처리되어 있으며 Redis 0번 데이터베이스에 접근하여
+	 * Response에 대한 접근을 담당한다.
+	 */
+	@Bean(name = "responseRedisUtils")
+	public RedisUtils responseRedisUtils(){
+		return new RedisUtils(responseRedisTemplate());
+	}
+
+	/**
+	 * RedisTemplate를 사용하기 위한 클래스
+	 * Redis에 대한 예외처리 등이 처리되어 있으며 Redis 1번 데이터베이스에 접근하여
+	 * Metadata에 대한 접근을 담당한다.
+	 */
+	@Bean(name = "metadataRedisUtils")
+	public RedisUtils metadataRedisUtils(){
+		return new RedisUtils(metadataRedisTemplate());
 	}
 }

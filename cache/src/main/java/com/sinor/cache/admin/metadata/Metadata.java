@@ -1,5 +1,6 @@
 package com.sinor.cache.admin.metadata;
 
+import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Cacheable
 @Table(name = "metadata")
 public class Metadata {
 	@Id
@@ -21,4 +23,32 @@ public class Metadata {
 
 	@Column(nullable = false)
 	private Long metadataTtlSecond;
+
+	@Column(nullable = false)
+	private int version;
+
+
+	public static Metadata defaultValue(String metadataUrl){
+		return Metadata.builder()
+			.metadataUrl(metadataUrl)
+			.metadataTtlSecond(60 * 10L)
+			.version(0)
+			.build();
+	}
+
+	public static Metadata createValue(String metadataUrl, Long metadataTtlSecond){
+		return Metadata.builder()
+			.metadataUrl(metadataUrl)
+			.metadataTtlSecond(metadataTtlSecond)
+			.version(1)
+			.build();
+	}
+
+	public static Metadata updateValue(String metadataUrl, Long metadataTtlSecond, int version){
+		return Metadata.builder()
+			.metadataUrl(metadataUrl)
+			.metadataTtlSecond(metadataTtlSecond)
+			.version(version + 1)
+			.build();
+	}
 }

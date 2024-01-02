@@ -1,41 +1,43 @@
 package com.sinor.cache.main.service;
 
-import static com.sinor.cache.common.ResponseStatus.*;
-
 import java.util.Map;
 
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sinor.cache.admin.api.model.ApiGetResponse;
 import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
 import com.sinor.cache.admin.metadata.service.MetadataService;
 import com.sinor.cache.common.CustomException;
 import com.sinor.cache.common.ResponseStatus;
+import com.sinor.cache.main.model.MainCacheResponse;
 import com.sinor.cache.utils.JsonToStringConverter;
 import com.sinor.cache.utils.RedisUtils;
 
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
 @Service
 @Transactional
 public class MainCacheService implements IMainCacheServiceV1 {
-
 	private final WebClient webClient;
 	private final MetadataService metadataService;
 	private final JsonToStringConverter jsonToStringConverter;
-	private final RedisUtils redisUtils;
-	private final ObjectMapper objectMapper;
-	private final RedisTemplate<String, String> redisTemplate;
+
+	private final RedisUtils responseRedisUtils;
+
+	public MainCacheService(WebClient webClient, MetadataService metadataService,
+		JsonToStringConverter jsonToStringConverter,
+		RedisUtils responseRedisUtils) {
+		this.webClient = webClient;
+		this.metadataService = metadataService;
+		this.jsonToStringConverter = jsonToStringConverter;
+		this.responseRedisUtils = responseRedisUtils;
+	}
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드
@@ -43,20 +45,29 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 * @param path        요청 path
 	 * @param queryString 요청 queryString
 	 */
-	public String getMainPathData(String path, MultiValueMap<String, String> queryString) throws
+	public ResponseEntity<String> getMainPathData(String path, MultiValueMap<String, String> queryString,
+		MultiValueMap<String, String> headers) throws
 		CustomException {
 
 		//테스트 Main uri
 		try {
 			ResponseEntity<String> response = webClient.get()
-				.uri(uriBuilder(path, queryString).build().toUri())
+				.uri(uriComponentsBuilder(path, queryString).build().toUri())
+				.headers(header -> header.addAll(headers))
 				.retrieve()
 				.toEntity(String.class)
 				.log()
 				.block();
 
-			return response.toString();
+			//TRANSFER_ENCODING 헤더 제거
+			HttpHeaders modifiedHeaders = new HttpHeaders();
+			modifiedHeaders.addAll(response.getHeaders());
+			modifiedHeaders.remove(HttpHeaders.TRANSFER_ENCODING);
 
+            return ResponseEntity
+				.status(response.getStatusCode())
+				.headers(modifiedHeaders)
+				.body(response.getBody());
 		} catch (WebClientResponseException e) {
 			throw new CustomException(ResponseStatus.DISPLAY_NOT_FOUND);
 		}
@@ -73,13 +84,23 @@ public class MainCacheService implements IMainCacheServiceV1 {
 		Map<String, String> body) {
 
 		try {
-			return webClient.post()
-				.uri(uriBuilder(path, queryString).build().toUri())
+			ResponseEntity<String> response = webClient.post()
+				.uri(uriComponentsBuilder(path, queryString).build().toUri())
 				.bodyValue(body)
 				.retrieve()
 				.toEntity(String.class)
 				.log()
 				.block();
+
+			//TRANSFER_ENCODING 헤더 제거
+			HttpHeaders modifiedHeaders = new HttpHeaders();
+			modifiedHeaders.addAll(response.getHeaders());
+			modifiedHeaders.remove(HttpHeaders.TRANSFER_ENCODING);
+
+            return ResponseEntity
+				.status(response.getStatusCode())
+				.headers(modifiedHeaders)
+				.body(response.getBody());
 		} catch (WebClientResponseException e) {
 			throw new CustomException(ResponseStatus.DISPLAY_NOT_FOUND);
 		}
@@ -94,13 +115,22 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	public ResponseEntity<String> deleteMainPathData(String path, MultiValueMap<String, String> queryString) {
 
 		try {
-			return webClient.delete()
-				.uri(uriBuilder(path, queryString).build().toUri())
-				//.exchangeToMono(response -> response.bodyToMono(String.class))
+			ResponseEntity<String> response = webClient.delete()
+				.uri(uriComponentsBuilder(path, queryString).build().toUri())
 				.retrieve()
 				.toEntity(String.class)
 				.log()
 				.block();
+
+			//TRANSFER_ENCODING 헤더 제거
+			HttpHeaders modifiedHeaders = new HttpHeaders();
+			modifiedHeaders.addAll(response.getHeaders());
+			modifiedHeaders.remove(HttpHeaders.TRANSFER_ENCODING);
+
+            return ResponseEntity
+				.status(response.getStatusCode())
+				.headers(modifiedHeaders)
+				.body(response.getBody());
 		} catch (WebClientResponseException e) {
 			throw new CustomException(ResponseStatus.DISPLAY_NOT_FOUND);
 		}
@@ -116,14 +146,23 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	public ResponseEntity<String> updateMainPathData(String path, MultiValueMap<String, String> queryString,
 		Map<String, String> body) {
 		try {
-			return webClient.put()
-				.uri(uriBuilder(path, queryString).build().toUri())
+			ResponseEntity<String> response = webClient.put()
+				.uri(uriComponentsBuilder(path, queryString).build().toUri())
 				.bodyValue(body)
-				//.exchangeToMono(response -> response.bodyToMono(String.class))
 				.retrieve()
 				.toEntity(String.class)
 				.log()
 				.block();
+
+			//TRANSFER_ENCODING 헤더 제거
+			HttpHeaders modifiedHeaders = new HttpHeaders();
+			modifiedHeaders.addAll(response.getHeaders());
+			modifiedHeaders.remove(HttpHeaders.TRANSFER_ENCODING);
+
+            return ResponseEntity
+				.status(response.getStatusCode())
+				.headers(modifiedHeaders)
+				.body(response.getBody());
 		} catch (WebClientResponseException e) {
 			throw new CustomException(ResponseStatus.DISPLAY_NOT_FOUND);
 		}
@@ -136,25 +175,24 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 * @param path 특정 path에 캐시가 있나 확인하기 위한 파라미터
 	 * @return 값이 있다면 value, 없다면 null
 	 */
-	public String getDataInCache(String path, MultiValueMap<String, String> queryParams) throws
+	public MainCacheResponse getDataInCache(String path, MultiValueMap<String, String> queryParams,
+		MultiValueMap<String, String> headers) throws
 		CustomException {
-		String uri = uriBuilder(path, queryParams).build().toUriString();
 
-		System.out.println(uri);
+		MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
 
-		if (!redisUtils.isExist(uri))
-			return postInCache(path, queryParams);
+		// URI 조합
+		String key = getUriPathQuery(path, queryParams) + "V" + metadata.getVersion();
 
-		try {
-			System.out.println("역직렬화 시작");
-			ApiGetResponse cachedData = objectMapper.readValue(redisTemplate.opsForValue().get(uri),
-				ApiGetResponse.class);
-			System.out.println("역직렬화 성공");
-			return cachedData.getResponse();
+		if (!responseRedisUtils.isExist(key))
+			return null;
 
-		} catch (JsonProcessingException e) {
-			throw new CustomException(DESERIALIZATION_ERROR);
-		}
+		// redis에 값이 있다면
+		// Redis에서 받은 값 ApiGetResponse로 역직렬화
+		ApiGetResponse cachedData = jsonToStringConverter.jsontoClass(responseRedisUtils.getRedisData(key),
+			ApiGetResponse.class);
+
+		return cachedData.getResponse();
 	}
 
 	/**
@@ -163,38 +201,32 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 * @param path        검색할 캐시의 Path
 	 * @param queryParams 각 캐시의 구별을 위한 QueryString
 	 */
-	public String postInCache(String path, MultiValueMap<String, String> queryParams) throws
+	public MainCacheResponse postInCache(String path, MultiValueMap<String, String> queryParams,
+		MultiValueMap<String, String> headers) throws
 		CustomException {
 
-		//mainServer에서 받은 response
-		String data = getMainPathData(path, queryParams);
+		// Main에서 받은 값 CustomResponse로 Body, Header, Status 분할
+		ResponseEntity<String> data = getMainPathData(path, queryParams, headers);
 
-		System.out.println(data);
+		MainCacheResponse mainCacheResponse = MainCacheResponse.from(data);
 
+		// 옵션 값 찾기 or 생성
 		MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
-		ApiGetResponse apiGetResponse = ApiGetResponse.from(metadata, data);
+
+		// 캐시 Response 객체를 위에 값을 이용해 생성하고 직렬화
+		ApiGetResponse apiGetResponse = ApiGetResponse.from(metadata, mainCacheResponse);
 		String response = jsonToStringConverter.objectToJson(apiGetResponse);
 
-		redisUtils.setRedisData(uriBuilder(path, queryParams).build().toUriString(), response, apiGetResponse.getTtl());
+		// path + queryString + metadata version 형태의 Key 이름 생성
+		String cacheKeyName = getUriPathQuery(path, queryParams) + "V" + metadata.getVersion();
+		// 캐시 저장
+		responseRedisUtils.setRedisData(cacheKeyName, response, metadata.getMetadataTtlSecond());
 
-		System.out.println("value : " + response);
-
-		System.out.println("createAt : " + apiGetResponse.getCreateAt());
-		System.out.println("ttl : " + apiGetResponse.getTtl());
-		System.out.println("url : " + apiGetResponse.getUrl());
-		System.out.println("response : " + apiGetResponse.getResponse());
-
-		return apiGetResponse.getResponse();
+		// Response만 반환
+		return mainCacheResponse;
 	}
 
-	/**
-	 * uri를 생성해주는 메소드
-	 *
-	 * @param path        검색할 캐시의 Path
-	 * @param queryParams 각 캐시의 구별을 위한 QueryString
-	 */
-	public UriComponentsBuilder uriBuilder(String path, MultiValueMap<String, String> queryParams) {
-
+	private UriComponentsBuilder uriComponentsBuilder(String path, MultiValueMap<String, String> queryParams) {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/");
 		builder.path(path);
 
@@ -202,6 +234,15 @@ public class MainCacheService implements IMainCacheServiceV1 {
 			builder.queryParams(queryParams);
 
 		return builder;
+	}
+
+	private String getUriPathQuery(String path, MultiValueMap<String, String> queryParams) {
+		UriComponents uriComponents = uriComponentsBuilder(path, queryParams).build();
+
+		if (uriComponents.getQuery() == null)
+			return uriComponents.getPath();
+
+		return uriComponents.getPath() + "?" + uriComponents.getQuery();
 	}
 
 }

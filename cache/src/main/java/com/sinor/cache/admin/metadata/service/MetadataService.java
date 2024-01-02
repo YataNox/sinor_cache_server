@@ -1,8 +1,11 @@
 package com.sinor.cache.admin.metadata.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +15,8 @@ import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
 import com.sinor.cache.admin.metadata.repository.MetadataRepository;
 import com.sinor.cache.common.CustomException;
 import com.sinor.cache.common.ResponseStatus;
+import com.sinor.cache.utils.JsonToStringConverter;
+import com.sinor.cache.utils.RedisUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,10 +25,16 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class MetadataService implements IMetadataServiceV1 {
 	private final MetadataRepository metadataRepository;
+	private final JsonToStringConverter jsonToStringConverter;
+
+	private final RedisUtils metadataRedisUtils;
 
 	@Autowired
-	public MetadataService(MetadataRepository optionRepository) {
+	public MetadataService(MetadataRepository optionRepository, JsonToStringConverter jsonToStringConverter,
+		RedisUtils metadataRedisUtils) {
 		this.metadataRepository = optionRepository;
+		this.jsonToStringConverter = jsonToStringConverter;
+		this.metadataRedisUtils = metadataRedisUtils;
 	}
 
 	/**
@@ -32,22 +43,23 @@ public class MetadataService implements IMetadataServiceV1 {
 	 */
 	@Override
 	public MetadataGetResponse findOrCreateMetadataById(String path) throws CustomException {
+		// 캐시 검사
+		if(metadataRedisUtils.isExist(path)) {
+			Metadata cacheMetadata = jsonToStringConverter.jsontoClass(metadataRedisUtils.getRedisData(path),
+				Metadata.class);
+			log.info("Get Metadata Cache : " + cacheMetadata.getMetadataUrl());
+			return MetadataGetResponse.from(cacheMetadata);
+		}
+
+		System.out.println(path + " Cache 미발견 Mysql 호출");
 		// 옵션 조회, 없으면 기본 10분으로 Metadata 생성
-		Metadata metadata = metadataRepository.findById(path)
-			.orElse(
-				metadataRepository.save(
-					Metadata.builder()
-						.metadataUrl(path)
-						.metadataTtlSecond(600L)
-						.build()
-				)
-			);
+		Optional<Metadata> metadata = metadataRepository.findById(path);
+
+		if(metadata.isEmpty())
+			return createMetadata(path);
 
 		// response 반환
-		return MetadataGetResponse.builder()
-			.metadataUrl(metadata.getMetadataUrl())
-			.metadataTtlSecond(metadata.getMetadataTtlSecond())
-			.build();
+		return MetadataGetResponse.from(metadata.get());
 	}
 
 	/**
@@ -56,15 +68,26 @@ public class MetadataService implements IMetadataServiceV1 {
 	 */
 	@Override
 	public MetadataGetResponse findMetadataById(String path) throws CustomException {
-		// 옵션 조회, 없으면 기본 10분으로 Metadata 생성
-		Metadata metadata = metadataRepository.findById(path)
-			.orElseThrow(() -> new CustomException(ResponseStatus.METADATA_NOT_FOUND));
+		// 캐시 검사
+		if(metadataRedisUtils.isExist(path)) {
+			Metadata cacheMetadata = jsonToStringConverter.jsontoClass(metadataRedisUtils.getRedisData(path),
+				Metadata.class);
+
+			return MetadataGetResponse.from(cacheMetadata);
+		}
+
+		// 옵션 조회
+		long startTime = System.currentTimeMillis();
+		System.out.println("조회 시작");
+		Optional<Metadata> metadata = metadataRepository.findById(path);
+		long endTime = System.currentTimeMillis();
+		System.out.println("조회 종료 : " + (endTime - startTime) + "밀리초");
+
+		if(metadata.isEmpty())
+			throw new CustomException(ResponseStatus.METADATA_NOT_FOUND);
 
 		// response 반환
-		return MetadataGetResponse.builder()
-			.metadataUrl(metadata.getMetadataUrl())
-			.metadataTtlSecond(metadata.getMetadataTtlSecond())
-			.build();
+		return MetadataGetResponse.from(metadata.get());
 	}
 
 	/**
@@ -73,19 +96,25 @@ public class MetadataService implements IMetadataServiceV1 {
 	 * @param newExpiredTime 새로 적용할 만료시간
 	 */
 	@Override
+	@CachePut(cacheNames = "metadataCacheInfo", key = "#path")
 	public MetadataGetResponse updateMetadata(String path, Long newExpiredTime) throws CustomException {
+
 		// 해당 url 유무 파악
-		if(!metadataRepository.existsById(path))
+		long startTime = System.currentTimeMillis();
+		Optional<Metadata> metadata = metadataRepository.findById(path);
+		long endTime = System.currentTimeMillis();
+		System.out.println("조회 종료 : " + (endTime - startTime) + "밀리초");
+
+		if(metadata.isEmpty())
 			throw new CustomException(ResponseStatus.METADATA_NOT_FOUND);
 
 		// 변경 값으로 저장
-		Metadata metadata = metadataRepository.save(new Metadata(path, newExpiredTime));
-
+		Metadata saveMetadata = metadataRepository.save(
+			Metadata.updateValue(metadata.get().getMetadataUrl(), newExpiredTime, metadata.get().getVersion())
+		);
+		metadataRedisUtils.setRedisData(path, jsonToStringConverter.objectToJson(saveMetadata));
 		// response 반환
-		return MetadataGetResponse.builder()
-			.metadataUrl(metadata.getMetadataUrl())
-			.metadataTtlSecond(metadata.getMetadataTtlSecond())
-			.build();
+		return MetadataGetResponse.from(saveMetadata);
 	}
 
 	/**
@@ -93,18 +122,19 @@ public class MetadataService implements IMetadataServiceV1 {
 	 * @param path 삭제할 path
 	 */
 	@Override
+	@CacheEvict(value = "metadataCacheInfo", key = "#path")
 	public void deleteMetadataById(String path) throws CustomException {
 		// 유무 파악
 		if(!metadataRepository.existsById(path))
 			throw new CustomException(ResponseStatus.METADATA_NOT_FOUND);
-		
+
 		// 캐시 삭제
 		metadataRepository.deleteById(path);
-
+		metadataRedisUtils.deleteCache(path);
 	}
 
 	/**
-	 * 옵션 생성
+	 * 옵션 생성 expriedTime 지정 가능
 	 * @param path 생성할 path 값
 	 * @param expiredTime 적용할 만료시간
 	 */
@@ -113,20 +143,36 @@ public class MetadataService implements IMetadataServiceV1 {
 		// url 옵션이 이미 있는지 조회
 		if(metadataRepository.existsById(path))
 			throw new RuntimeException("해당 옵션 값이 있습니다..");
-		
+
 		// 옵션 생성
 		Metadata metadata = metadataRepository.save(
-			Metadata.builder()
-				.metadataUrl(path)
-				.metadataTtlSecond(expiredTime)
-				.build()
+			Metadata.createValue(path, expiredTime)
 		);
 
+		metadataRedisUtils.setRedisData(path, jsonToStringConverter.objectToJson(metadata));
 		// response 반환
-		return MetadataGetResponse.builder()
-			.metadataUrl(metadata.getMetadataUrl())
-			.metadataTtlSecond(metadata.getMetadataTtlSecond())
-			.build();
+		return MetadataGetResponse.from(metadata);
+	}
+
+	/**
+	 * 옵션 생성 default Value를 활용
+	 * @param path
+	 */
+	@Override
+	public MetadataGetResponse createMetadata(String path) throws CustomException {
+		// url 옵션이 이미 있는지 조회
+		if(metadataRepository.existsById(path))
+			throw new RuntimeException("해당 옵션 값이 있습니다..");
+
+		// 옵션 생성
+		Metadata metadata = metadataRepository.save(
+			Metadata.defaultValue(path)
+		);
+
+		// 옵션 Redis 저장
+		metadataRedisUtils.setRedisData(path, jsonToStringConverter.objectToJson(metadata));
+		// response 반환
+		return MetadataGetResponse.from(metadata);
 	}
 
 	/**
@@ -134,11 +180,16 @@ public class MetadataService implements IMetadataServiceV1 {
 	 * @param pageRequest 조회할 목록의 size, page 번호가 들어 있는 Paging 클래스
 	 */
 	@Override
-	public List<MetadataGetResponse> findAll(PageRequest pageRequest) {
-		return metadataRepository.findAll(pageRequest).stream().map(value -> MetadataGetResponse.builder()
-			.metadataUrl(value.getMetadataUrl())
-			.metadataTtlSecond(value.getMetadataTtlSecond())
-			.build()).toList();
+	public List<MetadataGetResponse> findAllByPage(PageRequest pageRequest) {
+		return metadataRepository.findAll(pageRequest).stream().map(MetadataGetResponse::from).toList();
+	}
+
+	/**
+	 * page 상관없이 Metadata 전체를 조회하는 메소드
+	 * 초기 세팅 이외의 사용 비권장
+	 */
+	public List<Metadata> findAll(){
+		return metadataRepository.findAll();
 	}
 
 	/**
@@ -149,4 +200,17 @@ public class MetadataService implements IMetadataServiceV1 {
 	public Boolean isExistById(String path) {
 		return metadataRepository.existsById(path);
 	}
+
+	/*@Cacheable(value = "metadataCacheInfo", key = "#path")
+	public String getMetadataCache(String path){
+		log.info("캐시 없음. 메소드 동작");
+		long startTime = System.currentTimeMillis();
+		Optional<Metadata> metadata = metadataRepository.findById(path);
+		long endTime = System.currentTimeMillis();
+		System.out.println("조회 종료 : " + (endTime - startTime) + "밀리초");
+
+		if(metadata.isEmpty())
+			throw new CustomException(ResponseStatus.METADATA_NOT_FOUND);
+		return jsonToStringConverter.objectToJson(MetadataGetResponse.from(metadata.get()));
+	}*/
 }

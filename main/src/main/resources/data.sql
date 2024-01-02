@@ -31,8 +31,8 @@ VALUES
 INSERT INTO expression (category, category_name, code_name)
 VALUES
     (1, 'https://example.com/link1', 'expression 1'),
-    (  2, 'https://example.com/link2', 'expression 2'),
-    ( 3, 'https://example.com/link3', 'expression 3');
+    (2, 'https://example.com/link2', 'expression 2'),
+    (3, 'https://example.com/link3', 'expression 3');
 
 INSERT INTO gathering (created_at, crew_count, date_yn, distance, new_yn, origin_yn, name, thumbnail)
 VALUES

@@ -28,7 +28,8 @@ public class WebClientConfig {
 	public WebClient webClient() {
 		return WebClient.builder()
 			.uriBuilderFactory(factory)
-			.baseUrl("http://mainHost:8080")
+			//.baseUrl("http://mainHost:8080")
+			.baseUrl("https://test.senor.co.kr")
 			.codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(2 * 1024 * 1024))
 			.clientConnector(new ReactorClientHttpConnector(httpClient))
 			.build();

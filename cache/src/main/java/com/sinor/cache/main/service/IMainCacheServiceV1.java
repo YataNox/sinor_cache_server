@@ -4,9 +4,9 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.sinor.cache.common.CustomException;
+import com.sinor.cache.main.model.MainCacheResponse;
 
 public interface IMainCacheServiceV1 {
 	/**
@@ -15,8 +15,8 @@ public interface IMainCacheServiceV1 {
 	 * @param path        요청 path
 	 * @param queryString 요청 queryString
 	 */
-	String getMainPathData(String path, MultiValueMap<String, String> queryString) throws
-		CustomException;
+	ResponseEntity<?> getMainPathData(String path, MultiValueMap<String, String> queryString,
+		MultiValueMap<String, String> headers) throws CustomException;
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드
@@ -54,8 +54,8 @@ public interface IMainCacheServiceV1 {
 	 * @param path 특정 path에 캐시가 있나 확인하기 위한 파라미터
 	 * @return 값이 있다면 value, 없다면 null
 	 */
-	String getDataInCache(String path, MultiValueMap<String, String> queryParams) throws
-		CustomException;
+	MainCacheResponse getDataInCache(String path, MultiValueMap<String, String> queryParams,
+		MultiValueMap<String, String> headers) throws CustomException;
 
 	/**
 	 * 캐시에 데이터가 없으면 메인 데이터를 조회해서 캐시에 저장하고 반환해주는 메소드
@@ -63,13 +63,7 @@ public interface IMainCacheServiceV1 {
 	 * @param path        검색할 캐시의 Path
 	 * @param queryString 각 캐시의 구별을 위한 QueryString
 	 */
-	String postInCache(String path, MultiValueMap<String, String> queryString) throws CustomException;
+	MainCacheResponse postInCache(String path, MultiValueMap<String, String> queryString,
+		MultiValueMap<String, String> headers) throws CustomException;
 
-	/**
-	 * uri를 생성해주는 메소드
-	 *
-	 * @param path        검색할 캐시의 Path
-	 * @param queryParams 각 캐시의 구별을 위한 QueryString
-	 */
-	UriComponentsBuilder uriBuilder(String path, MultiValueMap<String, String> queryParams);
 }

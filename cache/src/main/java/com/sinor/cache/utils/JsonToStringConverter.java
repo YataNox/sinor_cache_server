@@ -13,15 +13,17 @@ public class JsonToStringConverter {
 		this.objectMapper = objectMapper;
 	}
 
-	public <T> T jsonToString(String jsonValue, Class<T> clazz) throws CustomException {
+	// 역직렬화 Redis value를 ApiGetReponse로 변환
+	public <T> T jsontoClass(String jsonValue, Class<T> clazz) throws CustomException {
 		try {
-			System.out.println(jsonValue + " : " + clazz);
 			return objectMapper.readValue(jsonValue, clazz);
 		} catch (JsonProcessingException e) {
+			e.printStackTrace();
 			throw new CustomException(DESERIALIZATION_ERROR);
 		}
 	}
 
+	// 직렬화
 	public <T> String objectToJson(T jsonValue) throws CustomException {
 		try {
 			return objectMapper.writeValueAsString(jsonValue);

@@ -1,10 +1,13 @@
 package com.sinor.cache.main.controller;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sinor.cache.main.model.MainCacheRequest;
+import com.sinor.cache.main.model.MainCacheResponse;
 import com.sinor.cache.main.service.MainCacheService;
 
 @RestController
@@ -24,10 +27,21 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@Override
-	public String getDataReadCache(String path, MultiValueMap<String, String> queryParams) {
+	public ResponseEntity<?> getDataReadCache(String path, MultiValueMap<String, String> queryParams,
+		MultiValueMap<String, String> headers) {
 
-		return mainCacheService.getDataInCache(path, queryParams);
+		MainCacheResponse pathCache = mainCacheService.getDataInCache(path, queryParams, headers);
 
+		if (pathCache == null)
+			pathCache = mainCacheService.postInCache(path, queryParams, headers);
+
+		HttpHeaders header = new HttpHeaders();
+
+		MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
+		multiValueMap.setAll(pathCache.getHeaders());
+		header.addAll(multiValueMap);
+
+		return ResponseEntity.status(pathCache.getStatusCodeValue()).headers(header).body(pathCache.getBody());
 	}
 
 	/**
