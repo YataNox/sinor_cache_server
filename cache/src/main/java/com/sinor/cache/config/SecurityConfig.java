@@ -26,7 +26,7 @@ public class SecurityConfig {
 			.authorizeHttpRequests(registry -> registry
 				.requestMatchers("/admin/**").hasRole("ADMIN")
 				.requestMatchers("/api/v**/authentication").permitAll()
-				.anyRequest().authenticated())
+				.anyRequest().permitAll())
 			.oauth2ResourceServer(oauth2ResourceServer ->
 				oauth2ResourceServer.jwt(jwt ->
 					jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
