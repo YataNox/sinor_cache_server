@@ -179,16 +179,21 @@ public class MainCacheService implements IMainCacheServiceV1 {
 		MultiValueMap<String, String> headers) throws
 		CustomException {
 
-		MetadataGetResponse metadata = metadataService.findOrCreateMetadataById(path);
+		// metadata 확인
+		// Metadata 조회
+		MetadataGetResponse metadata = metadataService.findMetadataCacheById(path);
 
-		// URI 조합
+		if(metadata == null)
+			return null;
+
+			// URI 조합
 		String key = getUriPathQuery(path, queryParams) + "V" + metadata.getVersion();
 
+		// response 확인
 		if (!responseRedisUtils.isExist(key))
 			return null;
 
-		// redis에 값이 있다면
-		// Redis에서 받은 값 ApiGetResponse로 역직렬화
+		// response 조회
 		ApiGetResponse cachedData = jsonToStringConverter.jsontoClass(responseRedisUtils.getRedisData(key),
 			ApiGetResponse.class);
 
@@ -233,16 +238,14 @@ public class MainCacheService implements IMainCacheServiceV1 {
 		if (queryParams != null)
 			builder.queryParams(queryParams);
 
+		System.out.println("builder : " + builder.toUriString());
 		return builder;
 	}
 
 	private String getUriPathQuery(String path, MultiValueMap<String, String> queryParams) {
 		UriComponents uriComponents = uriComponentsBuilder(path, queryParams).build();
-
-		if (uriComponents.getQuery() == null)
-			return uriComponents.getPath();
-
-		return uriComponents.getPath() + "?" + uriComponents.getQuery();
+		System.out.println(uriComponents.toUriString());
+		return uriComponents.toUriString();
 	}
 
 }

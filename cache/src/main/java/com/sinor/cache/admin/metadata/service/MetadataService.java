@@ -44,12 +44,10 @@ public class MetadataService implements IMetadataServiceV1 {
 	@Override
 	public MetadataGetResponse findOrCreateMetadataById(String path) throws CustomException {
 		// 캐시 검사
-		if(metadataRedisUtils.isExist(path)) {
-			Metadata cacheMetadata = jsonToStringConverter.jsontoClass(metadataRedisUtils.getRedisData(path),
-				Metadata.class);
-			log.info("Get Metadata Cache : " + cacheMetadata.getMetadataUrl());
-			return MetadataGetResponse.from(cacheMetadata);
-		}
+		MetadataGetResponse metadataGetResponse = findMetadataCacheById(path);
+
+		if(metadataGetResponse != null)
+			return metadataGetResponse;
 
 		System.out.println(path + " Cache 미발견 Mysql 호출");
 		// 옵션 조회, 없으면 기본 10분으로 Metadata 생성
@@ -62,6 +60,19 @@ public class MetadataService implements IMetadataServiceV1 {
 		return MetadataGetResponse.from(metadata.get());
 	}
 
+	@Override
+	public MetadataGetResponse findMetadataCacheById(String path) throws CustomException{
+		// 캐시 검사
+		if(metadataRedisUtils.isExist(path)) {
+			Metadata cacheMetadata = jsonToStringConverter.jsontoClass(metadataRedisUtils.getRedisData(path),
+				Metadata.class);
+			log.info("Get Metadata Cache : " + cacheMetadata.getMetadataUrl());
+			return MetadataGetResponse.from(cacheMetadata);
+		}
+
+		return null;
+	}
+
 	/**
 	 * 옵션 조회 없으면 예외 발생
 	 * @param path 조회할 옵션의 path
@@ -69,12 +80,10 @@ public class MetadataService implements IMetadataServiceV1 {
 	@Override
 	public MetadataGetResponse findMetadataById(String path) throws CustomException {
 		// 캐시 검사
-		if(metadataRedisUtils.isExist(path)) {
-			Metadata cacheMetadata = jsonToStringConverter.jsontoClass(metadataRedisUtils.getRedisData(path),
-				Metadata.class);
+		MetadataGetResponse metadataGetResponse = findMetadataCacheById(path);
 
-			return MetadataGetResponse.from(cacheMetadata);
-		}
+		if(metadataGetResponse != null)
+			return metadataGetResponse;
 
 		// 옵션 조회
 		long startTime = System.currentTimeMillis();
@@ -198,6 +207,9 @@ public class MetadataService implements IMetadataServiceV1 {
 	 */
 	@Override
 	public Boolean isExistById(String path) {
+		if(metadataRedisUtils.isExist(path))
+			return true;
+
 		return metadataRepository.existsById(path);
 	}
 

@@ -29,14 +29,15 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	@Override
 	public ResponseEntity<?> getDataReadCache(String path, MultiValueMap<String, String> queryParams,
 		MultiValueMap<String, String> headers) {
-
+		// 캐시 조회
 		MainCacheResponse pathCache = mainCacheService.getDataInCache(path, queryParams, headers);
 
+		// 메인 요청 및 캐시 생성
 		if (pathCache == null)
 			pathCache = mainCacheService.postInCache(path, queryParams, headers);
 
+		// 헤더 재조립
 		HttpHeaders header = new HttpHeaders();
-
 		MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
 		multiValueMap.setAll(pathCache.getHeaders());
 		header.addAll(multiValueMap);
