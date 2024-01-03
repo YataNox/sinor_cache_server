@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sinor.cache.main.model.MainCacheRequest;
 import com.sinor.cache.main.model.MainCacheResponse;
 import com.sinor.cache.main.service.MainCacheService;
+import com.sinor.cache.utils.URIUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,7 +34,7 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	public ResponseEntity<?> getDataReadCache(String path, MultiValueMap<String, String> queryParams,
 		MultiValueMap<String, String> headers) {
 
-		MultiValueMap<String, String> encodedQueryParams = mainCacheService.encodingUrl(queryParams);
+		MultiValueMap<String, String> encodedQueryParams = URIUtils.encodingUrl(queryParams);
 
 		MainCacheResponse pathCache = mainCacheService.getDataInCache(path, encodedQueryParams, headers);
 

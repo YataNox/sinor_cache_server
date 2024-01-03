@@ -1,18 +1,12 @@
 package com.sinor.cache.main.service;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -212,7 +206,7 @@ public class MainCacheService implements IMainCacheServiceV1 {
 			return null;
 
 		// URI 조합
-		String key = URIUtils.getUriPathQuery(path, queryParams, metadata.getVersion());
+		String key = URIUtils.getResponseKey(path, queryParams, metadata.getVersion());
 
 		System.out.println("전체 uri : " + key);
 
@@ -249,36 +243,11 @@ public class MainCacheService implements IMainCacheServiceV1 {
 		String response = jsonToStringConverter.objectToJson(apiGetResponse);
 
 		// path + queryString + metadata version 형태의 Key 이름 생성
-		String cacheKeyName = URIUtils.getUriPathQuery(path, queryParams, metadata.getVersion());
+		String cacheKeyName = URIUtils.getResponseKey(path, queryParams, metadata.getVersion());
 		// 캐시 저장
 		responseRedisUtils.setRedisData(cacheKeyName, response, metadata.getMetadataTtlSecond());
 
 		// Response만 반환
 		return mainCacheResponse;
-	}
-
-	/**
-	 * url에 포함되어있는 한글 등을 인코딩
-	 * @param queryParams 요청에 전달될 값
-	 * @return 인코딩되 결과값
-	 */
-	public MultiValueMap<String, String> encodingUrl(MultiValueMap<String, String> queryParams) {
-
-		MultiValueMap<String, String> encodedQueryParams = new LinkedMultiValueMap<>();
-
-		for (String key : queryParams.keySet()) {
-			List<String> encodedValues = queryParams.get(key).stream()
-				.map(value -> {
-					try {
-						return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
-					} catch (UnsupportedEncodingException e) {
-						throw new RuntimeException(e);
-					}
-				})
-				.collect(Collectors.toList());
-			encodedQueryParams.put(key, encodedValues);
-		}
-
-		return encodedQueryParams;
 	}
 }
