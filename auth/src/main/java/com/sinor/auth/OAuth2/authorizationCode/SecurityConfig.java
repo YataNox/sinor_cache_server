@@ -3,6 +3,7 @@ package com.sinor.auth.OAuth2.authorizationCode;
 import java.time.Duration;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -29,6 +30,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
+	@Value("${jwt.username}")
+	private String username;
+	@Value("${jwt.password}")
+	private String password;
+	@Value("${jwt.role}")
+	private String role;
+
 	@Bean
 	public SecurityFilterChain filterChain(
 		HttpSecurity http,
@@ -44,7 +52,6 @@ public class SecurityConfig {
 			.sessionManagement(session -> {
 				session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 			})
-
 			.httpBasic(Customizer.withDefaults())
 			.csrf(AbstractHttpConfigurer::disable)
 			.addFilterBefore(new JwtAuthenticationFilter(userDetailsService, jwtTokenService),
@@ -55,12 +62,11 @@ public class SecurityConfig {
 	@Bean
 	public RegisteredClientRepository registeredClientRepository(PasswordEncoder passwordEncoder) {
 		RegisteredClient client = RegisteredClient.withId(UUID.randomUUID().toString())
-			.clientId("sinor")
-			.clientSecret(passwordEncoder.encode("sinor-q5n2g"))
+			.clientId(username)
+			.clientSecret(passwordEncoder.encode(password))
 			.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
 			.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
 			.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-			// .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
 			.clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
 			.tokenSettings(TokenSettings.builder().accessTokenTimeToLive(Duration.ofSeconds(60)).build())
 			.build();
@@ -76,9 +82,9 @@ public class SecurityConfig {
 	public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
 		User.UserBuilder users = User.builder();
 		UserDetails user = users
-			.username("sinor")
-			.password(passwordEncoder.encode("sinor-q5n2g"))
-			.roles("ADMIN")
+			.username(username)
+			.password(passwordEncoder.encode(password))
+			.roles(role)
 			.build();
 		return new InMemoryUserDetailsManager(user);
 	}

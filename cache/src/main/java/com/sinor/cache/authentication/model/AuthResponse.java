@@ -1,13 +1,13 @@
-package com.sinor.cache.admin.authentication;
+package com.sinor.cache.authentication.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-public class AuthenticationDto {
+public class AuthResponse {
 	@Getter
-	@Builder
+	@AllArgsConstructor
 	public static class Req {
 		private String username;
 		private String password;

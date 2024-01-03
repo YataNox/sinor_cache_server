@@ -4,6 +4,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,11 +21,19 @@ import lombok.RequiredArgsConstructor;
 public class AuthenticationController {
 	private final UserDetailsService userDetailsService;
 	private final JwtTokenService jwtTokenService;
-
+	private final AuthenticationManager authenticationManager;
 	private final long EXPIRATION_TIME = 864_000_000;
 
 	@PostMapping("/api/v1/authentication")
 	public AuthenticationDto.Res authentication(@RequestBody AuthenticationDto.Req request) {
+		try {
+			authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+			);
+		} catch (AuthenticationException e) {
+			// 인증 실패 시 처리, 예를 들어 예외를 던지거나 에러 응답 반환
+			throw new BadCredentialsException("Invalid username/password supplied");
+		}
 		UserToken userToken = UserToken.builder()
 			.username(request.getUsername())
 			.roles(userDetailsService.loadUserByUsername(request.getUsername()).getAuthorities().stream()

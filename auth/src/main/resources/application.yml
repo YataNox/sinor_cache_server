@@ -6,4 +6,4 @@ logging:
     org.springframework.security: trace
 spring:
   profiles:
-    include: key
+    include: key,oauth
