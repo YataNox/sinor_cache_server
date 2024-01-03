@@ -1,4 +1,4 @@
-package com.sinor.auth.OAuth2.authorizationCode;
+package com.sinor.auth.OAuth2.model;
 
 import java.util.Date;
 
