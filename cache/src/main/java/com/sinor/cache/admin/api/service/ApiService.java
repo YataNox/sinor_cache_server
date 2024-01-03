@@ -16,15 +16,15 @@ import com.sinor.cache.admin.metadata.service.MetadataService;
 import com.sinor.cache.common.admin.AdminException;
 import com.sinor.cache.utils.JsonToStringConverter;
 import com.sinor.cache.utils.RedisUtils;
+import com.sinor.cache.utils.URIUtils;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ApiService implements IApiServiceV1 {
+
 	private final JsonToStringConverter jsonToStringConverter;
 	private final RedisUtils metadataRedisUtils;
 	private final MetadataService metadataService;
@@ -32,8 +32,7 @@ public class ApiService implements IApiServiceV1 {
 
 	@Autowired
 	public ApiService(MetadataService metadataService, JsonToStringConverter jsonToStringConverter,
-		RedisUtils metadataRedisUtils,
-		RedisUtils responseRedisUtils) {
+		RedisUtils metadataRedisUtils, RedisUtils responseRedisUtils) {
 		this.metadataService = metadataService;
 		this.metadataRedisUtils = metadataRedisUtils;
 		this.jsonToStringConverter = jsonToStringConverter;
@@ -46,8 +45,13 @@ public class ApiService implements IApiServiceV1 {
 	 */
 	public ApiGetResponse findCacheById(String key) throws AdminException {
 
-		String value = responseRedisUtils.getRedisData(key);
-		System.out.println("value - " + value);
+		String versionKey = URIUtils.getUriPathQuery(key,
+			metadataService.findMetadataById(responseRedisUtils.disuniteKey(key)).getVersion());
+
+		log.info("version key : " + versionKey);
+
+		String value = responseRedisUtils.getRedisData(versionKey);
+		log.info("value : " + value);
 		if (value.isBlank())
 			throw new AdminException(CACHE_NOT_FOUND);
 
@@ -100,7 +104,12 @@ public class ApiService implements IApiServiceV1 {
 	 */
 	@Override
 	public Boolean deleteCacheById(String key) throws AdminException {
-		return responseRedisUtils.deleteCache(key);
+
+		String versionKey = URIUtils.getUriPathQuery(key,
+			metadataService.findMetadataById(responseRedisUtils.disuniteKey(key)).getVersion());
+
+		log.info("version key : " + versionKey);
+		return responseRedisUtils.deleteCache(versionKey);
 	}
 
 	/**
@@ -127,6 +136,7 @@ public class ApiService implements IApiServiceV1 {
 	 * @param response 수정내용
 	 * @return 수정된 결과값
 	 */
+	//TODO 버저닝 포함한 리팩토링 필요
 	@Override
 	public ApiGetResponse updateCacheById(String key, String response) {
 		if (responseRedisUtils.isExist(key)) {

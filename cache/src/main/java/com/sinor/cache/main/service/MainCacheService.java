@@ -202,13 +202,11 @@ public class MainCacheService implements IMainCacheServiceV1 {
 		// Metadata 조회
 		MetadataGetResponse metadata = metadataService.findMetadataCacheById(path);
 
-		if(metadata == null)
+		if (metadata == null)
 			return null;
 
 		// URI 조합
 		String key = URIUtils.getResponseKey(path, queryParams, metadata.getVersion());
-
-		System.out.println("전체 uri : " + key);
 
 		// response 확인
 		if (!responseRedisUtils.isExist(key))

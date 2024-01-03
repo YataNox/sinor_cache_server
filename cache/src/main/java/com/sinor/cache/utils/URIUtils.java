@@ -1,6 +1,7 @@
 package com.sinor.cache.utils;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -27,9 +28,8 @@ public class URIUtils {
 		UriComponentsBuilder uriComponents = UriComponentsBuilder.fromPath(path);
 
 		if (queryParams != null)
-			uriComponents.queryParams(queryParams);
+			uriComponents.queryParams(decodingUrl(queryParams));
 
-		System.out.println(uriComponents.toUriString());
 		return uriComponents.toUriString() + "/V" + version;
 	}
 
@@ -56,5 +56,29 @@ public class URIUtils {
 		}
 
 		return encodedQueryParams;
+	}
+
+	public static MultiValueMap<String, String> decodingUrl(MultiValueMap<String, String> queryParams) {
+
+		MultiValueMap<String, String> decodedQueryParams = new LinkedMultiValueMap<>();
+
+		for (String key : queryParams.keySet()) {
+			List<String> decodedValues = queryParams.get(key).stream()
+				.map(value -> {
+					try {
+						return URLDecoder.decode(value, StandardCharsets.UTF_8.toString());
+					} catch (UnsupportedEncodingException e) {
+						throw new RuntimeException(e);
+					}
+				})
+				.collect(Collectors.toList());
+			decodedQueryParams.put(key, decodedValues);
+		}
+
+		return decodedQueryParams;
+	}
+
+	public static String getUriPathQuery(String key, int version) {
+		return key + "/V" + version;
 	}
 }

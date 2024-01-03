@@ -65,7 +65,8 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	public ResponseEntity<String> postDataReadCache(String path, MultiValueMap<String, String> queryParams,
 		MainCacheRequest body) {
 
-		return mainCacheService.postMainPathData(path, queryParams, body.getRequestBody());
+		return mainCacheService.postMainPathData(path, URIUtils.encodingUrl(queryParams),
+			body.getRequestBody());
 	}
 
 	/**
@@ -77,7 +78,7 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	 */
 	@Override
 	public ResponseEntity<String> deleteDataRefreshCache(String path, MultiValueMap<String, String> queryParams) {
-		return mainCacheService.deleteMainPathData(path, queryParams);
+		return mainCacheService.deleteMainPathData(path, URIUtils.encodingUrl(queryParams));
 	}
 
 	/**
@@ -91,6 +92,7 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	@Override
 	public ResponseEntity<String> updateDataRefreshCache(String path, MultiValueMap<String, String> queryParams,
 		MainCacheRequest body) {
-		return mainCacheService.updateMainPathData(path, queryParams, body.getRequestBody());
+		return mainCacheService.updateMainPathData(path, URIUtils.encodingUrl(queryParams),
+			body.getRequestBody());
 	}
 }
