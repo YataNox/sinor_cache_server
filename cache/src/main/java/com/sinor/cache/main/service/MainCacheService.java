@@ -16,8 +16,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.sinor.cache.admin.api.model.ApiGetResponse;
 import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
@@ -28,8 +26,8 @@ import com.sinor.cache.common.main.MainResponseStatus;
 import com.sinor.cache.main.model.MainCacheResponse;
 import com.sinor.cache.utils.JsonToStringConverter;
 import com.sinor.cache.utils.RedisUtils;
+import com.sinor.cache.utils.URIUtils;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -64,7 +62,7 @@ public class MainCacheService implements IMainCacheServiceV1 {
 		//테스트 Main uri
 		try {
 			ResponseEntity<String> response = webClient.get()
-				.uri(uriComponentsBuilder(path, queryString).build().toUri())
+				.uri(URIUtils.uriComponentsBuilder(path, queryString).build().toUri())
 				.headers(header -> header.addAll(headers))
 				.retrieve()
 				.toEntity(String.class)
@@ -101,7 +99,7 @@ public class MainCacheService implements IMainCacheServiceV1 {
 
 		try {
 			ResponseEntity<String> response = webClient.post()
-				.uri(uriComponentsBuilder(path, queryString).build().toUri())
+				.uri(URIUtils.uriComponentsBuilder(path, queryString).build().toUri())
 				.bodyValue(body)
 				.retrieve()
 				.toEntity(String.class)
@@ -136,7 +134,7 @@ public class MainCacheService implements IMainCacheServiceV1 {
 
 		try {
 			ResponseEntity<String> response = webClient.delete()
-				.uri(uriComponentsBuilder(path, queryString).build().toUri())
+				.uri(URIUtils.uriComponentsBuilder(path, queryString).build().toUri())
 				.retrieve()
 				.toEntity(String.class)
 				.log()
@@ -171,7 +169,7 @@ public class MainCacheService implements IMainCacheServiceV1 {
 		Map<String, String> body) {
 		try {
 			ResponseEntity<String> response = webClient.put()
-				.uri(uriComponentsBuilder(path, queryString).build().toUri())
+				.uri(URIUtils.uriComponentsBuilder(path, queryString).build().toUri())
 				.bodyValue(body)
 				.retrieve()
 				.toEntity(String.class)
@@ -214,7 +212,7 @@ public class MainCacheService implements IMainCacheServiceV1 {
 			return null;
 
 		// URI 조합
-		String key = getUriPathQuery(path, queryParams) + "V" + metadata.getVersion();
+		String key = URIUtils.getUriPathQuery(path, queryParams, metadata.getVersion());
 
 		System.out.println("전체 uri : " + key);
 
@@ -251,29 +249,12 @@ public class MainCacheService implements IMainCacheServiceV1 {
 		String response = jsonToStringConverter.objectToJson(apiGetResponse);
 
 		// path + queryString + metadata version 형태의 Key 이름 생성
-		String cacheKeyName = getUriPathQuery(path, queryParams) + "V" + metadata.getVersion();
+		String cacheKeyName = URIUtils.getUriPathQuery(path, queryParams, metadata.getVersion());
 		// 캐시 저장
 		responseRedisUtils.setRedisData(cacheKeyName, response, metadata.getMetadataTtlSecond());
 
 		// Response만 반환
 		return mainCacheResponse;
-	}
-
-	private UriComponentsBuilder uriComponentsBuilder(String path, MultiValueMap<String, String> queryParams) {
-		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://mainHost:8080/");
-		builder.path(path);
-
-		if (queryParams != null)
-			builder.queryParams(queryParams);
-
-		System.out.println("builder : " + builder.toUriString());
-		return builder;
-	}
-
-	private String getUriPathQuery(String path, MultiValueMap<String, String> queryParams) {
-		UriComponents uriComponents = uriComponentsBuilder(path, queryParams).build();
-		System.out.println(uriComponents.toUriString());
-		return uriComponents.toUriString();
 	}
 
 	/**
