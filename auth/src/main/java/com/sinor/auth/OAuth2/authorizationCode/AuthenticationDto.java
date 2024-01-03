@@ -6,6 +6,7 @@ import lombok.Getter;
 
 public class AuthenticationDto {
 	@Getter
+	@Builder
 	@AllArgsConstructor
 	public static class Req {
 		private final String username;
