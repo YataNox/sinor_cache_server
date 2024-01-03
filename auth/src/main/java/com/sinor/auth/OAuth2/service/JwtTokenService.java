@@ -1,4 +1,4 @@
-package com.sinor.auth.OAuth2.authorizationCode;
+package com.sinor.auth.OAuth2.service;
 
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -13,6 +13,9 @@ import java.util.Date;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import com.sinor.auth.OAuth2.model.RefreshTokenDto;
+import com.sinor.auth.OAuth2.model.UserToken;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

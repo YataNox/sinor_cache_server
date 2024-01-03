@@ -1,12 +1,8 @@
 package com.sinor.cache.authentication.service;
 
-import org.springframework.stereotype.Service;
-
 import com.sinor.cache.authentication.model.AuthResponse;
 
 import reactor.core.publisher.Mono;
-
-@Service
 
 public interface IAuthServieV1 {
 	/**

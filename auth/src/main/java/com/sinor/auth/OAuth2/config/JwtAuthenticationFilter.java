@@ -1,4 +1,4 @@
-package com.sinor.auth.OAuth2.authorizationCode;
+package com.sinor.auth.OAuth2.config;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -11,6 +11,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.sinor.auth.OAuth2.model.UserToken;
+import com.sinor.auth.OAuth2.service.JwtTokenService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -43,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 					e.printStackTrace();
 					return null;
 				}
-				
+
 			})
 			.filter(it -> !it.isExpired())
 			.filter(it -> it.getUsername() != null)

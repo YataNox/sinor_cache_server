@@ -1,4 +1,4 @@
-package com.sinor.auth.OAuth2.authorizationCode;
+package com.sinor.auth.OAuth2.utils;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
