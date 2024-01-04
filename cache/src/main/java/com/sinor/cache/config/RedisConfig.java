@@ -79,8 +79,9 @@ public class RedisConfig {
 		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
 		container.setConnectionFactory(responseRedisConnectionFactory());
 
-		MessageListenerAdapter listenerAdapter = new MessageListenerAdapter(new CacheMessage(responseRedisTemplate()), "handleMessage");
+		MessageListenerAdapter listenerAdapter = new MessageListenerAdapter(new CacheMessage(responseRedisTemplate()));
 		container.addMessageListener(listenerAdapter, new ChannelTopic("__keyevent@0__:expired"));
+		container.addMessageListener(listenerAdapter, new ChannelTopic("__keyevent@0__:del"));
 
 		return container;
 	}

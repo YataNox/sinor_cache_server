@@ -28,7 +28,19 @@ public class CacheMessage implements MessageListener {
 	 */
 	@Override
 	public void onMessage(Message message, byte[] pattern) {
-		System.out.println("Received Redis expiration event for key: " + message);
-		// 히히 됐당
+		System.out.println("pattern : " + new String(pattern));
+		System.out.println("Redis Message : " + message);
+		switch (new String(pattern)) {
+			case "__keyevent@0__:del" -> writeLogDel(message);
+			case "__keyevent@0__:expired" -> writeLogExpired(message);
+		}
+	}
+
+	private void writeLogExpired(Message keyName){
+		log.info("Received Redis expiration event for key: " + keyName);
+	}
+
+	private void writeLogDel(Message keyName){
+		log.info("Received Redis del event for key: " + keyName);
 	}
 }
