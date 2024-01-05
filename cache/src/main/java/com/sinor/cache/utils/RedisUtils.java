@@ -78,15 +78,32 @@ public class RedisUtils {
 		});
 	}
 
+	/**
+	 * cache key Name에서 Path 부분만 추출
+	 * @param key path만 추출할 key Name
+	 * @return path of key
+	 */
 	public String disuniteKey(String key) {
 
 		if (key.contains("?")) {
-			System.out.println("key의 url : " + key.substring(0, key.indexOf("?")));
 			return key.substring(0, key.indexOf("?"));
 		} else {
 			return key;
 		}
 
+	}
+
+	/**
+	 * uri 에서 queryString만 추출
+	 * @param uri 추출할 key uri
+	 */
+	public String getQueryString(String uri){
+		if (uri.contains("?")) {
+			System.out.println("key의 queryString : " + uri.substring(uri.indexOf("?")));
+			return uri.substring(uri.indexOf("?"));
+		} else {
+			return "";
+		}
 	}
 
 	public Boolean deleteCache(String key) throws AdminException {

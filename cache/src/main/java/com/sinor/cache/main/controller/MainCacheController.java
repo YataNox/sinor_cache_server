@@ -13,6 +13,7 @@ import com.sinor.cache.utils.URIUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
+//TODO logback-spring.xml파일에 UTF-8설정을 해주었지만 한글 출력X,도커와 관련된 문제가 아닐까 추측
 @Slf4j
 @RestController
 public class MainCacheController implements IMainCacheControllerV1 {
@@ -42,7 +43,8 @@ public class MainCacheController implements IMainCacheControllerV1 {
 		if (pathCache == null)
 			pathCache = mainCacheService.postInCache(path, encodedQueryParams, headers);
 
-		log.info("check body : {}", pathCache.getBody());
+		//TODO niginx.conf에 설정해두어서 원래 clientIp가 출력되야 하는데, null값 출력
+		log.info("request info: ip={}\n body={}", headers.getFirst("X-Forwarded-For"), pathCache.getBody());
 
 		// 헤더 재조립
 		HttpHeaders header = new HttpHeaders();
@@ -63,10 +65,10 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	 */
 	@Override
 	public ResponseEntity<String> postDataReadCache(String path, MultiValueMap<String, String> queryParams,
-		MainCacheRequest body) {
+		MainCacheRequest body, MultiValueMap<String, String> headers) {
 
 		return mainCacheService.postMainPathData(path, URIUtils.encodingUrl(queryParams),
-			body.getRequestBody());
+			body.getRequestBody(), headers);
 	}
 
 	/**
@@ -77,8 +79,9 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	 * @apiNote <a href="https://www.baeldung.com/spring-request-response-body#@requestbody">reference</a>
 	 */
 	@Override
-	public ResponseEntity<String> deleteDataRefreshCache(String path, MultiValueMap<String, String> queryParams) {
-		return mainCacheService.deleteMainPathData(path, URIUtils.encodingUrl(queryParams));
+	public ResponseEntity<String> deleteDataRefreshCache(String path, MultiValueMap<String, String> queryParams,
+		MultiValueMap<String, String> headers) {
+		return mainCacheService.deleteMainPathData(path, URIUtils.encodingUrl(queryParams), headers);
 	}
 
 	/**
@@ -91,8 +94,8 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	 */
 	@Override
 	public ResponseEntity<String> updateDataRefreshCache(String path, MultiValueMap<String, String> queryParams,
-		MainCacheRequest body) {
+		MainCacheRequest body, MultiValueMap<String, String> headers) {
 		return mainCacheService.updateMainPathData(path, URIUtils.encodingUrl(queryParams),
-			body.getRequestBody());
+			body.getRequestBody(), headers);
 	}
 }

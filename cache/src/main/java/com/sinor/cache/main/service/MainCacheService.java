@@ -60,7 +60,6 @@ public class MainCacheService implements IMainCacheServiceV1 {
 				.headers(header -> header.addAll(headers))
 				.retrieve()
 				.toEntity(String.class)
-				.log()
 				.block();
 
 			//TRANSFER_ENCODING 헤더 제거
@@ -72,8 +71,6 @@ public class MainCacheService implements IMainCacheServiceV1 {
 				.status(response.getStatusCode())
 				.headers(modifiedHeaders)
 				.body(response.getBody());
-
-			log.info("Successfully retrieved data for path: {}", path);
 
 			return modifiedResponse;
 		} catch (WebClientResponseException e) {
@@ -89,15 +86,15 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 * @param body        Requestbody
 	 */
 	public ResponseEntity<String> postMainPathData(String path, MultiValueMap<String, String> queryString,
-		Map<String, String> body) {
+		Map<String, String> body, MultiValueMap<String, String> headers) {
 
 		try {
 			ResponseEntity<String> response = webClient.post()
 				.uri(URIUtils.uriComponentsBuilder(path, queryString).build().toUri())
 				.bodyValue(body)
+				.headers(header -> header.addAll(headers))
 				.retrieve()
 				.toEntity(String.class)
-				.log()
 				.block();
 
 			//TRANSFER_ENCODING 헤더 제거
@@ -109,8 +106,6 @@ public class MainCacheService implements IMainCacheServiceV1 {
 				.status(response.getStatusCode())
 				.headers(modifiedHeaders)
 				.body(response.getBody());
-
-			log.info("Successfully retrieved data for path: {}", path);
 
 			return modifiedResponse;
 		} catch (WebClientResponseException e) {
@@ -124,14 +119,15 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 * @param path        요청 path
 	 * @param queryString 요청 queryString
 	 */
-	public ResponseEntity<String> deleteMainPathData(String path, MultiValueMap<String, String> queryString) {
+	public ResponseEntity<String> deleteMainPathData(String path, MultiValueMap<String, String> queryString,
+		MultiValueMap<String, String> headers) {
 
 		try {
 			ResponseEntity<String> response = webClient.delete()
 				.uri(URIUtils.uriComponentsBuilder(path, queryString).build().toUri())
+				.headers(header -> header.addAll(headers))
 				.retrieve()
 				.toEntity(String.class)
-				.log()
 				.block();
 
 			//TRANSFER_ENCODING 헤더 제거
@@ -143,8 +139,6 @@ public class MainCacheService implements IMainCacheServiceV1 {
 				.status(response.getStatusCode())
 				.headers(modifiedHeaders)
 				.body(response.getBody());
-
-			log.info("Successfully retrieved data for path: {}", path);
 
 			return modifiedResponse;
 		} catch (WebClientResponseException e) {
@@ -160,14 +154,14 @@ public class MainCacheService implements IMainCacheServiceV1 {
 	 * @param body        Requestbody
 	 */
 	public ResponseEntity<String> updateMainPathData(String path, MultiValueMap<String, String> queryString,
-		Map<String, String> body) {
+		Map<String, String> body, MultiValueMap<String, String> headers) {
 		try {
 			ResponseEntity<String> response = webClient.put()
 				.uri(URIUtils.uriComponentsBuilder(path, queryString).build().toUri())
 				.bodyValue(body)
+				.headers(header -> header.addAll(headers))
 				.retrieve()
 				.toEntity(String.class)
-				.log()
 				.block();
 
 			//TRANSFER_ENCODING 헤더 제거
@@ -179,8 +173,6 @@ public class MainCacheService implements IMainCacheServiceV1 {
 				.status(response.getStatusCode())
 				.headers(modifiedHeaders)
 				.body(response.getBody());
-
-			log.info("Successfully retrieved data for path: {}", path);
 
 			return modifiedResponse;
 		} catch (WebClientResponseException e) {

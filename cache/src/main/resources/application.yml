@@ -1,4 +1,6 @@
-server.port: 8000
+server:
+  port: 8000
+  forward-headers-strategy: framework
 ## 시큐리티 로깅
 
 logging:
@@ -44,11 +46,6 @@ spring:
     init:
       mode: always
       platform: mysql
-
-logging.level:
-  #root: INFO #로깅을 위해 추가
-  org.hibernate.SQL: debug
-  org.hibernate.type: trace
 
 springdoc:
   swagger-ui:

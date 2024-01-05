@@ -1,5 +1,8 @@
 package com.sinor.cache.admin.api.controller;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,14 +23,6 @@ public class ApiController implements IApiControllerV1 {
 		this.apiService = apiService;
 	}
 
-	public class KeyDto {
-		private String key;
-
-		public String getKey() {
-			return key;
-		}
-	}
-
 	/**
 	 * 단일 캐시 조회
 	 *
@@ -35,10 +30,16 @@ public class ApiController implements IApiControllerV1 {
 	 */
 
 	@Override
-	public ResponseEntity<SuccessResponse<?>> getCache(ApIGetRequest key) {
-		System.out.println(key.getKey());
+	public ResponseEntity<SuccessResponse<?>> getCache(String key) {
+
+		//TODO 인코딩된 부분을 해결하기 위해 작성(개선 필요)
+		String encodingKey = URLEncoder.encode(key, StandardCharsets.UTF_8)
+			.replace("%3F", "?")
+			.replace("%26", "&")
+			.replace("%3D", "=");
+
 		SuccessResponse<?> adminResponse = SuccessResponse.from(ResponseStatus.SUCCESS,
-			apiService.findCacheById(key.getKey()));
+			apiService.findCacheById(encodingKey));
 		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(adminResponse);
 	}
 
@@ -59,9 +60,15 @@ public class ApiController implements IApiControllerV1 {
 	 * @param key 삭제할 캐시의 key 값
 	 */
 	@Override
-	public ResponseEntity<?> deletecache(ApIGetRequest key) {
+	public ResponseEntity<?> deletecache(String key) {
 
-		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(apiService.deleteCacheById(key.getKey()));
+		//TODO 인코딩된 부분을 해결하기 위해 작성(개선 필요)
+		String encodingKey = URLEncoder.encode(key, StandardCharsets.UTF_8)
+			.replace("%3F", "?")
+			.replace("%26", "&")
+			.replace("%3D", "=");
+
+		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body(apiService.deleteCacheById(encodingKey));
 	}
 
 	@Override

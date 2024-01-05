@@ -45,14 +45,13 @@ public class MetadataService implements IMetadataServiceV1 {
 		// 캐시 검사
 		MetadataGetResponse metadataGetResponse = findMetadataCacheById(path);
 
-		if(metadataGetResponse != null)
+		if (metadataGetResponse != null)
 			return metadataGetResponse;
 
-		System.out.println(path + " Cache 미발견 Mysql 호출");
 		// 옵션 조회, 없으면 기본 10분으로 Metadata 생성
 		Optional<Metadata> metadata = metadataRepository.findById(path);
 
-		if(metadata.isEmpty())
+		if (metadata.isEmpty())
 			return createMetadata(path);
 
 		// response 반환
@@ -60,12 +59,11 @@ public class MetadataService implements IMetadataServiceV1 {
 	}
 
 	@Override
-	public MetadataGetResponse findMetadataCacheById(String path) throws AdminException{
+	public MetadataGetResponse findMetadataCacheById(String path) throws AdminException {
 		// 캐시 검사
-		if(metadataRedisUtils.isExist(path)) {
+		if (metadataRedisUtils.isExist(path)) {
 			Metadata cacheMetadata = jsonToStringConverter.jsontoClass(metadataRedisUtils.getRedisData(path),
 				Metadata.class);
-			log.info("Get Metadata Cache : " + cacheMetadata.getMetadataUrl());
 			return MetadataGetResponse.from(cacheMetadata);
 		}
 
@@ -81,7 +79,7 @@ public class MetadataService implements IMetadataServiceV1 {
 		// 캐시 검사
 		MetadataGetResponse metadataGetResponse = findMetadataCacheById(path);
 
-		if(metadataGetResponse != null)
+		if (metadataGetResponse != null)
 			return metadataGetResponse;
 
 		// 옵션 조회
@@ -204,7 +202,7 @@ public class MetadataService implements IMetadataServiceV1 {
 	 */
 	@Override
 	public Boolean isExistById(String path) {
-		if(metadataRedisUtils.isExist(path))
+		if (metadataRedisUtils.isExist(path))
 			return true;
 
 		return metadataRepository.existsById(path);

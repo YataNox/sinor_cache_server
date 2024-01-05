@@ -9,7 +9,8 @@
             <level>ERROR</level>
         </filter>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %m%n</pattern>
+            <charset>UTF-8</charset>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %m%n</pattern>
         </encoder>
     </appender>
 
@@ -34,8 +35,8 @@
         </rollingPolicy>
         <!--지정된 패턴에 맞게 로그 메시지 형식을 구성-->
         <encoder>
-            <charset>UTF-8</charset>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %m%n</pattern>
+            <charset>UTF-8</charset> <!--한글 출력을 위-->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %m%n</pattern>
         </encoder>
     </appender>
 
@@ -58,7 +59,7 @@
         <!--지정된 패턴에 맞게 로그 메시지 형식을 구성-->
         <encoder>
             <charset>UTF-8</charset>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %m%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %m%n</pattern>
         </encoder>
     </appender>
 
