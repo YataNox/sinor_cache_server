@@ -1,10 +1,15 @@
 package com.sinor.cache.common;
 
+import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+
+import com.sinor.cache.utils.JsonToStringConverter;
+import com.sinor.cache.utils.RedisUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,10 +20,17 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CacheMessage implements MessageListener {
 
-	private final RedisTemplate<String, String> resourceRedisTemplate;
+	private final RedisUtils responseRedisUtils;
+	private final RedisUtils cacheListRedisUtils;
+	private final JsonToStringConverter jsonToStringConverter;
 
-	public CacheMessage(@Qualifier("redisTemplate") RedisTemplate<String, String> resourceRedisTemplate) {
-		this.resourceRedisTemplate = resourceRedisTemplate;
+	@Autowired
+	public CacheMessage(@Qualifier("responseRedisUtils") RedisUtils responseRedisUtils,
+		@Qualifier("cacheListRedisUtils") RedisUtils cacheListRedisUtils,
+		JsonToStringConverter jsonToStringConverter) {
+		this.responseRedisUtils = responseRedisUtils;
+		this.cacheListRedisUtils = cacheListRedisUtils;
+		this.jsonToStringConverter = jsonToStringConverter;
 	}
 
 	/**
@@ -33,6 +45,7 @@ public class CacheMessage implements MessageListener {
 		switch (new String(pattern)) {
 			case "__keyevent@0__:del" -> writeLogDel(message);
 			case "__keyevent@0__:expired" -> writeLogExpired(message);
+			case "__keyevent@0__:set" -> writeLogSet(message);
 		}
 	}
 
@@ -42,5 +55,37 @@ public class CacheMessage implements MessageListener {
 
 	private void writeLogDel(Message keyName){
 		log.info("Received Redis del event for key: " + keyName);
+	}
+
+	private void writeLogSet(Message keyName){
+		log.info("Received Redis set event for key: " + keyName);
+		insertCacheList(keyName.toString());
+	}
+
+	private void insertCacheList(String key){
+		// response에 대한 key가 넘어오기 때문에 무조건 뒤에 /V, 즉 버전이 붙어서 온다.
+		// 해당 version 값을 지운 uri를 추출한다.
+		int index = key.lastIndexOf("/V");
+		String uri = key.substring(0, index);
+		System.out.println(uri);
+
+		// 이후 path 값을 추출한다.
+		String path = cacheListRedisUtils.disuniteKey(uri);
+		String queryString = cacheListRedisUtils.getQueryString(uri);
+
+		if(queryString.isEmpty())
+			return;
+		
+		// 해당 path의 캐시 목록을 조회한 뒤 list에서 해당 queryString 삽입
+		ArrayList<String> list;
+		if(!cacheListRedisUtils.isExist(key)) {
+			list = new ArrayList<>();
+		}else {
+			list = jsonToStringConverter.jsontoClass(cacheListRedisUtils.getRedisData(key),
+				ArrayList.class);
+		}
+
+		list.add(queryString);
+		cacheListRedisUtils.setRedisData(path, jsonToStringConverter.objectToJson(list));
 	}
 }
