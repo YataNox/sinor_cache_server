@@ -47,11 +47,6 @@ spring:
       mode: always
       platform: mysql
 
-logging.level:
-  #root: INFO #로깅을 위해 추가
-  org.hibernate.SQL: debug
-  org.hibernate.type: trace
-
 springdoc:
   swagger-ui:
     path: /swagger-ui.html

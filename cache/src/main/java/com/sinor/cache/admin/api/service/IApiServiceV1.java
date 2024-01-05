@@ -20,11 +20,6 @@ public interface IApiServiceV1 {
 	List<ApiGetResponse> findCacheList(String pattern) throws AdminException;
 
 	/**
-	 * 전체 캐시 조회
-	 */
-	List<ApiGetResponse> findAllCache();
-
-	/**
 	 * 캐시 생성 및 덮어쓰기
 	 * @param key 생성할 캐시의 Key
 	 * @param value 생성할 캐시의 Value

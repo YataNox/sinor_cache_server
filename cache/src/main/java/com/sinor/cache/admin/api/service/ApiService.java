@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sinor.cache.admin.api.model.ApiGetResponse;
+import com.sinor.cache.admin.metadata.model.MetadataGetResponse;
 import com.sinor.cache.admin.metadata.service.MetadataService;
 import com.sinor.cache.common.admin.AdminException;
 import com.sinor.cache.utils.JsonToStringConverter;
@@ -74,15 +75,6 @@ public class ApiService implements IApiServiceV1 {
 	}
 
 	/**
-	 * 전체 캐시 조회
-	 */
-	@Override
-	public List<ApiGetResponse> findAllCache() { // 수많은 오류로 인해 임시 삭제
-		// 구조를 다시 정해서 작성해야함
-		return null;
-	}
-
-	/**
 	 * 캐시 생성 및 덮어쓰기
 	 * @param key 생성할 캐시의 Key
 	 * @param value 생성할 캐시의 Value
@@ -91,7 +83,14 @@ public class ApiService implements IApiServiceV1 {
 	@Override
 	@Transactional
 	public ApiGetResponse saveOrUpdate(String key, String value, Long expiredTime) throws AdminException {
+		// path 추출, 해당 path의 metadata 조회
+		MetadataGetResponse metadata = metadataService.findMetadataById(responseRedisUtils.disuniteKey(key));
+		// 조회한 값을 이용한 Versioning 된 Cache Name 추출
+		key = URIUtils.getUriPathQuery(key, metadata.getVersion());
+		
+		// 캐시에 저장된 값이 있으면 수정, 없으면 생성
 		responseRedisUtils.setRedisData(key, value, expiredTime);
+
 		return jsonToStringConverter.jsontoClass(responseRedisUtils.getRedisData(key), ApiGetResponse.class);
 	}
 
@@ -135,17 +134,22 @@ public class ApiService implements IApiServiceV1 {
 	 */
 	@Override
 	public ApiGetResponse updateCacheById(String key, String response) {
+		// path 추출, 해당 path의 metadata 조회
+		MetadataGetResponse metadata = metadataService.findMetadataById(responseRedisUtils.disuniteKey(key));
+		// 조회한 값을 이용한 Versioning 된 Cache Name 추출
+		key = URIUtils.getUriPathQuery(key, metadata.getVersion());
+
 		if (responseRedisUtils.isExist(key)) {
 
-			String url = responseRedisUtils.disuniteKey(key);
-
+			// 추출한 Metadata ttl 값으로 캐시 데이터와 변경
 			responseRedisUtils.setRedisData(key, response,
-				metadataService.findOrCreateMetadataById(url).getMetadataTtlSecond());
+				metadata.getMetadataTtlSecond());
 
+			// 변경한 데이터를 추출하여 ApiGetResponse 반환
 			return jsonToStringConverter.jsontoClass(responseRedisUtils.getRedisData(key), ApiGetResponse.class);
 		}
 
-		throw new AdminException(DESERIALIZATION_ERROR);
+		throw new AdminException(CACHE_NOT_FOUND);
 	}
 
 	/**
