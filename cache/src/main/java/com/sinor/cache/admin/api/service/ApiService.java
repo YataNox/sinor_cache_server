@@ -64,7 +64,13 @@ public class ApiService implements IApiServiceV1 {
 	 * @param pattern 조회할 캐시들의 공통 패턴
 	 */
 	@Override
+	//TODO cacheListTemplate안의 path 키 값으로 저장되어 있는 ArrayList 안 queryString들을 이용해서 원하는 목록들만 조회할 수 있도록 변경 필요
 	public List<ApiGetResponse> findCacheList(String pattern) throws AdminException {
+		// 예를들어 expression path에 대한 캐시 목록들을 조회한다고 가정하면
+		// cacheListTemplate에서 expression key에 대한 캐시를 가져온다(value는 ArrayList)
+		// 해당 리스트 안에는 expression path에 대한 캐시가 활성화된 queryString값들이 들어있다.
+		// expression과 queryString, metadata의 version을  합쳐서 key값을 만든다.
+		// 조합한 key 값을 이용해서 response들을 조회한다.
 		List<ApiGetResponse> list = new ArrayList<>();
 
 		Cursor<byte[]> cursor = responseRedisUtils.searchPatternKeys(pattern);
@@ -116,6 +122,7 @@ public class ApiService implements IApiServiceV1 {
 	 * @param pattern 삭제할 캐시들의 공통 패턴
 	 */
 	@Override
+	//TODO cacheListTemplate안의 path 키 값으로 저장되어 있는 ArrayList 안 queryString들을 이용해서 원하는 목록들만 삭제할 수 있도록 변경 필요
 	public void deleteCacheList(String pattern) throws AdminException {
 		// scan으로 키 조회
 		Cursor<byte[]> cursor = responseRedisUtils.searchPatternKeys(pattern);
