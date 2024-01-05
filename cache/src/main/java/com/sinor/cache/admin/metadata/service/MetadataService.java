@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -106,7 +104,6 @@ public class MetadataService implements IMetadataServiceV1 {
 	 * @param newExpiredTime 새로 적용할 만료시간
 	 */
 	@Override
-	@CachePut(cacheNames = "metadataCacheInfo", key = "#path")
 	public MetadataGetResponse updateMetadata(String path, Long newExpiredTime) throws AdminException {
 
 		// 해당 url 유무 파악
@@ -132,7 +129,6 @@ public class MetadataService implements IMetadataServiceV1 {
 	 * @param path 삭제할 path
 	 */
 	@Override
-	@CacheEvict(value = "metadataCacheInfo", key = "#path")
 	public void deleteMetadataById(String path) throws AdminException {
 		// 유무 파악
 		if (!metadataRepository.existsById(path))

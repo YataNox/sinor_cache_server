@@ -14,6 +14,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.sinor.cache.common.CacheMessage;
 import com.sinor.cache.utils.JsonToStringConverter;
 import com.sinor.cache.utils.RedisUtils;
 
@@ -78,21 +79,11 @@ public class RedisConfig {
 		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
 		container.setConnectionFactory(responseRedisConnectionFactory());
 
-		MessageListenerAdapter listenerAdapter = new MessageListenerAdapter(new CacheMessageListener());
+		MessageListenerAdapter listenerAdapter = new MessageListenerAdapter(new CacheMessage(responseRedisTemplate()));
 		container.addMessageListener(listenerAdapter, new ChannelTopic("__keyevent@0__:expired"));
+		container.addMessageListener(listenerAdapter, new ChannelTopic("__keyevent@0__:del"));
 
 		return container;
-	}
-
-	/**
-	 * Redis 메시지가 감지 됬을 때 이벤트를 처리할 메소드
-	 */
-	public static class CacheMessageListener {
-
-		public void handleMessage(String message) {
-			System.out.println("Received Redis expiration event for key: " + message);
-			// 여기서 캐시 만료 이벤트 처리 로직을 수행
-		}
 	}
 
 	/**

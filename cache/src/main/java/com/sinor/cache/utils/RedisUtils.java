@@ -81,6 +81,7 @@ public class RedisUtils {
 	public String disuniteKey(String key) {
 
 		if (key.contains("?")) {
+			System.out.println("key의 url : " + key.substring(0, key.indexOf("?")));
 			return key.substring(0, key.indexOf("?"));
 		} else {
 			return key;

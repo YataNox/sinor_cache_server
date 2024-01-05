@@ -65,11 +65,4 @@ public interface IMainCacheServiceV1 {
 	 */
 	MainCacheResponse postInCache(String path, MultiValueMap<String, String> queryString,
 		MultiValueMap<String, String> headers) throws MainException;
-
-	/**
-	 * url에 포함되어있는 한글 등을 인코딩
-	 * @param queryParams 요청에 전달될 값
-	 * @return 인코딩되 결과값
-	 */
-	MultiValueMap<String, String> encodingUrl(MultiValueMap<String, String> queryParams) throws MainException;
 }

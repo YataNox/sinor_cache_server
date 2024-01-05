@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sinor.cache.main.model.MainCacheRequest;
 import com.sinor.cache.main.model.MainCacheResponse;
 import com.sinor.cache.main.service.MainCacheService;
+import com.sinor.cache.utils.URIUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,7 +34,7 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	public ResponseEntity<?> getDataReadCache(String path, MultiValueMap<String, String> queryParams,
 		MultiValueMap<String, String> headers) {
 
-		MultiValueMap<String, String> encodedQueryParams = mainCacheService.encodingUrl(queryParams);
+		MultiValueMap<String, String> encodedQueryParams = URIUtils.encodingUrl(queryParams);
 
 		MainCacheResponse pathCache = mainCacheService.getDataInCache(path, encodedQueryParams, headers);
 
@@ -64,7 +65,8 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	public ResponseEntity<String> postDataReadCache(String path, MultiValueMap<String, String> queryParams,
 		MainCacheRequest body) {
 
-		return mainCacheService.postMainPathData(path, queryParams, body.getRequestBody());
+		return mainCacheService.postMainPathData(path, URIUtils.encodingUrl(queryParams),
+			body.getRequestBody());
 	}
 
 	/**
@@ -76,7 +78,7 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	 */
 	@Override
 	public ResponseEntity<String> deleteDataRefreshCache(String path, MultiValueMap<String, String> queryParams) {
-		return mainCacheService.deleteMainPathData(path, queryParams);
+		return mainCacheService.deleteMainPathData(path, URIUtils.encodingUrl(queryParams));
 	}
 
 	/**
@@ -90,6 +92,7 @@ public class MainCacheController implements IMainCacheControllerV1 {
 	@Override
 	public ResponseEntity<String> updateDataRefreshCache(String path, MultiValueMap<String, String> queryParams,
 		MainCacheRequest body) {
-		return mainCacheService.updateMainPathData(path, queryParams, body.getRequestBody());
+		return mainCacheService.updateMainPathData(path, URIUtils.encodingUrl(queryParams),
+			body.getRequestBody());
 	}
 }
