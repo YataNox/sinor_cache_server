@@ -34,6 +34,8 @@ public class CacheMessage implements MessageListener {
 	 * @param message message must not be {@literal null}.
 	 * @param pattern pattern matching the channel (if specified) - can be {@literal null}.
 	 */
+	//TODO SET에 대한 redis 메시지 발행을 위한 conf 설정이 시간 관계로 EA로 설정되어 있음 차후 효율성있는 설정으로 변경 필요
+	//TODO SET에 대한 메시지를 추가한 이유는 ApiController에서 path별 활성화된 캐시들의 조회와 삭제를 효율성 있게 하기 위해서 인데 시간부족으로 미작성
 	@Override
 	public void onMessage(Message message, byte[] pattern) {
 		System.out.println("pattern : " + new String(pattern));
@@ -75,18 +77,14 @@ public class CacheMessage implements MessageListener {
 		// 해당 path의 캐시 목록을 조회한 뒤 list에서 해당 queryString 삽입
 		ArrayList<String> list;
 		if(!cacheListRedisUtils.isExist(path)) {
-			System.out.println("새 list 생성");
 			list = new ArrayList<>();
 		}else {
-			System.out.println("list 호출");
 			list = jsonToStringConverter.jsontoClass(cacheListRedisUtils.getRedisData(path),
 				ArrayList.class);
 		}
 
 		list.add(queryString);
 		cacheListRedisUtils.setRedisData(path, jsonToStringConverter.objectToJson(list));
-
-		printKeyList(path);
 	}
 
 	private void removeCacheList(String key){
@@ -112,22 +110,14 @@ public class CacheMessage implements MessageListener {
 
 		list.remove(queryString);
 		cacheListRedisUtils.setRedisData(path, jsonToStringConverter.objectToJson(list));
-
-		printKeyList(path);
 	}
 
+	/**
+	 * key에서 metadata version 부분 제거
+	 */
 	private String splitKeyVersion(String key){
 		int index = key.lastIndexOf("/V");
 		String uri = key.substring(0, index);
-		System.out.println(uri);
 		return uri;
-	}
-
-	private void printKeyList(String path){
-		ArrayList<String> list = jsonToStringConverter.jsontoClass(cacheListRedisUtils.getRedisData(path),
-				ArrayList.class);
-		for(String s : list){
-			System.out.println(s);
-		}
 	}
 }

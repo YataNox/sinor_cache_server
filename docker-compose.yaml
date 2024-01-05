@@ -124,6 +124,11 @@ services:
     ports:
       - "9000:9000"
     restart: no
+    depends_on:
+      cache_redis_db:
+        condition: service_healthy
+      cache_mysql_db:
+        condition: service_healthy
 
 
 
