@@ -32,6 +32,7 @@ public class ApiController implements IApiControllerV1 {
 	@Override
 	public ResponseEntity<SuccessResponse<?>> getCache(String key) {
 
+		//TODO 인코딩된 부분을 해결하기 위해 작성(개선 필요)
 		String encodingKey = URLEncoder.encode(key, StandardCharsets.UTF_8)
 			.replace("%3F", "?")
 			.replace("%26", "&")
@@ -61,7 +62,7 @@ public class ApiController implements IApiControllerV1 {
 	@Override
 	public ResponseEntity<?> deletecache(String key) {
 
-		//TODO 임시용(인코딩된 부분을 해결하기 위해)
+		//TODO 인코딩된 부분을 해결하기 위해 작성(개선 필요)
 		String encodingKey = URLEncoder.encode(key, StandardCharsets.UTF_8)
 			.replace("%3F", "?")
 			.replace("%26", "&")

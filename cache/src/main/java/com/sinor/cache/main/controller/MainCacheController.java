@@ -13,6 +13,7 @@ import com.sinor.cache.utils.URIUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
+//TODO logback-spring.xml파일에 UTF-8설정을 해주었지만 한글 출력X,도커와 관련된 문제가 아닐까 추측
 @Slf4j
 @RestController
 public class MainCacheController implements IMainCacheControllerV1 {
