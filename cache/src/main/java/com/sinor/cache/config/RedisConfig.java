@@ -64,20 +64,6 @@ public class RedisConfig {
 	}
 
 	/**
-	 * refresh 토큰 등의 저장을 위한 Redis 3번 데이터베이스
-	 * 사용 시 Redis-cli 내부에서 SELECT 3 접속
-	 */
-	@Bean
-	public RedisConnectionFactory tokenRedisConnectionFactory() {
-		RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-		redisStandaloneConfiguration.setHostName("redisHost");
-		redisStandaloneConfiguration.setPort(6379);
-		redisStandaloneConfiguration.setDatabase(3);
-
-		return new LettuceConnectionFactory(redisStandaloneConfiguration); // 여러 다른 Redis 연결 방법이 있을 수 있습니다.
-	}
-
-	/**
 	 * 스프링에서 Redis에 접근하기 위한 Template 객체
 	 * 0 : response, 1 : metadata, 2 : cacheList, 3 : token
 	 */
@@ -103,15 +89,6 @@ public class RedisConfig {
 	public RedisTemplate<String, String> cacheListRedisTemplate() {
 		RedisTemplate<String, String> template = new RedisTemplate<>();
 		template.setConnectionFactory(cacheListRedisConnectionFactory());
-		template.setKeySerializer(new StringRedisSerializer());
-		template.setValueSerializer(new StringRedisSerializer());
-		return template;
-	}
-
-	@Bean(name = "tokenRedisTemplate")
-	public RedisTemplate<String, String> tokenRedisTemplate() {
-		RedisTemplate<String, String> template = new RedisTemplate<>();
-		template.setConnectionFactory(tokenRedisConnectionFactory());
 		template.setKeySerializer(new StringRedisSerializer());
 		template.setValueSerializer(new StringRedisSerializer());
 		return template;
@@ -181,15 +158,5 @@ public class RedisConfig {
 	@Bean(name = "cacheListRedisUtils")
 	public RedisUtils cacheListRedisUtils(){
 		return new RedisUtils(cacheListRedisTemplate());
-	}
-
-	/**
-	 * RedisTemplate를 사용하기 위한 클래스
-	 * Redis에 대한 예외처리 등이 처리되어 있으며 Redis 3번 데이터베이스에 접근하여
-	 * token에 대한 접근을 담당한다.
-	 */
-	@Bean(name = "tokenRedisUtils")
-	public RedisUtils tokenRedisUtils(){
-		return new RedisUtils(tokenRedisTemplate());
 	}
 }

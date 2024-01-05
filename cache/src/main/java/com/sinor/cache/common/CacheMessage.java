@@ -34,6 +34,8 @@ public class CacheMessage implements MessageListener {
 	 * @param message message must not be {@literal null}.
 	 * @param pattern pattern matching the channel (if specified) - can be {@literal null}.
 	 */
+	//TODO SET에 대한 redis 메시지 발행을 위한 conf 설정이 시간 관계로 EA로 설정되어 있음 차후 효율성있는 설정으로 변경 필요
+	//TODO SET에 대한 메시지를 추가한 이유는 ApiController에서 path별 활성화된 캐시들의 조회와 삭제를 효율성 있게 하기 위해서 인데 시간부족으로 미작성
 	@Override
 	public void onMessage(Message message, byte[] pattern) {
 		System.out.println("pattern : " + new String(pattern));
