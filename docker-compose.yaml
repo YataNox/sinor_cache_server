@@ -92,7 +92,7 @@ services:
     hostname: mainHost
     build: ./main
     ports:
-      - "8080:8080"1
+      - "8080:8080"
     restart: no
     depends_on:
       main_db:
