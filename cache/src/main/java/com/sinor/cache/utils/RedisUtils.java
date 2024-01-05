@@ -5,6 +5,7 @@ import static com.sinor.cache.common.admin.AdminResponseStatus.*;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.KeyScanOptions;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 
@@ -69,12 +70,11 @@ public class RedisUtils {
 	 * @param pattern 찾으려는 key의 일부
 	 * @return 찾은 key들의 Cursor
 	 */
-	//TODO ScanOptions의 deprecated로 인해 Redis KeyCommands으로 리팩토링 필요
 	public Cursor<byte[]> searchPatternKeys(String pattern) {
 
 		return redisTemplate.executeWithStickyConnection(connection -> {
-			ScanOptions options = ScanOptions.scanOptions().match("*" + pattern + "*").build();
-			return connection.scan(options);
+			ScanOptions options = KeyScanOptions.scanOptions().match("*" + pattern + "*").build();
+			return connection.keyCommands().scan(options);
 		});
 	}
 
@@ -97,7 +97,7 @@ public class RedisUtils {
 	 * uri 에서 queryString만 추출
 	 * @param uri 추출할 key uri
 	 */
-	public String getQueryString(String uri){
+	public String getQueryString(String uri) {
 		if (uri.contains("?")) {
 			System.out.println("key의 queryString : " + uri.substring(uri.indexOf("?")));
 			return uri.substring(uri.indexOf("?"));

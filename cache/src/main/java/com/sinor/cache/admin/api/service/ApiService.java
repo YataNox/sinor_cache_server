@@ -132,7 +132,7 @@ public class ApiService implements IApiServiceV1 {
 	 * @param response 수정내용
 	 * @return 수정된 결과값
 	 */
-	//TODO Redis에서 업데이트 확인, 출력을 위한 역직렬화 과정에서 오류 발생
+	//TODO Redis에서 업데이트 확인, 출력을 위한 역직렬화 과정에서 오류 발생(response의 형식이 너무 까다로움)
 	@Override
 	public ApiGetResponse updateCacheById(String key, String response) {
 		// path 추출, 해당 path의 metadata 조회
