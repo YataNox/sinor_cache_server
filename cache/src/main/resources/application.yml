@@ -1,4 +1,6 @@
-server.port: 8000
+server:
+  port: 8000
+  forward-headers-strategy: framework
 ## 시큐리티 로깅
 
 logging:

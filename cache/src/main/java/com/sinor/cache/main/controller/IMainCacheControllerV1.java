@@ -43,7 +43,7 @@ public interface IMainCacheControllerV1 {
 	@PostMapping("/{path}")
 	ResponseEntity<String> postDataReadCache(@PathVariable String path,
 		@RequestParam(required = false) MultiValueMap<String, String> queryParams,
-		MainCacheRequest body);
+		MainCacheRequest body, @RequestHeader MultiValueMap<String, String> headers);
 
 	/**
 	 * 데이터 삭제 및 캐시 갱신
@@ -54,7 +54,8 @@ public interface IMainCacheControllerV1 {
 	 */
 	@DeleteMapping("/{path}")
 	ResponseEntity<String> deleteDataRefreshCache(@PathVariable String path,
-		@RequestParam(required = false) MultiValueMap<String, String> queryParams);
+		@RequestParam(required = false) MultiValueMap<String, String> queryParams,
+		@RequestHeader MultiValueMap<String, String> headers);
 
 	/**
 	 * 데이터 수정 및 캐시 갱신
@@ -67,5 +68,5 @@ public interface IMainCacheControllerV1 {
 	@PutMapping("/{path}")
 	ResponseEntity<String> updateDataRefreshCache(@PathVariable String path,
 		@RequestParam(required = false) MultiValueMap<String, String> queryParams,
-		MainCacheRequest body);
+		MainCacheRequest body, @RequestHeader MultiValueMap<String, String> headers);
 }

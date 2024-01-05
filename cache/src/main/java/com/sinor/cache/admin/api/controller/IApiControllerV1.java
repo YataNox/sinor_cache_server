@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.sinor.cache.admin.api.model.ApIGetRequest;
 import com.sinor.cache.common.SuccessResponse;
@@ -15,7 +16,7 @@ public interface IApiControllerV1 {
 	 * @param key 조회할 캐시의 Key 값
 	 */
 	@GetMapping("/admin/cache")
-	ResponseEntity<SuccessResponse<?>> getCache(@RequestBody ApIGetRequest key);
+	ResponseEntity<SuccessResponse<?>> getCache(@RequestParam String key);
 
 	/**
 	 * URL 별 캐시 목록 조회
@@ -29,7 +30,7 @@ public interface IApiControllerV1 {
 	 * @param key 삭제할 캐시의 key 값
 	 */
 	@DeleteMapping("/admin/cache")
-	ResponseEntity<?> deletecache(@RequestBody ApIGetRequest key);
+	ResponseEntity<?> deletecache(@RequestParam String key);
 
 	@DeleteMapping("/admin/caches")
 	ResponseEntity<?> deletecaches(@RequestBody String url);

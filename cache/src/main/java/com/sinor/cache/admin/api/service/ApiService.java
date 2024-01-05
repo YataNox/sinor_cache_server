@@ -48,10 +48,7 @@ public class ApiService implements IApiServiceV1 {
 		String versionKey = URIUtils.getUriPathQuery(key,
 			metadataService.findMetadataById(responseRedisUtils.disuniteKey(key)).getVersion());
 
-		log.info("version key : " + versionKey);
-
 		String value = responseRedisUtils.getRedisData(versionKey);
-		log.info("value : " + value);
 		if (value.isBlank())
 			throw new AdminException(CACHE_NOT_FOUND);
 
@@ -108,7 +105,7 @@ public class ApiService implements IApiServiceV1 {
 		String versionKey = URIUtils.getUriPathQuery(key,
 			metadataService.findMetadataById(responseRedisUtils.disuniteKey(key)).getVersion());
 
-		log.info("version key : " + versionKey);
+		log.info("value of deleted key: " + responseRedisUtils.getRedisData(versionKey));
 		return responseRedisUtils.deleteCache(versionKey);
 	}
 
@@ -136,7 +133,6 @@ public class ApiService implements IApiServiceV1 {
 	 * @param response 수정내용
 	 * @return 수정된 결과값
 	 */
-	//TODO 버저닝 포함한 리팩토링 필요
 	@Override
 	public ApiGetResponse updateCacheById(String key, String response) {
 		if (responseRedisUtils.isExist(key)) {

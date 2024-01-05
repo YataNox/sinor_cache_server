@@ -1,6 +1,5 @@
 package com.sinor.cache.common;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.boot.ApplicationArguments;
@@ -20,7 +19,9 @@ public class MetadataCacheInitializer implements ApplicationRunner {
 	private final MetadataService metadataService;
 	private final JsonToStringConverter jsonToStringConverter;
 	private final RedisUtils metadataRedisUtils;
-	public MetadataCacheInitializer(MetadataService metadataService, JsonToStringConverter jsonToStringConverter, RedisUtils metadataRedisUtils) {
+
+	public MetadataCacheInitializer(MetadataService metadataService, JsonToStringConverter jsonToStringConverter,
+		RedisUtils metadataRedisUtils) {
 		this.metadataService = metadataService;
 		this.jsonToStringConverter = jsonToStringConverter;
 		this.metadataRedisUtils = metadataRedisUtils;
@@ -31,10 +32,10 @@ public class MetadataCacheInitializer implements ApplicationRunner {
 		// 애플리케이션 실행 후 Mysql의 Metadata redis 캐시 저장
 		List<Metadata> list = metadataService.findAll();
 
-		for(Metadata metadata : list){
+		for (Metadata metadata : list) {
 			String cacheData = jsonToStringConverter.objectToJson(metadata);
 			metadataRedisUtils.setRedisData(metadata.getMetadataUrl(), cacheData);
-			log.info(metadata.getMetadataUrl() + " Cache Created : " + LocalDateTime.now());
+			//log.info(metadata.getMetadataUrl() + " Cache Created : " + LocalDateTime.now());
 		}
 	}
 }

@@ -26,7 +26,7 @@ public interface IMainCacheServiceV1 {
 	 * @param body        Requestbody
 	 */
 	ResponseEntity<String> postMainPathData(String path, MultiValueMap<String, String> queryString,
-		Map<String, String> body) throws MainException;
+		Map<String, String> body, MultiValueMap<String, String> headers) throws MainException;
 
 	/**
 	 * Main 서버에 요청을 보내는 메서드
@@ -34,7 +34,8 @@ public interface IMainCacheServiceV1 {
 	 * @param path        요청 path
 	 * @param queryString 요청 queryString
 	 */
-	ResponseEntity<String> deleteMainPathData(String path, MultiValueMap<String, String> queryString) throws
+	ResponseEntity<String> deleteMainPathData(String path, MultiValueMap<String, String> queryString,
+		MultiValueMap<String, String> headers) throws
 		MainException;
 
 	/**
@@ -45,7 +46,7 @@ public interface IMainCacheServiceV1 {
 	 * @param body        Requestbody
 	 */
 	ResponseEntity<String> updateMainPathData(String path, MultiValueMap<String, String> queryString,
-		Map<String, String> body) throws MainException;
+		Map<String, String> body, MultiValueMap<String, String> headers) throws MainException;
 
 	/**
 	 * 캐시에 데이터가 있는지 확인하고 없으면 데이터를 조회해서 있으면 데이터를 조회해서 반환해주는 메소드
