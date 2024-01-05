@@ -19,16 +19,12 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class CacheMessage implements MessageListener {
-
-	private final RedisUtils responseRedisUtils;
 	private final RedisUtils cacheListRedisUtils;
 	private final JsonToStringConverter jsonToStringConverter;
 
 	@Autowired
-	public CacheMessage(@Qualifier("responseRedisUtils") RedisUtils responseRedisUtils,
-		@Qualifier("cacheListRedisUtils") RedisUtils cacheListRedisUtils,
+	public CacheMessage(@Qualifier("cacheListRedisUtils") RedisUtils cacheListRedisUtils,
 		JsonToStringConverter jsonToStringConverter) {
-		this.responseRedisUtils = responseRedisUtils;
 		this.cacheListRedisUtils = cacheListRedisUtils;
 		this.jsonToStringConverter = jsonToStringConverter;
 	}
@@ -51,10 +47,12 @@ public class CacheMessage implements MessageListener {
 
 	private void writeLogExpired(Message keyName){
 		log.info("Received Redis expiration event for key: " + keyName);
+		removeCacheList(keyName.toString());
 	}
 
 	private void writeLogDel(Message keyName){
 		log.info("Received Redis del event for key: " + keyName);
+		removeCacheList(keyName.toString());
 	}
 
 	private void writeLogSet(Message keyName){
@@ -65,9 +63,7 @@ public class CacheMessage implements MessageListener {
 	private void insertCacheList(String key){
 		// response에 대한 key가 넘어오기 때문에 무조건 뒤에 /V, 즉 버전이 붙어서 온다.
 		// 해당 version 값을 지운 uri를 추출한다.
-		int index = key.lastIndexOf("/V");
-		String uri = key.substring(0, index);
-		System.out.println(uri);
+		String uri = splitKeyVersion(key);
 
 		// 이후 path 값을 추출한다.
 		String path = cacheListRedisUtils.disuniteKey(uri);
@@ -78,14 +74,60 @@ public class CacheMessage implements MessageListener {
 		
 		// 해당 path의 캐시 목록을 조회한 뒤 list에서 해당 queryString 삽입
 		ArrayList<String> list;
-		if(!cacheListRedisUtils.isExist(key)) {
+		if(!cacheListRedisUtils.isExist(path)) {
+			System.out.println("새 list 생성");
 			list = new ArrayList<>();
 		}else {
-			list = jsonToStringConverter.jsontoClass(cacheListRedisUtils.getRedisData(key),
+			System.out.println("list 호출");
+			list = jsonToStringConverter.jsontoClass(cacheListRedisUtils.getRedisData(path),
 				ArrayList.class);
 		}
 
 		list.add(queryString);
 		cacheListRedisUtils.setRedisData(path, jsonToStringConverter.objectToJson(list));
+
+		printKeyList(path);
+	}
+
+	private void removeCacheList(String key){
+		// response에 대한 key가 넘어오기 때문에 무조건 뒤에 /V, 즉 버전이 붙어서 온다.
+		// 해당 version 값을 지운 uri를 추출한다.
+		String uri = splitKeyVersion(key);
+
+		// 이후 path, queryString 값을 추출한다.
+		String path = cacheListRedisUtils.disuniteKey(uri);
+		String queryString = cacheListRedisUtils.getQueryString(uri);
+
+		if(queryString.isEmpty())
+			return;
+
+		// 해당 path의 캐시 목록을 조회한 뒤 list에서 해당 queryString 삽입
+		ArrayList<String> list;
+		if(!cacheListRedisUtils.isExist(path)) {
+			list = new ArrayList<>();
+		}else {
+			list = jsonToStringConverter.jsontoClass(cacheListRedisUtils.getRedisData(path),
+				ArrayList.class);
+		}
+
+		list.remove(queryString);
+		cacheListRedisUtils.setRedisData(path, jsonToStringConverter.objectToJson(list));
+
+		printKeyList(path);
+	}
+
+	private String splitKeyVersion(String key){
+		int index = key.lastIndexOf("/V");
+		String uri = key.substring(0, index);
+		System.out.println(uri);
+		return uri;
+	}
+
+	private void printKeyList(String path){
+		ArrayList<String> list = jsonToStringConverter.jsontoClass(cacheListRedisUtils.getRedisData(path),
+				ArrayList.class);
+		for(String s : list){
+			System.out.println(s);
+		}
 	}
 }
