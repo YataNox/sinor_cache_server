@@ -47,6 +47,7 @@ public class SecurityConfig {
 		System.out.println("adminConverter : " + adminConverter());
 		return http.build();
 	}
+
 	/**
 	 * @apiNote jwt를 이용하여 인증을 처리한다.
 	 * @apiNote jwt의 roles를 이용하여 Admin권한을 검색하여 ADMIN이 있다면 admin권한을 부여한다.

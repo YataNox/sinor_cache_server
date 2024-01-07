@@ -77,18 +77,14 @@ public class CacheMessage implements MessageListener {
 		// 해당 path의 캐시 목록을 조회한 뒤 list에서 해당 queryString 삽입
 		ArrayList<String> list;
 		if(!cacheListRedisUtils.isExist(path)) {
-			System.out.println("새 list 생성");
 			list = new ArrayList<>();
 		}else {
-			System.out.println("list 호출");
 			list = jsonToStringConverter.jsontoClass(cacheListRedisUtils.getRedisData(path),
 				ArrayList.class);
 		}
 
-		list.add(queryString);
+		list.add(key);
 		cacheListRedisUtils.setRedisData(path, jsonToStringConverter.objectToJson(list));
-
-		printKeyList(path);
 	}
 
 	private void removeCacheList(String key){
@@ -112,24 +108,16 @@ public class CacheMessage implements MessageListener {
 				ArrayList.class);
 		}
 
-		list.remove(queryString);
+		list.remove(key);
 		cacheListRedisUtils.setRedisData(path, jsonToStringConverter.objectToJson(list));
-
-		printKeyList(path);
 	}
 
+	/**
+	 * key에서 metadata version 부분 제거
+	 */
 	private String splitKeyVersion(String key){
 		int index = key.lastIndexOf("/V");
 		String uri = key.substring(0, index);
-		System.out.println(uri);
 		return uri;
-	}
-
-	private void printKeyList(String path){
-		ArrayList<String> list = jsonToStringConverter.jsontoClass(cacheListRedisUtils.getRedisData(path),
-				ArrayList.class);
-		for(String s : list){
-			System.out.println(s);
-		}
 	}
 }

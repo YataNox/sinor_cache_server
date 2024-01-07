@@ -1,0 +1,101 @@
+### CREATE member#1
+// @no-log
+POST http://{{host}}:8080/member
+Content-Type: application/json
+
+{
+  "name": "member#1",
+  "profile": "https://picsum.photos/200"
+}
+
+### CREATE board#1
+// @no-log
+POST http://{{host}}:8080/board
+Content-Type: application/json
+
+{
+}
+
+### CREATE vote#1
+// @no-log
+POST http://{{host}}:8080/vote
+Content-Type: application/json
+
+{
+  "boardId": 1,
+  "validUntil": "2023-12-27T16:56:39",
+  "isAnonymous": false,
+  "isMultiple": true,
+  "voteItems": [
+    {
+      "content": "식당#1"
+    }
+  ]
+}
+
+### CREATE vote_item
+// @no-log
+POST http://{{host}}:8080/vote/item
+Content-Type: application/json
+
+{
+  "voteId": 1,
+  "content": "식당#2"
+}
+
+### CREATE vote_log#1
+// @no-log
+POST http://{{host}}:8080/vote/log
+Content-Type: application/json
+
+{
+  "voteItemId": 1,
+  "memberId": 1
+}
+
+### CREATE vote_log#2
+// @no-log
+POST http://{{host}}:8080/vote/log
+Content-Type: application/json
+
+{
+  "voteItemId": 1,
+  "memberId": 2
+}
+
+### READ boards
+// @no-log
+GET http://{{host}}:8080/board/1
+#
+
+### UPDATE voteLog
+// @no-log
+PUT http://{{host}}:8080/vote/log/1
+Content-Type: application/json
+
+{
+  "voteItemId": 2
+}
+
+#### DELETE voteLog
+#// @no-log
+#DELETE http://{{host}}:8080/vote/log/2
+#
+
+###
+#// @no-log
+#DELETE http://{{host}}:8080/board/1
+#
+####
+#// @no-log
+#GET http://{{host}}:8080/vote/103
+#
+####
+#// @no-log
+#GET http://{{host}}:8080/member/1
+#
+####
+#// @no-log
+#DELETE http://{{host}}:8080/vote/1
+#
+#

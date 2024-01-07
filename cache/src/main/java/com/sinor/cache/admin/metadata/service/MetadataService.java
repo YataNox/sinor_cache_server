@@ -2,6 +2,7 @@ package com.sinor.cache.admin.metadata.service;
 
 import static com.sinor.cache.common.admin.AdminResponseStatus.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,13 +28,15 @@ public class MetadataService implements IMetadataServiceV1 {
 	private final JsonToStringConverter jsonToStringConverter;
 
 	private final RedisUtils metadataRedisUtils;
+	private final RedisUtils cacheListRedisUtils;
 
 	@Autowired
 	public MetadataService(MetadataRepository optionRepository, JsonToStringConverter jsonToStringConverter,
-		RedisUtils metadataRedisUtils) {
+		RedisUtils metadataRedisUtils, RedisUtils cacheListRedisUtils) {
 		this.metadataRepository = optionRepository;
 		this.jsonToStringConverter = jsonToStringConverter;
 		this.metadataRedisUtils = metadataRedisUtils;
+		this.cacheListRedisUtils = cacheListRedisUtils;
 	}
 
 	/**
@@ -58,6 +61,11 @@ public class MetadataService implements IMetadataServiceV1 {
 		return MetadataGetResponse.from(metadata.get());
 	}
 
+	/**
+	 * 옵션 캐시 조회
+	 * @param path 조회할 캐시의 path
+	 * @return metadata cache value OR null
+	 */
 	@Override
 	public MetadataGetResponse findMetadataCacheById(String path) throws AdminException {
 		// 캐시 검사
@@ -118,6 +126,12 @@ public class MetadataService implements IMetadataServiceV1 {
 			Metadata.updateValue(metadata.get().getMetadataUrl(), newExpiredTime, metadata.get().getVersion())
 		);
 		metadataRedisUtils.setRedisData(path, jsonToStringConverter.objectToJson(saveMetadata));
+
+		// 활성 캐시 목록 초기화
+		ArrayList<String> list = jsonToStringConverter.jsontoClass(cacheListRedisUtils.getRedisData(path), ArrayList.class);
+		list.clear();
+		cacheListRedisUtils.setRedisData(path, jsonToStringConverter.objectToJson(list));
+
 		// response 반환
 		return MetadataGetResponse.from(saveMetadata);
 	}

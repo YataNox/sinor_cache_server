@@ -23,17 +23,17 @@ public interface IApiControllerV1 {
 	 * @param url 조회할 캐시들의 공통 url 값
 	 */
 	@GetMapping("/admin/cache/list")
-	ResponseEntity<SuccessResponse<?>> getCacheListByKeyParams(@RequestBody String url);
+	ResponseEntity<SuccessResponse<?>> getCacheListByKeyParams(@RequestParam String url);
 
 	/**
 	 * 단일 캐시 삭제
 	 * @param key 삭제할 캐시의 key 값
 	 */
 	@DeleteMapping("/admin/cache")
-	ResponseEntity<?> deletecache(@RequestParam String key);
+	ResponseEntity<?> deleteCache(@RequestParam String key);
 
-	@DeleteMapping("/admin/caches")
-	ResponseEntity<?> deletecaches(@RequestBody String url);
+	@DeleteMapping("/admin/cache/list")
+	ResponseEntity<?> deleteCacheList(@RequestParam String url);
 
 	/**
 	 *
