@@ -1,6 +1,17 @@
 package com.sinor.auth.security;
 
 import java.security.Key;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.Date;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -26,18 +37,17 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-// @Transactional(readOnly = true)
 public class JwtTokenProvider implements InitializingBean {
 
 	private final UserDetailsServiceImpl userDetailsService;
 	private final RedisService redisService;
 
-	private static final String AUTHORITIES_KEY = "role";
+	private static final String AUTHORITIES_KEY = "roles";
 	private static final String EMAIL_KEY = "email";
 	private static final String url = "https://authHost:9000";
 
 	private final String secretKey;
-	private static Key signingKey;
+	private static KeyPair signingKeyPair;
 
 	private final Long accessTokenValidityInMilliseconds;
 	private final Long refreshTokenValidityInMilliseconds;
@@ -45,13 +55,12 @@ public class JwtTokenProvider implements InitializingBean {
 	public JwtTokenProvider(
 		UserDetailsServiceImpl userDetailsService,
 		RedisService redisService,
-		@Value("${jwt.secret}") String secretKey,
+		@Value("${jwt.private-key}") String secretKey,
 		@Value("${jwt.access-token-validity-in-seconds}") Long accessTokenValidityInMilliseconds,
 		@Value("${jwt.refresh-token-validity-in-seconds}") Long refreshTokenValidityInMilliseconds) {
 		this.userDetailsService = userDetailsService;
 		this.redisService = redisService;
 		this.secretKey = secretKey;
-		// seconds -> milliseconds
 		this.accessTokenValidityInMilliseconds = accessTokenValidityInMilliseconds * 1000;
 		this.refreshTokenValidityInMilliseconds = refreshTokenValidityInMilliseconds * 1000;
 	}
@@ -59,8 +68,15 @@ public class JwtTokenProvider implements InitializingBean {
 	// 시크릿 키 설정
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		byte[] secretKeyBytes = Decoders.BASE64.decode(secretKey);
-		signingKey = Keys.hmacShaKeyFor(secretKeyBytes);
+		signingKeyPair = generateKeyPair(secretKey);
+		String publicKey = Base64.getEncoder().encodeToString(signingKeyPair.getPublic().getEncoded());
+		System.out.println("publickey : " + publicKey);
+	}
+
+	private KeyPair generateKeyPair(String secretKey) throws NoSuchAlgorithmException {
+		KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+		generator.initialize(2048, new SecureRandom(secretKey.getBytes()));
+		return generator.generateKeyPair();
 	}
 
 	@Transactional
@@ -69,21 +85,21 @@ public class JwtTokenProvider implements InitializingBean {
 
 		String accessToken = Jwts.builder()
 			.setHeaderParam("typ", "JWT")
-			.setHeaderParam("alg", "HS512")
+			.setHeaderParam("alg", "RS256")
 			.setExpiration(new Date(now + accessTokenValidityInMilliseconds))
 			.setSubject("access-token")
 			.claim(url, true)
 			.claim(EMAIL_KEY, email)
 			.claim(AUTHORITIES_KEY, authorities)
-			.signWith(signingKey, SignatureAlgorithm.HS512)
+			.signWith(signingKeyPair.getPrivate(), SignatureAlgorithm.RS256)
 			.compact();
 
 		String refreshToken = Jwts.builder()
 			.setHeaderParam("typ", "JWT")
-			.setHeaderParam("alg", "HS512")
+			.setHeaderParam("alg", "RS256")
 			.setExpiration(new Date(now + refreshTokenValidityInMilliseconds))
 			.setSubject("refresh-token")
-			.signWith(signingKey, SignatureAlgorithm.HS512)
+			.signWith(signingKeyPair.getPrivate(), SignatureAlgorithm.RS256)
 			.compact();
 
 		return new AuthDto.TokenDto(accessToken, refreshToken);
@@ -94,7 +110,7 @@ public class JwtTokenProvider implements InitializingBean {
 	public Claims getClaims(String token) {
 		try {
 			return Jwts.parserBuilder()
-				.setSigningKey(signingKey)
+				.setSigningKey(signingKeyPair.getPublic())
 				.build()
 				.parseClaimsJws(token)
 				.getBody();
@@ -114,16 +130,17 @@ public class JwtTokenProvider implements InitializingBean {
 	}
 
 	// == 토큰 검증 == //
-
 	public boolean validateRefreshToken(String refreshToken) {
 		try {
+			System.out.println("validateRefreshToken: 검증 " + redisService.getValues(refreshToken));
 			if (redisService.getValues(refreshToken).equals("delete")) { // 회원 탈퇴했을 경우
 				return false;
 			}
 			Jwts.parserBuilder()
-				.setSigningKey(signingKey)
+				.setSigningKey(signingKeyPair.getPublic())
 				.build()
 				.parseClaimsJws(refreshToken);
+			System.out.println("refreshToken: " + refreshToken);
 			return true;
 		} catch (SignatureException e) {
 			log.error("Invalid JWT signature.");
@@ -149,7 +166,7 @@ public class JwtTokenProvider implements InitializingBean {
 				return false;
 			}
 			Jwts.parserBuilder()
-				.setSigningKey(signingKey)
+				.setSigningKey(signingKeyPair.getPublic())
 				.build()
 				.parseClaimsJws(accessToken);
 			return true;

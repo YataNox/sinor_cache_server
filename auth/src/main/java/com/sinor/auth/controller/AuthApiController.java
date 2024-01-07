@@ -1,5 +1,7 @@
 package com.sinor.auth.controller;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,7 +56,9 @@ public class AuthApiController {
 
 	// 로그인 -> 토큰 발급
 	@PostMapping("/v1/login")
-	public ResponseEntity<?> login(@RequestBody @Valid AuthDto.LoginDto loginDto) {
+	public ResponseEntity<?> login(@RequestBody @Valid AuthDto.LoginDto loginDto) throws
+		NoSuchAlgorithmException,
+		InvalidKeySpecException {
 		// User 등록 및 Refresh Token 저장
 		AuthDto.TokenDto tokenDto = authService.login(loginDto);
 
@@ -88,7 +92,9 @@ public class AuthApiController {
 	// 토큰 재발급
 	@PostMapping("/v1/refresh")
 	public ResponseEntity<?> reissue(@CookieValue(name = "refresh-token") String requestRefreshToken,
-		@RequestHeader("Authorization") String requestAccessToken) {
+		@RequestHeader("Authorization") String requestAccessToken) throws
+		NoSuchAlgorithmException,
+		InvalidKeySpecException {
 		AuthDto.TokenDto reissuedTokenDto = authService.reissue(requestAccessToken, requestRefreshToken);
 		System.out.println("reissuedTokenDto : " + reissuedTokenDto);
 		if (reissuedTokenDto != null) { // 토큰 재발급 성공
@@ -102,6 +108,7 @@ public class AuthApiController {
 			Map<String,String> tokens = new HashMap<>();
 			tokens.put("accessToken", reissuedTokenDto.getAccessToken());
 			tokens.put("refreshToken", reissuedTokenDto.getRefreshToken());
+
 			return ResponseEntity
 				.status(HttpStatus.OK)
 				.header(HttpHeaders.SET_COOKIE, responseCookie.toString())

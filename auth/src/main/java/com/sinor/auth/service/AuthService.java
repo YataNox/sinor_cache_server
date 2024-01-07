@@ -1,6 +1,9 @@
 package com.sinor.auth.service;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,7 +32,7 @@ public class AuthService {
 	private final String SERVER = "Server";
 
 	// 로그인: 인증 정보 저장 및 비어 토큰 발급
-	public AuthDto.TokenDto login(AuthDto.LoginDto loginDto) {
+	public AuthDto.TokenDto login(AuthDto.LoginDto loginDto) throws NoSuchAlgorithmException, InvalidKeySpecException {
 		UsernamePasswordAuthenticationToken authenticationToken =
 			new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
 		Authentication authentication = authenticationManagerBuilder.getObject()
@@ -45,7 +48,9 @@ public class AuthService {
 	}
 
 	// 토큰 재발급: validate 메서드가 true 반환할 때만 사용 -> AT, RT 재발급
-	public AuthDto.TokenDto reissue(String requestAccessTokenInHeader, String requestRefreshToken) {
+	public AuthDto.TokenDto reissue(String requestAccessTokenInHeader, String requestRefreshToken) throws
+		NoSuchAlgorithmException,
+		InvalidKeySpecException {
 		String requestAccessToken = resolveToken(requestAccessTokenInHeader);
 
 		Authentication authentication = jwtTokenProvider.getAuthentication(requestAccessToken);
@@ -53,19 +58,23 @@ public class AuthService {
 
 		String refreshTokenInRedis = redisService.getValues("RT(" + SERVER + "):" + principal);
 		if (refreshTokenInRedis == null) { // Redis에 저장되어 있는 RT가 없을 경우
-			return null; // -> 재로그인 요청
-		}
-		// 요청된 RT의 유효성 검사 & Redis에 저장되어 있는 RT와 같은지 비교
-		if (!jwtTokenProvider.validateRefreshToken(requestRefreshToken) || !refreshTokenInRedis.equals(
-			requestRefreshToken)) {
-			redisService.deleteValues("RT(" + SERVER + "):" + principal); // 탈취 가능성 -> 삭제
+			System.out.println("Redis에 저장된 RT가 없습니다.");
 			return null; // -> 재로그인 요청
 		}
 
+		// 요청된 RT의 유효성 검사 & Redis에 저장되어 있는 RT와 같은지 비교
+		if(!jwtTokenProvider.validateRefreshToken(requestRefreshToken) || !Objects.equals(refreshTokenInRedis, requestRefreshToken)) {
+			// System.out.println("requestRefreshToken: " + requestRefreshToken);
+			System.out.println(!Objects.equals(refreshTokenInRedis, requestRefreshToken));
+			System.out.println("RT가 유효하지 않거나, Redis에 저장된 RT와 다릅니다.");
+			redisService.deleteValues("RT(" + SERVER + "):" + principal); // 탈취 가능성 -> 삭제
+			return null; // -> 재로그인 요청
+		}
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		String authorities = getAuthorities(authentication);
 
 		// 토큰 재발급 및 Redis 업데이트
+		System.out.println("Redis에 저장된 RT: " + redisService.getValues("RT(" + SERVER + "):" + principal));
 		redisService.deleteValues("RT(" + SERVER + "):" + principal); // 기존 RT 삭제
 		AuthDto.TokenDto tokenDto = jwtTokenProvider.createToken(principal, authorities);
 		saveRefreshToken(SERVER, principal, tokenDto.getRefreshToken());
@@ -73,7 +82,9 @@ public class AuthService {
 	}
 
 	// 토큰 발급
-	public AuthDto.TokenDto generateToken(String provider, String email, String authorities) {
+	public AuthDto.TokenDto generateToken(String provider, String email, String authorities) throws
+		NoSuchAlgorithmException,
+		InvalidKeySpecException {
 		// RT가 이미 있을 경우
 		if (redisService.getValues("RT(" + provider + "):" + email) != null) {
 			redisService.deleteValues("RT(" + provider + "):" + email); // 삭제
@@ -89,7 +100,7 @@ public class AuthService {
 		redisService.setValuesWithTimeout("RT(" + provider + "):" + principal, // key
 			refreshToken, // value
 			jwtTokenProvider.getTokenExpirationTime(refreshToken)); // timeout(milliseconds)
-		System.out.println("Redis에 저장된 RT: " + redisService.getValues("RT(" + provider + "):" + principal));
+		System.out.println("저장할때 메서드(저장된 RT): " + redisService.getValues("RT(" + provider + "):" + principal));
 	}
 
 	// 권한 이름 가져오기

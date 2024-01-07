@@ -11,18 +11,14 @@ logging:
     root: info
   pattern:
     console: "%d{dd-MM-yyyy HH:mm:ss} %magenta([%thread]) %highlight(%-5level) %logger.%M - %msg%n"
-jwt:
-  authorization: c2lub3I6c2lub3ItcTVuMmc=
-  username: sinor
-  password: sinor-q5n2g
 
 spring:
   security:
     oauth2:
       resourceserver:
         jwt:
-          public-key-location: classpath:publicKey.txt
           jws-algorithms: RS256
+          public-key-location: classpath:publicKey.txt
   redis:
     data:
       host: redisHost
