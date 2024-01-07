@@ -30,10 +30,10 @@ public interface IApiControllerV1 {
 	 * @param key 삭제할 캐시의 key 값
 	 */
 	@DeleteMapping("/admin/cache")
-	ResponseEntity<?> deletecache(@RequestParam String key);
+	ResponseEntity<?> deleteCache(@RequestParam String key);
 
-	@DeleteMapping("/admin/caches")
-	ResponseEntity<?> deletecaches(@RequestParam String url);
+	@DeleteMapping("/admin/cache/list")
+	ResponseEntity<?> deleteCacheList(@RequestParam String url);
 
 	/**
 	 *

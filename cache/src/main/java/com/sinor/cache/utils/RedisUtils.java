@@ -2,6 +2,9 @@ package com.sinor.cache.utils;
 
 import static com.sinor.cache.common.admin.AdminResponseStatus.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.Cursor;
@@ -106,8 +109,27 @@ public class RedisUtils {
 		}
 	}
 
+	/**
+	 * 여러 키들 동시 조회
+	 * @param keys 조회할 키들의 List
+	 * @return keys의 Value List
+	 */
+	public List<String> mgetRedisData(List<String> keys) throws AdminException{
+		List<String> list = redisTemplate.opsForValue().multiGet(keys);
+
+		// 비었으면 빈 List 반환
+		if(list == null || Objects.requireNonNull(list).isEmpty())
+			list = new ArrayList<>();
+
+		return list;
+	}
+
 	public Boolean deleteCache(String key) throws AdminException {
 		return redisTemplate.delete(key);
+	}
+
+	public Long deleteCache(List<String> keys){
+		return redisTemplate.delete(keys);
 	}
 
 	public void unlinkCache(String key) throws AdminException {

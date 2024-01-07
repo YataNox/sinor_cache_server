@@ -30,8 +30,8 @@ public class SecurityConfig {
 			.csrf(AbstractHttpConfigurer::disable)
 			.cors(AbstractHttpConfigurer::disable)
 			.authorizeHttpRequests(registry -> registry
-				.requestMatchers("/admin/**").hasRole("ADMIN")
-				.requestMatchers("/api/v**/authentication").permitAll()
+				//.requestMatchers("/admin/**").hasRole("ADMIN")
+				//.requestMatchers("/api/v**/authentication").permitAll()
 				.anyRequest().permitAll())
 			.oauth2ResourceServer(oauth2ResourceServer ->
 				oauth2ResourceServer.jwt(jwt ->

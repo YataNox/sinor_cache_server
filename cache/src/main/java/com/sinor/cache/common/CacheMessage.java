@@ -83,7 +83,7 @@ public class CacheMessage implements MessageListener {
 				ArrayList.class);
 		}
 
-		list.add(queryString);
+		list.add(key);
 		cacheListRedisUtils.setRedisData(path, jsonToStringConverter.objectToJson(list));
 	}
 
@@ -108,7 +108,7 @@ public class CacheMessage implements MessageListener {
 				ArrayList.class);
 		}
 
-		list.remove(queryString);
+		list.remove(key);
 		cacheListRedisUtils.setRedisData(path, jsonToStringConverter.objectToJson(list));
 	}
 

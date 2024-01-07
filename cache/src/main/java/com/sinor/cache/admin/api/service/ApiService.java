@@ -27,15 +27,15 @@ import lombok.extern.slf4j.Slf4j;
 public class ApiService implements IApiServiceV1 {
 
 	private final JsonToStringConverter jsonToStringConverter;
-	private final RedisUtils metadataRedisUtils;
+	private final RedisUtils cacheListRedisUtils;
 	private final MetadataService metadataService;
 	private final RedisUtils responseRedisUtils;
 
 	@Autowired
 	public ApiService(MetadataService metadataService, JsonToStringConverter jsonToStringConverter,
-		RedisUtils metadataRedisUtils, RedisUtils responseRedisUtils) {
+		RedisUtils cacheListRedisUtils, RedisUtils responseRedisUtils) {
 		this.metadataService = metadataService;
-		this.metadataRedisUtils = metadataRedisUtils;
+		this.cacheListRedisUtils = cacheListRedisUtils;
 		this.jsonToStringConverter = jsonToStringConverter;
 		this.responseRedisUtils = responseRedisUtils;
 	}
@@ -57,27 +57,21 @@ public class ApiService implements IApiServiceV1 {
 	}
 
 	/**
-	 * 패턴과 일치하는 캐시 조회
-	 * @param pattern 조회할 캐시들의 공통 패턴
+	 * path의 활성 캐시 목록 조회
+	 * @param path 조회할 캐시들의 path
 	 */
 	@Override
-	//TODO cacheListTemplate안의 path 키 값으로 저장되어 있는 ArrayList 안 queryString들을 이용해서 원하는 목록들만 조회할 수 있도록 변경 필요
-	public List<ApiGetResponse> findCacheList(String pattern) throws AdminException {
-		// 예를들어 expression path에 대한 캐시 목록들을 조회한다고 가정하면
-		// cacheListTemplate에서 expression key에 대한 캐시를 가져온다(value는 ArrayList)
-		// 해당 리스트 안에는 expression path에 대한 캐시가 활성화된 queryString값들이 들어있다.
-		// expression과 queryString, metadata의 version을  합쳐서 key값을 만든다.
-		// 조합한 key 값을 이용해서 response들을 조회한다.
-		List<ApiGetResponse> list = new ArrayList<>();
+	// 활성 캐시가 비어있을 경우 빈 리스트를 반환하도록 설정되어 있음, 에러 처리를 할 거면 mgetRedisData에서 처리할 것.
+	public List<ApiGetResponse> findCacheList(String path) throws AdminException {
+		// path의 활성 캐시 목록 조회 및 최신 버전 값 붙이기
+		ArrayList<String> uriList = jsonToStringConverter.jsontoClass(cacheListRedisUtils.getRedisData(path), ArrayList.class);
+		
+		// 활성 캐시들의 response 조회 및 ApiGetResponse 역직렬화
+		List<ApiGetResponse> response = responseRedisUtils.mgetRedisData(uriList).stream().map(
+			value -> jsonToStringConverter.jsontoClass(value, ApiGetResponse.class)
+		).toList();
 
-		Cursor<byte[]> cursor = responseRedisUtils.searchPatternKeys(pattern);
-
-		processCursor(cursor, list);
-
-		if (list.isEmpty())
-			throw new AdminException(CACHE_NOT_FOUND);
-
-		return list;
+		return response;
 	}
 
 	/**
@@ -115,22 +109,18 @@ public class ApiService implements IApiServiceV1 {
 	}
 
 	/**
-	 * 패턴과 일치하는 캐시 삭제
-	 * @param pattern 삭제할 캐시들의 공통 패턴
+	 * URI별 활성 캐시 리스트 삭제
+	 * @param path 삭제할 캐시들의 공통 path
 	 */
 	@Override
-	//TODO cacheListTemplate안의 path 키 값으로 저장되어 있는 ArrayList 안 queryString들을 이용해서 원하는 목록들만 삭제할 수 있도록 변경 필요
-	public void deleteCacheList(String pattern) throws AdminException {
-		// scan으로 키 조회
-		Cursor<byte[]> cursor = responseRedisUtils.searchPatternKeys(pattern);
+	public void deleteCacheList(String path) throws AdminException {
+		// path의 활성 캐시 목록 조회
+		ArrayList<String> uriList = jsonToStringConverter.jsontoClass(cacheListRedisUtils.getRedisData(path), ArrayList.class);
 
-		if (cursor == null)
-			throw new AdminException(CACHE_NOT_FOUND);
+		// 조회한 목록 삭제
+		Long count = responseRedisUtils.deleteCache(uriList);
 
-		// unlink로 키 삭제
-		while (cursor.hasNext()) {
-			responseRedisUtils.unlinkCache(new String(cursor.next(), UTF_8));
-		}
+		log.info(path + " 활성 캐시 " + count + "개 삭제");
 	}
 
 	/**

@@ -60,7 +60,7 @@ public class ApiController implements IApiControllerV1 {
 	 * @param key 삭제할 캐시의 key 값
 	 */
 	@Override
-	public ResponseEntity<?> deletecache(String key) {
+	public ResponseEntity<?> deleteCache(String key) {
 
 		//TODO 인코딩된 부분을 해결하기 위해 작성(개선 필요)
 		String encodingKey = URLEncoder.encode(key, StandardCharsets.UTF_8)
@@ -72,7 +72,7 @@ public class ApiController implements IApiControllerV1 {
 	}
 
 	@Override
-	public ResponseEntity<?> deletecaches(String url) {
+	public ResponseEntity<?> deleteCacheList(String url) {
 		apiService.deleteCacheList(url);
 		return ResponseEntity.status(ResponseStatus.SUCCESS.getCode()).body("삭제 성공");
 	}
