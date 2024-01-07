@@ -24,11 +24,9 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-
 	private final JwtTokenProvider jwtTokenProvider;
 	private final AuthenticationManagerBuilder authenticationManagerBuilder;
 	private final RedisService redisService;
-
 	private final String SERVER = "Server";
 
 	// 로그인: 인증 정보 저장 및 비어 토큰 발급
@@ -52,7 +50,6 @@ public class AuthService {
 		NoSuchAlgorithmException,
 		InvalidKeySpecException {
 		String requestAccessToken = resolveToken(requestAccessTokenInHeader);
-
 		Authentication authentication = jwtTokenProvider.getAuthentication(requestAccessToken);
 		String principal = getPrincipal(requestAccessToken);
 
@@ -61,11 +58,9 @@ public class AuthService {
 			System.out.println("Redis에 저장된 RT가 없습니다.");
 			return null; // -> 재로그인 요청
 		}
-
+		System.out.println("RT의 유효성 검사 : "+ jwtTokenProvider.validateRefreshToken(requestRefreshToken));
 		// 요청된 RT의 유효성 검사 & Redis에 저장되어 있는 RT와 같은지 비교
-		if(!jwtTokenProvider.validateRefreshToken(requestRefreshToken) || !Objects.equals(refreshTokenInRedis, requestRefreshToken)) {
-			// System.out.println("requestRefreshToken: " + requestRefreshToken);
-			System.out.println(!Objects.equals(refreshTokenInRedis, requestRefreshToken));
+		if(jwtTokenProvider.validateRefreshToken(requestRefreshToken) || !Objects.equals(refreshTokenInRedis, requestRefreshToken)) {
 			System.out.println("RT가 유효하지 않거나, Redis에 저장된 RT와 다릅니다.");
 			redisService.deleteValues("RT(" + SERVER + "):" + principal); // 탈취 가능성 -> 삭제
 			return null; // -> 재로그인 요청
