@@ -1,19 +1,18 @@
-package com.sinor.auth.service;
+package com.sinor.auth.user.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.sinor.auth.domain.Role;
-import com.sinor.auth.domain.User;
-import com.sinor.auth.dto.AuthDto;
-import com.sinor.auth.repository.UserRepository;
+import com.sinor.auth.auth.dto.AuthDto;
+import com.sinor.auth.user.domain.Role;
+import com.sinor.auth.user.domain.User;
+import com.sinor.auth.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements IUserServiceV1 {
 
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;

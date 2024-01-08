@@ -1,4 +1,4 @@
-package com.sinor.auth.security;
+package com.sinor.auth.user.details;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,11 +6,10 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.sinor.auth.domain.User;
+import com.sinor.auth.user.domain.User;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
 
 @Getter
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package com.sinor.auth.service;
+package com.sinor.auth.auth.service;
 
 import java.util.concurrent.TimeUnit;
 
@@ -10,13 +10,12 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class RedisService {
+public class RedisService implements IRedisServiceV1 {
 	/**
 	 * 	엑세스토큰과 리프래시 토큰의 발급은 성공적이였으나, 레디스에 저장 시킬 때 레디스에 저장이 안되는 문제가 생겼다.
 	 * 	그 후 레디스에서 리프래시 토큰값을 가져와서 검사를 한후 새로운 엑세스토큰을 발급해주는데 거기서 레디스에 저장된 리프래시 토큰값이 없다고 나온다.(레디스에 똑바로 저장이 안되는것)
 	 *
 	 */
-
 	private final RedisTemplate<String, String> redisTemplate;
 
 	@Transactional

@@ -1,4 +1,4 @@
-package com.sinor.auth.domain;
+package com.sinor.auth.user.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

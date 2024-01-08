@@ -1,16 +1,9 @@
-package com.sinor.auth.security;
+package com.sinor.auth.jwt;
 
-import java.security.Key;
-import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Date;
 
@@ -21,8 +14,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.sinor.auth.dto.AuthDto;
-import com.sinor.auth.service.RedisService;
+import com.sinor.auth.auth.dto.AuthDto;
+import com.sinor.auth.auth.service.RedisService;
+import com.sinor.auth.user.details.UserDetailsImpl;
+import com.sinor.auth.user.details.UserDetailsServiceImpl;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -30,8 +25,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,18 +32,15 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class JwtTokenProvider implements InitializingBean {
 
-	private final UserDetailsServiceImpl userDetailsService;
-	private final RedisService redisService;
-
-	private static final String AUTHORITIES_KEY = "roles";
-	private static final String EMAIL_KEY = "email";
-	private static final String url = "https://authHost:9000";
-
-	private final String secretKey;
-	private static KeyPair signingKeyPair;
-
-	private final Long accessTokenValidityInMilliseconds;
-	private final Long refreshTokenValidityInMilliseconds;
+	private static final String AUTHORITIES_KEY = "roles"; // 토큰에 저장할 권한 키
+	private static final String EMAIL_KEY = "email"; // 토큰에 저장할 키
+	private static final String url = "https://authHost:9000"; // 인증서버 주소
+	private static KeyPair signingKeyPair; // 비밀키, 공개키 쌍
+	private final UserDetailsServiceImpl userDetailsService; // 유저 정보
+	private final RedisService redisService; // 레디스
+	private final String secretKey; // 비밀키
+	private final Long accessTokenValidityInMilliseconds; // 엑세스 토큰 유효시간
+	private final Long refreshTokenValidityInMilliseconds; // 리프래시 토큰 유효시간
 
 	public JwtTokenProvider(
 		UserDetailsServiceImpl userDetailsService,

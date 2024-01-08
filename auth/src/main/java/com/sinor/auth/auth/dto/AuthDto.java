@@ -1,4 +1,4 @@
-package com.sinor.auth.dto;
+package com.sinor.auth.auth.dto;
 
 import lombok.AccessLevel;
 import lombok.Builder;

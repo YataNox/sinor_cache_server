@@ -1,11 +1,11 @@
-package com.sinor.auth.security;
+package com.sinor.auth.user.details;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import com.sinor.auth.domain.User;
-import com.sinor.auth.repository.UserRepository;
+import com.sinor.auth.user.domain.User;
+import com.sinor.auth.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 

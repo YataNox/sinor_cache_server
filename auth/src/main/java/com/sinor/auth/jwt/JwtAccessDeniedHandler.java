@@ -1,4 +1,4 @@
-package com.sinor.auth.security;
+package com.sinor.auth.jwt;
 
 import java.io.IOException;
 

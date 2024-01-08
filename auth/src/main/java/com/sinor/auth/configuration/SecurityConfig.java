@@ -4,9 +4,7 @@ import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -17,10 +15,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.sinor.auth.security.JwtAccessDeniedHandler;
-import com.sinor.auth.security.JwtAuthenticationEntryPoint;
-import com.sinor.auth.security.JwtAuthenticationFilter;
-import com.sinor.auth.security.JwtTokenProvider;
+import com.sinor.auth.jwt.JwtAccessDeniedHandler;
+import com.sinor.auth.jwt.JwtAuthenticationEntryPoint;
+import com.sinor.auth.jwt.JwtAuthenticationFilter;
+import com.sinor.auth.jwt.JwtTokenProvider;
+
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -46,6 +45,7 @@ public class SecurityConfig {
 			.ignoring()
 			.requestMatchers(PathRequest.toStaticResources().atCommonLocations()); // 정적 리소스들
 	}
+
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		// 인터셉터로 요청을 안전하게 보호하는 방법 설정

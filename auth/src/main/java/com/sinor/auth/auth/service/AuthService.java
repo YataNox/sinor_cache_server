@@ -1,4 +1,4 @@
-package com.sinor.auth.service;
+package com.sinor.auth.auth.service;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -12,10 +12,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.sinor.auth.dto.AuthDto;
-import com.sinor.auth.security.JwtTokenProvider;
+import com.sinor.auth.auth.dto.AuthDto;
+import com.sinor.auth.jwt.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AuthService {
+public class AuthService implements IAuthServiceV1 {
 	private final JwtTokenProvider jwtTokenProvider;
 	private final AuthenticationManagerBuilder authenticationManagerBuilder;
 	private final RedisService redisService;
@@ -58,9 +57,10 @@ public class AuthService {
 			System.out.println("Redis에 저장된 RT가 없습니다.");
 			return null; // -> 재로그인 요청
 		}
-		System.out.println("RT의 유효성 검사 : "+ jwtTokenProvider.validateRefreshToken(requestRefreshToken));
+		System.out.println("RT의 유효성 검사 : " + jwtTokenProvider.validateRefreshToken(requestRefreshToken));
 		// 요청된 RT의 유효성 검사 & Redis에 저장되어 있는 RT와 같은지 비교
-		if(jwtTokenProvider.validateRefreshToken(requestRefreshToken) || !Objects.equals(refreshTokenInRedis, requestRefreshToken)) {
+		if (jwtTokenProvider.validateRefreshToken(requestRefreshToken) || !Objects.equals(refreshTokenInRedis,
+			requestRefreshToken)) {
 			System.out.println("RT가 유효하지 않거나, Redis에 저장된 RT와 다릅니다.");
 			redisService.deleteValues("RT(" + SERVER + "):" + principal); // 탈취 가능성 -> 삭제
 			return null; // -> 재로그인 요청
@@ -77,9 +77,7 @@ public class AuthService {
 	}
 
 	// 토큰 발급
-	public AuthDto.TokenDto generateToken(String provider, String email, String authorities) throws
-		NoSuchAlgorithmException,
-		InvalidKeySpecException {
+	public AuthDto.TokenDto generateToken(String provider, String email, String authorities) {
 		// RT가 이미 있을 경우
 		if (redisService.getValues("RT(" + provider + "):" + email) != null) {
 			redisService.deleteValues("RT(" + provider + "):" + email); // 삭제

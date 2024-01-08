@@ -1,4 +1,4 @@
-package com.sinor.auth.controller;
+package com.sinor.auth.auth.controller;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -15,29 +15,18 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sinor.auth.dto.AuthDto;
-import com.sinor.auth.service.AuthService;
-import com.sinor.auth.service.UserService;
+import com.sinor.auth.auth.dto.AuthDto;
+import com.sinor.auth.auth.service.AuthService;
+import com.sinor.auth.user.service.UserService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class AuthApiController {
-	/**
-	 * 1. 회원가입
-	 * 2. 로그인 -> 토큰 발급
-	 * 3. 토큰 재발급
-	 * 4. 로그아웃
-	 *
-	 * 회원가입은 localhost/auth/v1/signup
-	 * Body Email,Password -> Json 형태로 전달
-	 *
-	 */
+public class AuthApiController implements IAuthApiControllerV1 {
 
 	private final AuthService authService;
 	private final UserService userService;
@@ -46,7 +35,7 @@ public class AuthApiController {
 	private final long COOKIE_EXPIRATION = 7776000; // 90일
 
 	// 회원가입
-	@PostMapping("/v1/signup")
+
 	public ResponseEntity<Void> signup(@RequestBody @Valid AuthDto.SignupDto signupDto) {
 		String encodedPassword = encoder.encode(signupDto.getPassword());
 		// AuthDto.SignupDto newSignupDto = AuthDto.SignupDto.encodePassword(signupDto, encodedPassword);
@@ -55,7 +44,6 @@ public class AuthApiController {
 	}
 
 	// 로그인 -> 토큰 발급
-	@PostMapping("/v1/login")
 	public ResponseEntity<?> login(@RequestBody @Valid AuthDto.LoginDto loginDto) throws
 		NoSuchAlgorithmException,
 		InvalidKeySpecException {
@@ -68,7 +56,7 @@ public class AuthApiController {
 			.httpOnly(true)
 			.secure(true)
 			.build();
-		Map<String,String> tokens = new HashMap<>();
+		Map<String, String> tokens = new HashMap<>();
 		tokens.put("accessToken", tokenDto.getAccessToken());
 		tokens.put("refreshToken", tokenDto.getRefreshToken());
 
@@ -77,10 +65,9 @@ public class AuthApiController {
 			// AT 저장
 			.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenDto.getAccessToken())
 			.body(tokens);
-			// .build();
+		// .build();
 	}
 
-	@PostMapping("/v1/validate")
 	public ResponseEntity<?> validate(@RequestHeader("Authorization") String requestAccessToken) {
 		if (!authService.validate(requestAccessToken)) {
 			return ResponseEntity.status(HttpStatus.OK).build(); // 재발급 필요X
@@ -90,7 +77,6 @@ public class AuthApiController {
 	}
 
 	// 토큰 재발급
-	@PostMapping("/v1/refresh")
 	public ResponseEntity<?> reissue(@CookieValue(name = "refresh-token") String requestRefreshToken,
 		@RequestHeader("Authorization") String requestAccessToken) throws
 		NoSuchAlgorithmException,
@@ -105,7 +91,7 @@ public class AuthApiController {
 				.httpOnly(true)
 				.secure(true)
 				.build();
-			Map<String,String> tokens = new HashMap<>();
+			Map<String, String> tokens = new HashMap<>();
 			tokens.put("accessToken", reissuedTokenDto.getAccessToken());
 			tokens.put("refreshToken", reissuedTokenDto.getRefreshToken());
 
@@ -115,7 +101,7 @@ public class AuthApiController {
 				// AT 저장
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + reissuedTokenDto.getAccessToken())
 				.body(tokens);
-				// .build();
+			// .build();
 		} else { // Refresh Token 탈취 가능성
 			System.out.println("재로그인 하세요");
 			// Cookie 삭제 후 재로그인 유도
